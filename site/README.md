@@ -19,6 +19,6 @@ The build also replaces Verso's generated viewport meta tag on every HTML page s
 
 The build adds the self-hosted Plausible script to every page for `slean.org`. The loader runs only on that hostname, so local previews do not send pageviews to the production property. Plausible handles history-based navigation within the site.
 
-The site introduces the validator and its limits. The CLI, schemas, and Lean source remain the normative interfaces. The site does not load a private source trace; the displayed case is synthetic. Its search is supplied by Verso.
+The site introduces the validator and its limits, then walks through the recorded AND/OR dependency gates in the checked schema 0.3 case. The gate chapter includes exact CLI output, prefixes 11–13, a local Explorer command, and unknown-versus-zero variants. The CLI, schemas, and Lean source remain the normative interfaces. The site does not load a private source trace; the displayed cases are synthetic. Its search is supplied by Verso.
 
 The layout borrows a chapter sidebar and searchable hierarchy from the [Lean Language Reference](https://lean-lang.org/doc/reference/latest/) and a clear reading progression from [The Rust Programming Language](https://doc.rust-lang.org/book/). Those are navigation principles, not copied screens or assets. The local design tokens and UI decisions are in [DESIGN.md](../DESIGN.md).

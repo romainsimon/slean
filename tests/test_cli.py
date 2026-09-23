@@ -168,6 +168,24 @@ class CliTests(unittest.TestCase):
         self.assertEqual(run_case(case, "view", "agent")[2], baseline_view)
         self.assertNotIn("private-artifact-1", run_case(case, "timeline", "agent")[2])
 
+    def test_gate_examples_preserve_unknown_vs_measured_zero(self):
+        expected = (
+            ("dependency-gates-unknown.json", "unknown", None, "undetermined", "defer"),
+            ("dependency-gates-zero.json", "measured", "0", "fail", "reject"),
+        )
+        for name, status, value, verdict, decision in expected:
+            with self.subTest(name=name):
+                path = EXAMPLES / name
+                code, result, _ = invoke("validate", path)
+                self.assertEqual((code, result["ok"], result["events"]), (0, True, 13))
+                _, view, _ = invoke("view", path, "agent")
+                self.assertEqual((view["observations"][0]["status"], view["observations"][0]["value"]),
+                                 (status, value))
+                self.assertEqual(view["decisions"][0]["result"], decision)
+                _, state, _ = invoke("replay", path)
+                self.assertEqual(state["assessments"][0]["verdict"], verdict)
+                self.assertEqual(len(state["dependency_gates"]), 2)
+
     def test_exact_decimal_and_cost_cap(self):
         case = fixture()
         case["events"][3]["payload"]["value"] = "0.0010000000000000000001"

@@ -142,3 +142,21 @@ gated["events"] += [
                                              "operator": "any_of", "kind": "support"}),
 ]
 save("dependency-gates.json", gated)
+
+# Keep the same recorded gates while varying the first observation. A later
+# positive observation and an OR assertion do not rewrite the earlier decision.
+gated_unknown = copy.deepcopy(gated)
+gated_unknown["events"][3]["payload"].update(status="unknown", value=None)
+gated_unknown["events"][5]["payload"]["verdict"] = "undetermined"
+gated_unknown["events"][6]["payload"].update(
+    result="defer", reason="Synthetic measurement is unavailable."
+)
+save("dependency-gates-unknown.json", gated_unknown)
+
+gated_zero = copy.deepcopy(gated)
+gated_zero["events"][3]["payload"].update(status="measured", value="0")
+gated_zero["events"][5]["payload"]["verdict"] = "fail"
+gated_zero["events"][6]["payload"].update(
+    result="reject", reason="Synthetic measured zero does not exceed the threshold."
+)
+save("dependency-gates-zero.json", gated_zero)
