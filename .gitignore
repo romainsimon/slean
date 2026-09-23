@@ -1,6 +1,8 @@
 /.lake/
 /site/.lake/
 /site/_out/
+/blueprint/.lake/
+/blueprint/_out/
 *.olean
 *.ilean
 *.trace

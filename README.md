@@ -22,6 +22,8 @@ The equivalent typed Lean example is [examples/Synthetic.lean](examples/Syntheti
 
 The [Verso manual](site/README.md) builds locally with compiled Lean snippets. It is a development preview, not a deployed site.
 
+The [same-case Blueprint prototype](blueprint/README.md) records what Blueprint already makes readable and where experimental journal review still needs Slean. The [comparison decision](docs/blueprint-comparison.md) scopes a local Explorer to journal prefixes and evidence.
+
 ## Contract and limits
 
 - `lean-toolchain` pins Lean 4.28.0. `lake-manifest.json` has no external packages; Mathlib is not required.
