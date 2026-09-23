@@ -9,15 +9,26 @@ open Verso.Genre.Manual.InlineLean
 shortTitle := "Slean"
 %%%
 
-Une décision de recherche est-elle cohérente avec les règles et les mesures consignées avant elle ? Slean aide à répondre à cette question sur un dossier que vous pouvez rejouer.
+Une décision de recherche suit-elle les règles et les mesures consignées avant elle ? Slean aide la personne qui prépare ou relit un dossier à vérifier cette cohérence, puis à retrouver chaque élément de la décision.
 
-Dans ce manuel, un *dossier* est un fichier JSON contenant une question, un protocole figé, un journal d'événements, des observations et une décision. Slean vérifie leurs références, leur ordre, une comparaison décimale exacte et un plafond de coût déclaré. Il ne réalise pas l'expérience et ne prouve pas que la mesure est vraie.
+Ici, un *dossier* est un fichier JSON contenant la question, le protocole figé, les observations, une décision et le journal des événements. L'exemple de ce manuel est entièrement inventé ; vous pouvez le comprendre sans installer Lean.
 
-Le parcours ci-dessous utilise `examples/valid.json`, un cas entièrement inventé. Vous allez constater que la règle exige une mesure supérieure à `0.001`, que l'observation vaut `0.002` et que la décision enregistrée est `promote`. Vous pourrez ensuite faire échouer le même contrôle en changeant l'unité de la mesure.
+*Lire le résultat en une minute*
+
+- *Règle fixée avant la mesure :* promouvoir seulement si `synthetic_delta` est strictement supérieur à `0.001 ratio`, avec un coût au plus égal à `10.00 cpu_s`.
+- *Ce qui est consigné :* une observation de `0.002 ratio` et un coût de `2.50 cpu_s`.
+- *Ce que Slean vérifie :* l'observation a la bonne métrique et la bonne unité, arrive après la règle et avant l'évaluation ; `0.002 > 0.001` et le coût reste sous le plafond.
+- *Ce que le dossier annonce :* l'évaluation `pass`, puis la décision `promote`. Slean vérifie que cette chaîne est cohérente. Il ne prend pas la décision à la place de l'auteur.
+
+Si l'unité de l'observation change, Slean signale `metric_unit` à `event-4`. Si la mesure manque, sa valeur est `null` et la décision est `defer` : une mesure absente n'est pas un zéro. Le [cas vérifié](commencer-par-un-cas-verifie/) montre les deux commandes utiles ; [lire la décision](lire-la-decision/) explique la chaîne et ses limites ; [les portes ET et OU](portes-et-ou/) ajoutent les liens consignés dans le schéma 0.3.
+
+Slean vérifie le format, les références, l'ordre et les règles locales du dossier. Il ne réalise pas l'expérience, n'authentifie pas le capteur et ne prouve pas que la mesure est vraie.
 
 Version de développement · schéma SLEANSCHEMAVERSIONTOKEN · Lean 4.28.0. Aucun tag n'est sélectionné pour ce build.
 
-Depuis la racine d'une copie locale de Slean, avec Lean installé, commencez par :
+*Essayer sur une copie locale*
+
+Si vous avez accès au dépôt et Lean installé, lancez depuis sa racine :
 
 ```
 lake build
@@ -30,7 +41,7 @@ La seconde commande affiche exactement :
 {"case_id":"synthetic-decision-1","events":10,"ok":true}
 ```
 
-`ok: true` signifie que le dossier respecte les contrôles pris en charge. Pour comprendre _pourquoi_ la décision passe et ce que ces contrôles laissent ouvert, suivez [le cas vérifié](commencer-par-un-cas-verifie/), puis [la lecture de la décision](lire-la-decision/). Le chapitre [portes ET et OU](portes-et-ou/) traite ensuite du schéma 0.3.
+`ok: true` signifie que le dossier respecte les contrôles pris en charge. Ce résultat ne certifie ni les données d'origine ni la vérité de la conclusion.
 
 # Commencer par un cas vérifié
 %%%

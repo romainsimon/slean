@@ -9,15 +9,26 @@ open Verso.Genre.Manual.InlineLean
 shortTitle := "Slean"
 %%%
 
-Does a research decision agree with the rules and measurements recorded before it? Slean helps answer that question for a case whose event history you can replay.
+Does a research decision follow the rules and measurements recorded before it? Slean helps someone preparing or reviewing a case check that consistency and trace each part of the decision.
 
-In this manual, a *case* is a JSON file containing a question, a frozen protocol, an event journal, observations, and a decision. Slean checks their references and order, one exact decimal comparison, and a stated cost cap. It does not run the experiment or prove that a measurement is true.
+Here, a *case* is a JSON file with the question, frozen protocol, observations, a decision, and an event journal. This manual's example is entirely invented; you can understand it without installing Lean.
 
-The walkthrough uses `examples/valid.json`, a wholly invented case. You will see a rule requiring a measurement greater than `0.001`, an observation of `0.002`, and a recorded `promote` decision. You can then make the same check fail by changing the observation's unit.
+*Read the result in one minute*
+
+- *Rule fixed before measurement:* promote only if `synthetic_delta` is strictly greater than `0.001 ratio`, with cost no higher than `10.00 cpu_s`.
+- *What was recorded:* an observation of `0.002 ratio` and a cost of `2.50 cpu_s`.
+- *What Slean checks:* the observation has the right metric and unit, follows the rule, and precedes the assessment; `0.002 > 0.001` and cost stays below the cap.
+- *What the case declares:* assessment `pass`, then decision `promote`. Slean checks that this chain is consistent. It does not make the author's decision.
+
+If the observation's unit changes, Slean reports `metric_unit` at `event-4`. If the measurement is missing, its value is `null` and the decision is `defer`: missing data is not zero. [The checked case](Start-with-a-checked-case/) shows the two useful commands; [read the decision](Read-the-decision/) explains the chain and its limits; [AND and OR gates](and-or-gates/) add the recorded links in schema 0.3.
+
+Slean checks case shape, references, order, and local rules. It does not run the experiment, authenticate the sensor, or prove that a measurement is true.
 
 Development preview · schema SLEANSCHEMAVERSIONTOKEN · Lean 4.28.0. No tag is selected for this build.
 
-From the root of a local Slean checkout, with Lean installed, start with:
+*Try it in a local checkout*
+
+If you have repository access and Lean installed, run from its root:
 
 ```
 lake build
@@ -30,7 +41,7 @@ The second command prints exactly:
 {"case_id":"synthetic-decision-1","events":10,"ok":true}
 ```
 
-`ok: true` means the case passes the checks Slean supports. To understand _why_ the decision passes and what those checks leave open, continue with [the checked case](Start-with-a-checked-case/) and then [the decision](Read-the-decision/). The [AND and OR gates](and-or-gates/) chapter then covers schema 0.3.
+`ok: true` means the case passes the checks Slean supports. It does not certify the source data or the truth of the conclusion.
 
 # Start with a checked case
 
