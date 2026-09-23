@@ -5,6 +5,7 @@
 /blueprint/.lake/
 /blueprint/_out/
 /explorer/_out/
+/explorer/node_modules/
 *.olean
 *.ilean
 *.trace

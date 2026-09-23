@@ -14,6 +14,8 @@ python3 -m http.server 8768 --directory explorer/_out/agent
 
 Open `http://127.0.0.1:8768/`. The default artifact is `explorer/_out/agent/` and contains HTML, CSS, JavaScript, and self-hosted fonts. It needs no network connection after generation. The included case is synthetic. The page opens at the latest prefix; use the slider, Previous and Next buttons, desktop journal list or mobile event picker, or record links to move between prefixes. The exact selected event is available under **Exact event record**.
 
+The interface source is `app.ts`. To change it, run `npm ci --prefix explorer`, then `npm run check:types --prefix explorer` and `npm run build --prefix explorer`. Commit the resulting `app.js` with the TypeScript source; `render.py` copies this compiled file into the standalone artifact. Readers need only the built artifact, not Node or TypeScript.
+
 To inspect the versioned grouping fixture, render `examples/dependency-gates.json` into a separate output directory such as `explorer/_out/gates`. Its `all_of` gate records two prerequisites of a decision; its `any_of` gate records two alternative observation references for a claim. The list spells out AND/OR, members, kind and target. The map gives each group its own labeled node between members and target. Neither view evaluates those dependencies or changes the assessment.
 
 To inspect owner-only events locally, pass `--audience owner --output explorer/_out/owner`. This creates a separate artifact with owner data embedded in HTML. Keep that directory private. The renderer refuses to reuse a populated output directory unless its marker belongs to the same case and audience. An invalid case produces no artifact.
