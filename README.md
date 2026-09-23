@@ -1,0 +1,34 @@
+# Slean V0 research dossier
+
+Slean is a local, pre-publication Lean 4 prototype for checking the structure and decision history of a research dossier. It does not evaluate the truth of an empirical claim. The current value gate recommends a reduced validator scope; see [the V report](docs/gate-v.md).
+
+## Build and inspect
+
+Install `elan`, then run:
+
+```sh
+lake build
+bash tests/check.sh
+lake exe slean validate examples/valid.json
+lake exe slean replay examples/valid.json 7
+lake exe slean export examples/valid.json agent
+lake exe slean view examples/valid.json agent
+lake exe slean proof-statement
+```
+
+`validate` returns a JSON result and a nonzero exit code on error. `replay` returns the state after a prefix of the journal. `export` writes a canonical V0 case to standard output. `view` derives observation and relation data from that projection. `proof` reports the local status of formal claims in a case. The CLI accepts `-` as an input path for standard input. Do not send a private owner export to an agent or a public channel.
+
+The equivalent typed Lean example is [examples/Synthetic.lean](examples/Synthetic.lean). Its agent JSON bytes match the JSON fixture projection. All checked-in examples are synthetic. The local trace audit reads source files but never writes their converted content: `python3 tools/audit_autoresearch_trace.py <trace-directory>`.
+
+## Contract and limits
+
+- `lean-toolchain` pins Lean 4.28.0. `lake-manifest.json` has no external packages; Mathlib is not required.
+- `schema/v0.1.0.schema.json` specifies the wire shape. Lean replay is normative for references, chronology, exact decisions, and stated cost caps. Unsupported versions fail; there is no implicit migration.
+- One exact decimal metric and one prior observation can support an automatic `pass` or `fail`. External rules stay `external_unverified`. Unknown and technical errors stay `undetermined`.
+- A routine `promote` needs prior passing evidence. A human `override` needs a reason and does not become a `pass`.
+- The only local `kernel_checked` claim is the pinned theorem in `Slean/Proof.lean`. Imported JSON status never grants this status. No independent checker is configured.
+- Agent projection filters hidden events before it computes the view. An owner-only case header is redacted. Agent-visible objects must be safe for that audience.
+
+This repository has no approved public license or deployment. Apache-2.0 is a proposal for owner review, not a license grant. Do not publish, deploy, or treat a compiled dossier as scientific validation.
+
+See [product scope](PRODUCT.md), [architecture](ARCHITECTURE.md), [fixture baseline](docs/baseline.md), and [gate results](ROADMAP.md).

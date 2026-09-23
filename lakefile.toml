@@ -1,0 +1,10 @@
+name = "Slean"
+version = "0.1.0"
+defaultTargets = ["Slean", "slean"]
+
+[[lean_lib]]
+name = "Slean"
+
+[[lean_exe]]
+name = "slean"
+root = "Main"
