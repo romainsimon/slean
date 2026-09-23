@@ -66,10 +66,30 @@ header {
 }
 
 header .header-logo-wrapper { flex-basis: 0; padding: 0; border: 0; }
-header .header-title-wrapper { min-width: 0; padding-left: clamp(1.25rem, 3vw, 2.5rem); }
+header .header-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-width: 0;
+  padding-left: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.mutome-header-link {
+  display: flex;
+  flex: none;
+  align-items: center;
+  opacity: 0.65;
+}
+
+.mutome-header-link:hover,
+.mutome-header-link:focus-visible { opacity: 1; }
+.mutome-wordmark { display: block; width: 6.25rem; height: auto; }
+.mutome-mark { display: none; }
 
 .header-title,
 .header-title:visited {
+  display: block;
+  flex: none;
   margin: 0;
   max-width: none;
   width: fit-content;
@@ -334,6 +354,10 @@ main li code {
   font-size: 0.9em;
 }
 
+@media (min-width: 701px) and (max-width: 900px) {
+  :root { --search-bar-width: 12rem; }
+}
+
 @media (max-width: 700px) {
   :root {
     --verso-header-height: 4rem;
@@ -343,8 +367,13 @@ main li code {
   }
 
   header { padding-right: calc(var(--search-bar-width) + 2rem); }
-  header .header-title-wrapper { padding-left: 0; }
-  .header-title { margin-left: calc(var(--verso-burger-width) + 1.5rem); }
+  header .header-title-wrapper {
+    gap: 0.6rem;
+    margin-left: calc(var(--verso-burger-width) + 1.5rem);
+    padding-left: 0;
+  }
+  .mutome-wordmark { display: none; }
+  .mutome-mark { display: block; width: 1.5rem; height: 1.5rem; }
   .brand-wordmark { display: none; }
   .brand-mark { display: block; width: 2.25rem; height: 2.25rem; }
   .language-switch { font-size: 0.75rem; }
@@ -367,7 +396,8 @@ main li code {
 
 @media (max-width: 360px) {
   :root { --search-bar-width: 7rem; }
-  .header-title { margin-left: calc(var(--verso-burger-width) + 1rem); }
+  header .header-title-wrapper { gap: 0.35rem; margin-left: calc(var(--verso-burger-width) + 1rem); }
+  .brand-mark { width: 2rem; height: 2rem; }
   .language-switch { gap: 0.05rem; }
   .language-switch a { padding-inline: 0.15rem; }
 }

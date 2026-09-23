@@ -45,6 +45,10 @@ for french_slug, english_slug in routes:
             raise SystemExit(f"Missing {locale} page: {page}")
         markup = page.read_text(encoding="utf-8")
         header_logo = (
+            '<a class="mutome-header-link" href="https://mutome.com/" aria-label="Mutome">'
+            '<img class="mutome-wordmark" src="assets/brand/mutome-logo.svg" alt="" width="214" height="64">'
+            '<img class="mutome-mark" src="assets/brand/mutome-mark.svg" alt="" width="128" height="128">'
+            '</a>'
             '<a href="" class="header-title"><h1>'
             '<img class="brand-wordmark" src="assets/brand/slean-dark.svg" alt="Slean" width="1460" height="430">'
             '<img class="brand-mark" src="assets/brand/slean-mark.svg" alt="Slean" width="430" height="430">'

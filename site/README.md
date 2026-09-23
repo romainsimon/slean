@@ -15,6 +15,8 @@ The normal build is a development preview and displays no release tag. The displ
 
 The site uses the supplied Slean vector wordmark in the header and on both title pages. The charcoal and white variants are kept in `assets/brand/`; the white variant is available for future dark surfaces. The mobile header and favicon use a small S mark derived from the same vector geometry. The PNG exports are omitted because the SVGs stay sharp at any size. The build copies these assets into both language outputs.
 
+The header places the official Mutome logo before Slean and links it to `https://mutome.com/`. It uses the smaller Mutome mark on narrow screens. Both SVGs are copied from Mutome's `public/brand/` assets into each language output, so the logo remains visible without a runtime request to the other site.
+
 The build also replaces Verso's generated viewport meta tag on every HTML page so users can zoom on mobile. It fails if any generated page has no viewport tag or more than one.
 
 The build adds the self-hosted Plausible script to every generated page for `slean.org`. The loader runs only on that hostname, so local previews do not send production pageviews. Plausible handles history-based navigation within the site. Verify a real pageview in Plausible after the public site is reachable.

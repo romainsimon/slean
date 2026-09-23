@@ -142,7 +142,7 @@ Satoshi files are not committed because its closed-source [ITF Free Font License
 
 ### Hierarchy
 
-- **Brand** (`brand`): supplied charcoal Slean vector wordmark in the white header and on the title page. The mobile header uses an S mark derived from the same geometry; its larger strokes remain readable at small sizes. The supplied white wordmark is retained for a future dark surface. The font token remains the fallback for generated text.
+- **Brand** (`brand`): supplied charcoal Slean vector wordmark in the white header and on the title page. A smaller Mutome logo precedes it and links to Mutome; on mobile, both brands use their marks. The supplied white Slean wordmark is retained for a future dark surface. The font token remains the fallback for generated text.
 - **Display** (`display`): title page heading, with a restrained responsive range.
 - **Lede** (`lede`): one prominent sentence directly under the title.
 - **Chapter** (`chapter`) and **Section** (`section`): bold sans headings with tight tracking; smaller subheads keep the same family.
