@@ -1,6 +1,7 @@
 """Release builds must name an exact, clean, annotated source tag."""
 
 import importlib.util
+import json
 import subprocess
 import tempfile
 import unittest
@@ -18,6 +19,37 @@ def git(repo: Path, *args: str) -> None:
 
 
 class BuildIdentityTests(unittest.TestCase):
+    def test_schema_identity_follows_checked_wire_contract(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            schema_dir = root / "schema"
+            schema_dir.mkdir()
+            for version in ("0.2.0", "0.3.0"):
+                schema = {
+                    "$id": f"urn:slean:schema:{version}",
+                    "properties": {
+                        "schema_version": {"const": version},
+                        "semantics_version": {"const": version},
+                    },
+                }
+                (schema_dir / f"v{version}.schema.json").write_text(json.dumps(schema))
+            self.assertEqual(identity.latest_schema_version(root), "0.3.0")
+
+            output = root / "output"
+            (output / "en").mkdir(parents=True)
+            (output / "index.html").write_text(identity.PREVIEW_TEXT["fr"])
+            (output / "en/index.html").write_text(identity.PREVIEW_TEXT["en"])
+            identity.preview_pages(output, identity.latest_schema_version(root))
+            self.assertIn("schéma 0.3.0", (output / "index.html").read_text())
+            self.assertIn("schema 0.3.0", (output / "en/index.html").read_text())
+            self.assertNotIn(identity.SCHEMA_MARKER, (output / "index.html").read_text())
+
+            bad = json.loads((schema_dir / "v0.3.0.schema.json").read_text())
+            bad["properties"]["semantics_version"]["const"] = "0.2.0"
+            (schema_dir / "v0.3.0.schema.json").write_text(json.dumps(bad))
+            with self.assertRaisesRegex(ValueError, "Version fields disagree"):
+                identity.latest_schema_version(root)
+
     def test_tag_requires_exact_annotated_clean_source(self):
         with tempfile.TemporaryDirectory() as directory:
             repo = Path(directory)
