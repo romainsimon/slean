@@ -9,7 +9,7 @@ bash site/build.sh
 python3 -m http.server 8765 --directory site/_out/html-multi
 ```
 
-Open `http://127.0.0.1:8765/` locally. `build.sh` first runs the repository test suite, then builds the manual and copies the self-hosted IBM Plex Sans and Literata fonts, including their OFL licenses, into the site artifact. `site/_out/html-multi/build-info.json` records the base commit, source-tree cleanliness, schema version, and Lean version. The development preview has no public release tag. A clean build identifies its exact source commit.
+Open `http://127.0.0.1:8765/` locally. `build.sh` first runs the repository test suite, then builds the manual and copies IBM Plex Sans and its OFL license into the site artifact. The interface uses Satoshi from the [Fontshare API](https://api.fontshare.com/v2/css?f%5B%5D=satoshi%40400%2C500%2C700&display=swap), with IBM Plex Sans as an offline fallback. The [ITF Free Font License](https://www.fontshare.com/licenses/itf-ffl) permits website use through that API and restricts redistribution of the font files, so the repository does not copy Satoshi binaries. `site/_out/html-multi/build-info.json` records the base commit, source-tree cleanliness, schema version, and Lean version. The development preview has no public release tag. A clean build identifies its exact source commit.
 
 The build also replaces Verso's generated viewport meta tag on every HTML page so users can zoom on mobile. It fails if any generated page has no viewport tag or more than one.
 

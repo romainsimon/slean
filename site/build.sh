@@ -16,8 +16,7 @@ if [[ -n "$(git -C "$repo_dir" status --porcelain -- . ':(exclude)https:/')" ]];
 fi
 printf '{"source_revision":"%s","source_tree_clean":%s,"schema_version":"0.2.0","lean_version":"4.28.0"}\n' "$revision" "$source_tree_clean" > _out/html-multi/build-info.json
 mkdir -p _out/html-multi/fonts
+rm -f _out/html-multi/fonts/literata-semibold.ttf _out/html-multi/fonts/OFL-literata.txt
 cp assets/fonts/ibm-plex-sans-regular.ttf _out/html-multi/fonts/
 cp assets/fonts/ibm-plex-sans-semibold.ttf _out/html-multi/fonts/
-cp assets/fonts/literata-semibold.ttf _out/html-multi/fonts/
 cp assets/fonts/OFL-ibm-plex-sans.txt _out/html-multi/fonts/
-cp assets/fonts/OFL-literata.txt _out/html-multi/fonts/
