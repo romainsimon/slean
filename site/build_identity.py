@@ -61,26 +61,26 @@ def stamp_pages(output: Path, tag: str, revision: str) -> int:
             raise ValueError(f"Expected one unstamped head in {page}")
         if markup.count(footer_marker) != 1:
             raise ValueError(f"Expected one manual content footer position in {page}")
-        locale = "en" if "en" in page.relative_to(output).parts else "fr"
-        for locale, title_page in roots.items():
+        page_locale = "en" if "en" in page.relative_to(output).parts else "fr"
+        for root_locale, title_page in roots.items():
             if page != title_page:
                 continue
-            preview = PREVIEW_TEXT[locale]
+            preview = PREVIEW_TEXT[root_locale]
             if markup.count(preview) != 1:
                 raise ValueError(f"Expected one development-status sentence in {page}")
             replacement = (
                 f"Manuel construit depuis le tag {safe_tag} · schéma {SCHEMA_VERSION} · Lean {LEAN_VERSION}."
-                if locale == "fr" else
+                if root_locale == "fr" else
                 f"Manual built from tag {safe_tag} · schema {SCHEMA_VERSION} · Lean {LEAN_VERSION}."
             )
             markup = markup.replace(preview, replacement, 1)
         updated[page] = markup.replace(
             "</head>", f'<meta name="slean-build-tag" content="{safe_tag}"></head>', 1
         )
-        footer_label = "Identité du build" if locale == "fr" else "Build identity"
+        footer_label = "Identité du build" if page_locale == "fr" else "Build identity"
         footer_text = (
             f"Tag du build : {safe_tag} · commit {short_revision}"
-            if locale == "fr" else f"Build tag: {safe_tag} · commit {short_revision}"
+            if page_locale == "fr" else f"Build tag: {safe_tag} · commit {short_revision}"
         )
         updated[page] = updated[page].replace(
             footer_marker,

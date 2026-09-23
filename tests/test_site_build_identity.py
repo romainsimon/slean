@@ -66,6 +66,10 @@ class BuildIdentityTests(unittest.TestCase):
                 self.assertIn('<meta name="slean-build-tag" content="v0.2.0">', markup)
                 self.assertIn("commit 0123456789ab", markup)
                 self.assertEqual(markup.count('class="slean-build-footer"'), 1)
+                if "en" in page.relative_to(output).parts:
+                    self.assertIn("Build tag: v0.2.0", markup)
+                else:
+                    self.assertIn("Tag du build : v0.2.0", markup)
             self.assertIn("Manuel construit depuis le tag v0.2.0", (output / "index.html").read_text())
             self.assertIn("Manual built from tag v0.2.0", (output / "en/index.html").read_text())
 
