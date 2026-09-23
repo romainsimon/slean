@@ -12,6 +12,7 @@ rm -rf _out/html-multi _out/en-render
 lake exe sleandocs
 python3 prepare_locales.py
 python3 fix_viewport.py
+python3 add_analytics.py
 python3 build_identity.py stamp
 for locale_dir in _out/html-multi _out/html-multi/en; do
   mkdir -p "$locale_dir/fonts"
