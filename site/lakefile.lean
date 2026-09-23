@@ -7,7 +7,7 @@ require verso from git "https://github.com/leanprover/verso.git" @ "v4.28.0"
 require Slean from ".."
 
 lean_lib SleanDocs where
-  roots := #[`SleanDocs]
+  roots := #[`SleanDocs, `SleanDocsFr]
 
 @[default_target]
 lean_exe sleandocs where

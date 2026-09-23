@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SCHEMAS = {version: json.loads((ROOT / f"schema/v{version}.schema.json").read_text())
-           for version in ("0.1.0", "0.2.0")}
+           for version in ("0.1.0", "0.2.0", "0.3.0")}
 
 
 def matches(schema, value, root):
@@ -30,7 +30,9 @@ def matches(schema, value, root):
     if kind == "boolean":
         return isinstance(value, bool)
     if kind == "array":
-        return isinstance(value, list) and all(matches(schema["items"], item, root) for item in value)
+        return (isinstance(value, list) and len(value) >= schema.get("minItems", 0)
+                and (not schema.get("uniqueItems") or len(value) == len({json.dumps(item, sort_keys=True) for item in value}))
+                and all(matches(schema["items"], item, root) for item in value))
     if kind == "object":
         if not isinstance(value, dict):
             return False
@@ -45,10 +47,23 @@ def matches(schema, value, root):
 
 class SchemaTests(unittest.TestCase):
     def test_checked_in_fixtures_share_wire_shape(self):
-        schema = SCHEMAS["0.1.0"]
         for path in sorted((ROOT / "examples").glob("*.json")):
             with self.subTest(path=path.name):
-                self.assertTrue(matches(schema, json.loads(path.read_text()), schema))
+                case = json.loads(path.read_text())
+                schema = SCHEMAS[case["schema_version"]]
+                self.assertTrue(matches(schema, case, schema))
+
+    def test_dependency_gates_require_versioned_operator_and_members(self):
+        case = json.loads((ROOT / "examples/dependency-gates.json").read_text())
+        schema = SCHEMAS["0.3.0"]
+        self.assertTrue(matches(schema, case, schema))
+        self.assertFalse(matches(SCHEMAS["0.2.0"], case, SCHEMAS["0.2.0"]))
+        gate = case["events"][-1]["payload"]
+        gate["member_refs"] = ["observation-1", "observation-1"]
+        self.assertFalse(matches(schema, case, schema))
+        gate["member_refs"] = ["observation-1", "observation-2"]
+        gate["operator"] = "unspecified"
+        self.assertFalse(matches(schema, case, schema))
 
     def test_extra_field_is_outside_versioned_contract(self):
         case = json.loads((ROOT / "examples/valid.json").read_text())

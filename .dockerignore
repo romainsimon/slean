@@ -5,8 +5,10 @@
 /blueprint/.lake/
 /blueprint/_out/
 /explorer/_out/
+**/__pycache__/
+*.pyc
 *.olean
 *.ilean
 *.trace
-__pycache__/
-*.pyc
+.DS_Store
+/https:/

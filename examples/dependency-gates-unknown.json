@@ -9,7 +9,7 @@
       "provenance": "synthetic://slean-v0",
       "version": 1
     },
-    "text": "The synthetic metric exceeds 0.001 on the stated input."
+    "text": "At least one synthetic input exceeds 0.001."
   },
   "domain": "synthetic-computation",
   "events": [
@@ -23,7 +23,7 @@
         "claim_ref": "claim-1",
         "cost_cap": "10.00",
         "cost_unit": "cpu_s",
-        "data_scope": "synthetic input A",
+        "data_scope": "synthetic inputs A and B",
         "direction": "gte",
         "evaluator_ref": "synthetic-evaluator-v1",
         "frozen_at": "2026-01-01T00:01:00Z",
@@ -36,7 +36,7 @@
         },
         "inclusive": false,
         "metric_id": "synthetic_delta",
-        "stop_rule": "one synthetic measurement",
+        "stop_rule": "up to two synthetic measurements",
         "threshold": "0.001",
         "unit": "ratio"
       },
@@ -217,20 +217,21 @@
     },
     {
       "actor": "synthetic-author",
-      "audience": "owner",
+      "audience": "agent",
       "domain": "synthetic-computation",
       "event_id": "event-9",
-      "kind": "artifact_registered",
+      "kind": "run_started",
       "payload": {
-        "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
         "identity": {
-          "audience": "owner",
+          "audience": "agent",
           "domain": "synthetic-computation",
-          "id": "private-artifact-1",
+          "id": "run-2",
           "provenance": "synthetic://slean-v0",
           "version": 1
         },
-        "media_type": "application/json"
+        "input_ref": "synthetic-input-B",
+        "protocol_ref": "protocol-1",
+        "seed": "8"
       },
       "provenance": "synthetic://slean-v0",
       "recorded_at": "2026-01-01T00:09:00Z",
@@ -239,29 +240,105 @@
     },
     {
       "actor": "synthetic-author",
-      "audience": "owner",
+      "audience": "agent",
       "domain": "synthetic-computation",
       "event_id": "event-10",
-      "kind": "observation_recorded",
+      "kind": "artifact_registered",
       "payload": {
-        "artifact_ref": "private-artifact-1",
+        "digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
         "identity": {
-          "audience": "owner",
+          "audience": "agent",
           "domain": "synthetic-computation",
-          "id": "private-observation-1",
+          "id": "artifact-2",
           "provenance": "synthetic://slean-v0",
           "version": 1
         },
-        "metric_id": "synthetic_delta",
-        "observed_at": "2026-01-01T00:10:00Z",
-        "run_ref": "run-1",
-        "status": "measured",
-        "unit": "ratio",
-        "value": "0.009"
+        "media_type": "application/json"
       },
       "provenance": "synthetic://slean-v0",
       "recorded_at": "2026-01-01T00:10:00Z",
       "sequence": 10,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-11",
+      "kind": "observation_recorded",
+      "payload": {
+        "artifact_ref": "artifact-2",
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "observation-2",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "metric_id": "synthetic_delta",
+        "observed_at": "2026-01-01T00:11:00Z",
+        "run_ref": "run-2",
+        "status": "measured",
+        "unit": "ratio",
+        "value": "0.003"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:11:00Z",
+      "sequence": 11,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-12",
+      "kind": "dependency_gate_recorded",
+      "payload": {
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "gate-all-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "kind": "prerequisite",
+        "member_refs": [
+          "protocol-1",
+          "assessment-1"
+        ],
+        "operator": "all_of",
+        "target_ref": "decision-1"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:12:00Z",
+      "sequence": 12,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-13",
+      "kind": "dependency_gate_recorded",
+      "payload": {
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "gate-any-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "kind": "support",
+        "member_refs": [
+          "observation-1",
+          "observation-2"
+        ],
+        "operator": "any_of",
+        "target_ref": "claim-1"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:13:00Z",
+      "sequence": 13,
       "version": 1
     }
   ],
@@ -274,9 +351,9 @@
       "provenance": "synthetic://slean-v0",
       "version": 1
     },
-    "text": "Does a synthetic candidate exceed a fixed threshold?"
+    "text": "Does either synthetic input exceed a fixed threshold?"
   },
-  "schema_version": "0.1.0",
-  "semantics_version": "0.1.0",
+  "schema_version": "0.3.0",
+  "semantics_version": "0.3.0",
   "version": 1
 }

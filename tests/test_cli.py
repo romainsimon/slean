@@ -53,12 +53,16 @@ class CliTests(unittest.TestCase):
                 self.assertEqual(a[1]["error"]["code"], reason)
 
     def test_unknown_error_and_override(self):
-        for name in ("unknown.json", "technical-error.json"):
+        for name, reason in (
+            ("unknown.json", "Synthetic measurement is unavailable."),
+            ("technical-error.json", "Synthetic measurement failed with a technical error."),
+        ):
             code, result, _ = invoke("validate", EXAMPLES / name)
             self.assertEqual((code, result["ok"]), (0, True))
             _, state, _ = invoke("replay", EXAMPLES / name)
             self.assertEqual(state["assessments"][0]["verdict"], "undetermined")
             self.assertEqual(state["decisions"][0]["result"], "defer")
+            self.assertEqual(state["decisions"][0]["reason"], reason)
         code, result, _ = invoke("validate", EXAMPLES / "override-no-reason.json")
         self.assertEqual(code, 1)
         self.assertEqual(result["error"]["code"], "override_reason")
@@ -115,6 +119,73 @@ class CliTests(unittest.TestCase):
         self.assertEqual(run_case(case, "timeline", "owner")[1]["audience"], "owner")
         self.assertEqual(invoke("timeline", EXAMPLES / "unit-mismatch.json", "agent")[1]["error"]["code"], "metric_unit")
 
+    def test_versioned_dependency_gates_and_audience_projection(self):
+        case = fixture("dependency-gates.json")
+        self.assertEqual(run_case(case)[0], 0)
+        state = run_case(case, "replay")[1]
+        self.assertEqual([(gate["operator"], gate["kind"]) for gate in state["dependency_gates"]],
+                         [("all_of", "prerequisite"), ("any_of", "support")])
+        view = run_case(case, "view", "agent")[1]
+        self.assertEqual(view["dependency_gates"][1]["member_refs"],
+                         ["observation-1", "observation-2"])
+        timeline = run_case(case, "timeline", "agent")[1]
+        self.assertEqual(len(timeline["snapshots"][11]["dependency_gates"]), 0)
+        self.assertEqual(len(timeline["snapshots"][12]["dependency_gates"]), 1)
+        self.assertEqual(len(timeline["snapshots"][13]["dependency_gates"]), 2)
+
+        changed = copy.deepcopy(case)
+        changed["schema_version"] = changed["semantics_version"] = "0.2.0"
+        self.assertEqual(run_case(changed)[1]["error"]["code"], "version")
+        changed = copy.deepcopy(case)
+        changed["events"][-1]["payload"]["member_refs"][1] = "future-object"
+        self.assertEqual(run_case(changed)[1]["error"]["code"], "missing_gate_ref")
+        changed = copy.deepcopy(case)
+        changed["events"][-1]["payload"]["member_refs"][1] = "observation-1"
+        self.assertEqual(run_case(changed)[1]["error"]["code"], "gate_members")
+        changed = copy.deepcopy(case)
+        changed["events"][-1]["payload"]["operator"] = "unknown"
+        self.assertEqual(run_case(changed)[1]["error"]["code"], "gate_operator")
+        changed = copy.deepcopy(case)
+        changed["events"][11]["recorded_at"] = "2026-01-01T00:05:00Z"
+        self.assertEqual(run_case(changed)[1]["error"]["code"], "gate_time")
+        changed = copy.deepcopy(case)
+        changed["events"][7]["payload"]["source_ref"] = "relation-1"
+        self.assertEqual(run_case(changed)[1]["error"]["code"], "missing_relation_ref")
+
+        baseline_export = run_case(case, "export", "agent")[2]
+        baseline_view = run_case(case, "view", "agent")[2]
+        private_artifact = copy.deepcopy(fixture()["events"][8])
+        private_artifact.update(event_id="event-14", sequence=14,
+                                recorded_at="2026-01-01T00:14:00Z")
+        hidden_gate = copy.deepcopy(case["events"][-1])
+        hidden_gate.update(event_id="event-15", sequence=15,
+                           recorded_at="2026-01-01T00:15:00Z")
+        hidden_gate["payload"]["identity"]["id"] = "gate-hidden-1"
+        hidden_gate["payload"]["member_refs"] = ["observation-1", "private-artifact-1"]
+        case["events"].extend([private_artifact, hidden_gate])
+        self.assertEqual(run_case(case)[0], 0)
+        self.assertEqual(run_case(case, "export", "agent")[2], baseline_export)
+        self.assertEqual(run_case(case, "view", "agent")[2], baseline_view)
+        self.assertNotIn("private-artifact-1", run_case(case, "timeline", "agent")[2])
+
+    def test_gate_examples_preserve_unknown_vs_measured_zero(self):
+        expected = (
+            ("dependency-gates-unknown.json", "unknown", None, "undetermined", "defer"),
+            ("dependency-gates-zero.json", "measured", "0", "fail", "reject"),
+        )
+        for name, status, value, verdict, decision in expected:
+            with self.subTest(name=name):
+                path = EXAMPLES / name
+                code, result, _ = invoke("validate", path)
+                self.assertEqual((code, result["ok"], result["events"]), (0, True, 13))
+                _, view, _ = invoke("view", path, "agent")
+                self.assertEqual((view["observations"][0]["status"], view["observations"][0]["value"]),
+                                 (status, value))
+                self.assertEqual(view["decisions"][0]["result"], decision)
+                _, state, _ = invoke("replay", path)
+                self.assertEqual(state["assessments"][0]["verdict"], verdict)
+                self.assertEqual(len(state["dependency_gates"]), 2)
+
     def test_exact_decimal_and_cost_cap(self):
         case = fixture()
         case["events"][3]["payload"]["value"] = "0.0010000000000000000001"
@@ -126,9 +197,25 @@ class CliTests(unittest.TestCase):
         case["events"][4]["payload"]["amount"] = "10.01"
         code, result, _ = run_case(case)
         self.assertEqual((code, result["error"]["code"]), (1, "cost_cap_exceeded"))
+        case["events"][4]["payload"]["coverage"] = "partial"
+        code, result, _ = run_case(case)
+        self.assertEqual((code, result["error"]["code"]), (1, "cost_cap_exceeded"))
         case = fixture()
         case["events"][4]["payload"]["amount"] = "-1"
         self.assertEqual(run_case(case)[1]["error"]["code"], "cost")
+
+    def test_audiences_follow_the_wire_contract(self):
+        for field in ("question", "claim"):
+            case = fixture()
+            case[field]["identity"]["audience"] = "private"
+            self.assertEqual(run_case(case)[1]["error"]["code"], "audience")
+        case = fixture()
+        case["events"][0]["audience"] = "private"
+        case["events"][0]["payload"]["identity"]["audience"] = "private"
+        self.assertEqual(run_case(case)[1]["error"]["code"], "audience")
+        case = fixture()
+        case["events"][0]["payload"]["identity"]["audience"] = "private"
+        self.assertEqual(run_case(case)[1]["error"]["code"], "audience")
 
     def test_decision_cannot_predate_assessment(self):
         case = fixture()
