@@ -15,7 +15,7 @@ The normal build is a development preview and displays no release tag. The displ
 
 The site uses the supplied Slean vector wordmark in the header and on both title pages. The charcoal and white variants are kept in `assets/brand/`; the white variant is available for future dark surfaces. The mobile header and favicon use a small S mark derived from the same vector geometry. The PNG exports are omitted because the SVGs stay sharp at any size. The build copies these assets into both language outputs.
 
-The header places the official Mutome logo before Slean and links it to `https://mutome.com/`. It uses the smaller Mutome mark on narrow screens. Both SVGs are copied from Mutome's `public/brand/` assets into each language output, so the logo remains visible without a runtime request to the other site.
+The header links a compact stack of all six Mutome letters before Slean to `https://mutome.com/`. It reproduces the closed state of Mutome's `MutomeUnfold` wordmark using six crops of the self-hosted `mutome-texture.webp` asset from Mutome's `public/brand/`; the same full stack appears at narrow sizes. The accessible link is named Mutome, and the build copies the texture into both language outputs without a runtime request to the other site.
 
 The build also replaces Verso's generated viewport meta tag on every HTML page so users can zoom on mobile. It fails if any generated page has no viewport tag or more than one.
 
