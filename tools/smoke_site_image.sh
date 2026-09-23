@@ -6,9 +6,11 @@ expected_sha="${2:?usage: smoke_site_image.sh IMAGE COMMIT_SHA}"
 [[ "$expected_sha" =~ ^[0-9a-f]{40}$ ]] || { echo "Expected a full Git SHA" >&2; exit 1; }
 
 container_name="slean-smoke-${RANDOM}-${RANDOM}"
+artifact_dir="$(mktemp -d)"
 cleanup() {
   docker stop "$container_name" >/dev/null 2>&1 || true
   docker container rm "$container_name" >/dev/null 2>&1 || true
+  rm -rf "$artifact_dir"
 }
 trap cleanup EXIT
 
@@ -41,14 +43,13 @@ done
 label_sha="$(docker image inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "$image_ref")"
 [[ "$label_sha" == "$expected_sha" ]] || { echo "Image revision label mismatch" >&2; exit 1; }
 
-mkdir -p site/_out/html-multi
-docker cp "$container_name:/usr/share/nginx/html/." site/_out/html-multi/
-EXPECTED_SHA="$expected_sha" python3 - <<'PY'
+docker cp "$container_name:/usr/share/nginx/html/." "$artifact_dir/"
+EXPECTED_SHA="$expected_sha" SLEAN_ARTIFACT_DIR="$artifact_dir" python3 - <<'PY'
 import json
 import os
 from pathlib import Path
 
-root = Path("site/_out/html-multi")
+root = Path(os.environ["SLEAN_ARTIFACT_DIR"])
 pages = list(root.rglob("*.html"))
 script = "https://stats.yukicapital.com/js/pa-70RUKb_J9zQLn67oUHf2d.js"
 old_scripts = ("https://stats.yukicapital.com/js/script.js", "https://plausible.io/js/")
@@ -66,3 +67,4 @@ for page in pages:
 assert not any(path.name in {".git", ".env"} for path in root.rglob("*"))
 print("Final image: exact SHA, healthy, 16 pages, one Plausible loader per page")
 PY
+SLEAN_TEST_ORIGIN="$origin" npm --prefix site run test:browser

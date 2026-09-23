@@ -2,17 +2,6 @@ name: Site final image
 
 on:
   pull_request:
-    paths:
-      - .dockerignore
-      - Dockerfile
-      - .github/workflows/site-runtime.yml
-      - tools/smoke_site_image.sh
-      - site/**
-      - Slean/**
-      - tests/**
-      - schema/**
-      - lean-toolchain
-      - lakefile.toml
   push:
     branches:
       - main
@@ -39,10 +28,10 @@ jobs:
           test -z "$(git status --porcelain)"
           candidate_sha="$(git rev-parse HEAD)"
           docker build --build-arg SOURCE_COMMIT="$candidate_sha" -t slean-site:candidate .
-      - name: Smoke final image without source mount
-        run: bash tools/smoke_site_image.sh slean-site:candidate "$(git rev-parse HEAD)"
-      - name: Browser security and local analytics checks on final files
+      - name: Install browser test runtime
         run: |
           (cd site && npm ci && npx playwright install --with-deps chromium)
-          npm --prefix site run test:browser
-          npm audit --prefix site --audit-level=high
+      - name: Smoke final image and browser through Nginx
+        run: bash tools/smoke_site_image.sh slean-site:candidate "$(git rev-parse HEAD)"
+      - name: Audit browser test dependency
+        run: npm audit --prefix site --audit-level=high

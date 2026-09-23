@@ -32,8 +32,11 @@ const server = http.createServer(async (request, response) => {
 });
 
 async function main() {
-  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-  const origin = `http://127.0.0.1:${server.address().port}`;
+  const externalOrigin = process.env.SLEAN_TEST_ORIGIN;
+  if (!externalOrigin) {
+    await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  }
+  const origin = externalOrigin || `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch({
     headless: true,
     executablePath: process.env.CHROME_PATH || undefined,
@@ -157,12 +160,12 @@ async function main() {
     console.log("FR/EN URL text, search, highlights, keyboard and xref passed");
   } finally {
     await browser.close();
-    await new Promise((resolve) => server.close(resolve));
+    if (server.listening) await new Promise((resolve) => server.close(resolve));
   }
 }
 
 main().catch((error) => {
   console.error(error);
-  server.close();
+  if (server.listening) server.close();
   process.exitCode = 1;
 });
