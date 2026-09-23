@@ -30,7 +30,7 @@ La seconde commande affiche exactement :
 {"case_id":"synthetic-decision-1","events":10,"ok":true}
 ```
 
-`ok: true` signifie que le dossier respecte les contrôles pris en charge. Pour comprendre _pourquoi_ la décision passe et ce que ces contrôles laissent ouvert, suivez [le cas vérifié](commencer-par-un-cas-verifie/), puis [la lecture de la décision](lire-la-decision/).
+`ok: true` signifie que le dossier respecte les contrôles pris en charge. Pour comprendre _pourquoi_ la décision passe et ce que ces contrôles laissent ouvert, suivez [le cas vérifié](commencer-par-un-cas-verifie/), puis [la lecture de la décision](lire-la-decision/). Le chapitre [portes ET et OU](portes-et-ou/) traite ensuite du schéma 0.3.
 
 # Commencer par un cas vérifié
 %%%
@@ -117,6 +117,67 @@ lake exe slean view examples/unknown.json agent
 
 L'observation y a `status: "unknown"` et `value: null` ; la décision est `defer`. `null` veut dire « aucune mesure disponible », pas zéro. L'exemple `technical-error.json` conserve aussi une valeur nulle et une décision différée, avec un état d'erreur technique distinct.
 
+La [lecture des portes ET et OU](portes-et-ou/) montre ensuite comment des dépendances consignées s'ajoutent au journal sans recalculer cette décision.
+
+# Lire les portes ET et OU
+%%%
+file := "portes-et-ou"
+tag := "portes-et-ou"
+%%%
+
+Une *porte de dépendance* décrit des liens ajoutés par l'auteur entre des éléments déjà enregistrés :
+
+- `all_of` (ET) : tous les membres sont présentés comme prérequis de la cible.
+- `any_of` (OU) : les membres sont présentés comme soutiens alternatifs.
+
+Slean vérifie la forme, les identifiants, l'antériorité et la visibilité de ces liens. La porte ne calcule pas si les membres sont vrais, suffisants ou scientifiquement probants.
+
+Depuis la racine du dépôt, validez le dossier synthétique au schéma `0.3.0` :
+
+```
+lake build
+lake exe slean validate examples/dependency-gates.json
+```
+
+La seconde commande affiche exactement :
+
+```
+{"case_id":"synthetic-decision-1","events":13,"ok":true}
+```
+
+`ok: true` confirme ici que les deux portes sont des enregistrements recevables et que leurs références existent au bon moment ; ce n'est pas une évaluation de ET ou de OU. Dans ce dossier, `event-12` ajoute `gate-all-1` : `protocol-1` ET `assessment-1` sont des prérequis consignés pour `decision-1`. `event-13` ajoute `gate-any-1` : `observation-1` OU `observation-2` sont des soutiens alternatifs consignés pour `claim-1`. Ces événements arrivent après la décision `event-7` ; ils ne transforment pas rétroactivement son évaluation.
+
+*Voir à quel moment chaque porte apparaît*
+
+```
+for n in 11 12 13; do
+  lake exe slean replay examples/dependency-gates.json "$n" |
+    python3 -c 'import json,sys; print(len(json.load(sys.stdin)["dependency_gates"]))'
+done
+```
+
+Le résultat est exactement `0`, puis `1`, puis `2` sur trois lignes. Un *préfixe* est le nombre d'événements du début du journal pris en compte. Le préfixe 11 se termine avant les portes ; 12 inclut ET ; 13 inclut ET et OU. `lake exe slean view examples/dependency-gates.json agent` expose leurs opérateurs, membres et cibles dans `dependency_gates`.
+
+Pour parcourir les mêmes préfixes dans l'Explorer local :
+
+```
+python3 explorer/render.py examples/dependency-gates.json --output explorer/_out/gates
+python3 -m http.server 8768 --directory explorer/_out/gates
+```
+
+Ouvrez `http://127.0.0.1:8768/`, puis sélectionnez les événements 11, 12 et 13. La liste lisible au clavier, le détail de l'événement exact et la carte 2D proviennent du même journal validé. La carte répète les liens consignés ; elle ne démontre pas leur vérité.
+
+*Ne pas confondre inconnu et zéro*
+
+Comparez les deux vues `agent` :
+
+```
+lake exe slean view examples/dependency-gates-unknown.json agent
+lake exe slean view examples/dependency-gates-zero.json agent
+```
+
+Dans le premier cas, la première observation a `status: "unknown"`, `value: null` et la décision antérieure est `defer` ; l'évaluation est `undetermined`. Dans le second, elle a `status: "measured"`, `value: "0"` et la décision est `reject` ; l'évaluation est `fail`. Les deux dossiers ont les mêmes portes ET/OU et une seconde observation positive enregistrée après la décision. La porte OU ne transforme donc ni l'absence de mesure en zéro, ni la décision passée en `promote`.
+
 # Suivre la provenance
 %%%
 file := "suivre-la-provenance"
@@ -157,7 +218,7 @@ Les commandes qui lisent un dossier acceptent aussi `-` comme chemin d'entrée s
 lake exe slean view examples/valid.json agent
 ```
 
-`examples/valid.json` est au schéma `0.1.0`. Le schéma `0.2.0` ajoute les enregistrements source réservés au propriétaire. Dans chaque dossier, `schema_version` et `semantics_version` doivent former une paire prise en charge ; Slean ne migre pas un dossier implicitement. Consultez `schema/v0.1.0.schema.json` et `schema/v0.2.0.schema.json` dans le dépôt pour les champs exacts. Les nombres décimaux exacts, comme `"0.002"`, sont des chaînes ; `null` reste distinct de `"0"`.
+`examples/valid.json` est au schéma `0.1.0`. Le schéma `0.2.0` ajoute les enregistrements source réservés au propriétaire ; `0.3.0` ajoute `dependency_gate_recorded` avec `all_of` ou `any_of`. Dans chaque dossier, `schema_version` et `semantics_version` doivent former une paire prise en charge ; Slean ne migre pas un dossier implicitement. Consultez `schema/v0.1.0.schema.json`, `schema/v0.2.0.schema.json` et `schema/v0.3.0.schema.json` dans le dépôt pour les champs exacts. Les nombres décimaux exacts, comme `"0.002"`, sont des chaînes ; `null` reste distinct de `"0"`.
 
 *Si vous écrivez du Lean*
 
@@ -168,6 +229,7 @@ L'API typée permet de construire le même type de dossier. Ces déclarations so
 #check Slean.replay
 #check Slean.assessExact
 #check Slean.project
+#check Slean.DependencyGate
 ```
 
 `examples/Synthetic.lean` contient le cas typé complet. `bash tests/check.sh` le compile et compare son export `agent` avec la fixture JSON, octet par octet. Un statut de preuve importé depuis JSON n'accorde jamais `kernel_checked` ; ce statut est réservé à la déclaration locale fixée et contrôlée par le noyau Lean.
@@ -178,8 +240,8 @@ file := "limites-et-etat-du-developpement"
 tag := "limites-et-etat-du-developpement"
 %%%
 
-*Slean vérifie ici :* la forme versionnée du dossier, les identifiants et références, l'ordre causal du journal, la comparaison décimale locale, le plafond de coût déclaré, la règle de promotion et la projection d'audience. Il peut montrer une erreur précise ou conserver un résultat indéterminé.
+*Slean vérifie ici :* la forme versionnée du dossier, les identifiants et références, l'ordre causal du journal, la comparaison décimale locale, le plafond de coût déclaré, la règle de promotion, les références des portes ET/OU et la projection d'audience. Il peut montrer une erreur précise ou conserver un résultat indéterminé.
 
-*Slean ne vérifie pas ici :* que la mesure a été réellement prise, que les octets d'un artefact sont authentiques, que l'horloge externe ou l'évaluateur est fiable, que la décision humaine est judicieuse, ou que l'affirmation scientifique est vraie. Le théorème Lean local porte sur une propriété conditionnelle du mécanisme, pas sur ces faits empiriques. Aucune vérification indépendante de preuve n'est configurée.
+*Slean ne vérifie pas ici :* que la mesure a été réellement prise, que les octets d'un artefact sont authentiques, que l'horloge externe ou l'évaluateur est fiable, qu'une porte ET/OU démontre sa cible, que la décision humaine est judicieuse, ou que l'affirmation scientifique est vraie. Le théorème Lean local porte sur une propriété conditionnelle du mécanisme, pas sur ces faits empiriques. Aucune vérification indépendante de preuve n'est configurée.
 
 Ce site est un prototype local antérieur à la publication. Les exemples sont synthétiques. La licence publique, la visibilité du dépôt, le domaine et les intégrations restent des décisions distinctes. La construction exécute les tests et compile les exemples avant de générer le manuel. `build-info.json` indique le commit source, la propreté de l'arbre, le schéma, Lean et le tag sélectionné ; un build sans tag reste une prévisualisation de développement.

@@ -14,6 +14,7 @@ english = root / "en"
 chapters = [
     ("commencer-par-un-cas-verifie", "Start-with-a-checked-case"),
     ("lire-la-decision", "Read-the-decision"),
+    ("portes-et-ou", "and-or-gates"),
     ("suivre-la-provenance", "Follow-provenance"),
     ("format-et-api", "Format-and-API"),
     ("limites-et-etat-du-developpement", "Limits-and-development-status"),

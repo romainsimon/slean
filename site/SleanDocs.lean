@@ -30,7 +30,7 @@ The second command prints exactly:
 {"case_id":"synthetic-decision-1","events":10,"ok":true}
 ```
 
-`ok: true` means the case passes the checks Slean supports. To understand _why_ the decision passes and what those checks leave open, continue with [the checked case](Start-with-a-checked-case/) and then [the decision](Read-the-decision/).
+`ok: true` means the case passes the checks Slean supports. To understand _why_ the decision passes and what those checks leave open, continue with [the checked case](Start-with-a-checked-case/) and then [the decision](Read-the-decision/). The [AND and OR gates](and-or-gates/) chapter then covers schema 0.3.
 
 # Start with a checked case
 
@@ -109,6 +109,67 @@ lake exe slean view examples/unknown.json agent
 
 Its observation has `status: "unknown"` and `value: null`; the decision is `defer`. `null` means “no measurement available,” not zero. The `technical-error.json` case also retains a null value and a deferred decision, with a distinct technical-error status.
 
+Next, [read the AND and OR gates](and-or-gates/) to see how recorded dependencies extend the journal without recalculating that decision.
+
+# Read AND and OR gates
+%%%
+file := "and-or-gates"
+tag := "and-or-gates"
+%%%
+
+A *dependency gate* describes links added by the author between records already in the case:
+
+- `all_of` (AND): every member is presented as a prerequisite of the target.
+- `any_of` (OR): the members are presented as alternative supports.
+
+Slean checks the shape, IDs, prior existence, and visibility of these links. The gate does not calculate whether the members are true, sufficient, or scientifically persuasive.
+
+From the repository root, validate the synthetic schema `0.3.0` case:
+
+```
+lake build
+lake exe slean validate examples/dependency-gates.json
+```
+
+The second command prints exactly:
+
+```
+{"case_id":"synthetic-decision-1","events":13,"ok":true}
+```
+
+Here `ok: true` confirms that both gates are admissible records with references available at the right time; it does not evaluate AND or OR. In this case, `event-12` adds `gate-all-1`: `protocol-1` AND `assessment-1` are recorded prerequisites for `decision-1`. `event-13` adds `gate-any-1`: `observation-1` OR `observation-2` are recorded alternative supports for `claim-1`. Both events follow the decision at `event-7`; they do not retroactively change its assessment.
+
+*See when each gate appears*
+
+```
+for n in 11 12 13; do
+  lake exe slean replay examples/dependency-gates.json "$n" |
+    python3 -c 'import json,sys; print(len(json.load(sys.stdin)["dependency_gates"]))'
+done
+```
+
+The exact output is `0`, then `1`, then `2` on separate lines. A *prefix* is the number of events from the beginning of the journal included in a replay. Prefix 11 ends before the gates; 12 includes AND; 13 includes both AND and OR. `lake exe slean view examples/dependency-gates.json agent` exposes their operators, members, and targets under `dependency_gates`.
+
+To inspect those same prefixes in the local Explorer:
+
+```
+python3 explorer/render.py examples/dependency-gates.json --output explorer/_out/gates
+python3 -m http.server 8768 --directory explorer/_out/gates
+```
+
+Open `http://127.0.0.1:8768/`, then select events 11, 12, and 13. The keyboard-readable list, exact selected event, and 2D map come from the same validated journal. The map repeats recorded links; it does not prove their truth.
+
+*Keep unknown distinct from zero*
+
+Compare the two `agent` views:
+
+```
+lake exe slean view examples/dependency-gates-unknown.json agent
+lake exe slean view examples/dependency-gates-zero.json agent
+```
+
+In the first case, the first observation has `status: "unknown"`, `value: null`, and the earlier decision is `defer`; its assessment is `undetermined`. In the second, it has `status: "measured"`, `value: "0"`, and the decision is `reject`; its assessment is `fail`. Both cases have the same AND/OR gates and a later positive second observation. The OR gate therefore turns neither missing data into zero nor the earlier decision into `promote`.
+
 # Follow provenance
 
 The view lets you follow the decision to its assessment, the assessment to `observation-1`, and the observation to `run-1` and `artifact-1`. These IDs are checked references in the case; the decision's prose alone is insufficient. `event-8` adds a support relation from the observation to `claim-1`, after the decision prefix.
@@ -141,7 +202,7 @@ Commands that read a case also accept `-` for standard input. For example, from 
 lake exe slean view examples/valid.json agent
 ```
 
-`examples/valid.json` uses schema `0.1.0`. Schema `0.2.0` adds owner-only source records. In each case, `schema_version` and `semantics_version` must be a supported pair; Slean does not migrate cases implicitly. See `schema/v0.1.0.schema.json` and `schema/v0.2.0.schema.json` in the repository for exact fields. Exact decimals such as `"0.002"` are strings; `null` remains distinct from `"0"`.
+`examples/valid.json` uses schema `0.1.0`. Schema `0.2.0` adds owner-only source records; `0.3.0` adds `dependency_gate_recorded` with `all_of` or `any_of`. In each case, `schema_version` and `semantics_version` must be a supported pair; Slean does not migrate cases implicitly. See `schema/v0.1.0.schema.json`, `schema/v0.2.0.schema.json`, and `schema/v0.3.0.schema.json` in the repository for exact fields. Exact decimals such as `"0.002"` are strings; `null` remains distinct from `"0"`.
 
 *If you write Lean*
 
@@ -152,14 +213,15 @@ The typed API can build the same kind of case. These declarations are checked as
 #check Slean.replay
 #check Slean.assessExact
 #check Slean.project
+#check Slean.DependencyGate
 ```
 
 `examples/Synthetic.lean` contains the complete typed case. `bash tests/check.sh` compiles it and compares its `agent` export byte for byte with the JSON fixture. Imported JSON proof-status text never grants `kernel_checked`; that status is reserved for the pinned local declaration checked by the Lean kernel.
 
 # Limits and development status
 
-*Slean checks here:* the versioned case shape, IDs and references, causal journal order, local exact decimal comparison, stated cost cap, promotion rule, and audience projection. It can report a precise error or preserve an undetermined result.
+*Slean checks here:* the versioned case shape, IDs and references, causal journal order, local exact decimal comparison, stated cost cap, promotion rule, AND/OR gate references, and audience projection. It can report a precise error or preserve an undetermined result.
 
-*Slean does not check here:* that the measurement happened, that artifact bytes are authentic, that an external clock or evaluator is reliable, that a human decision is wise, or that the scientific claim is true. The local Lean theorem concerns a conditional property of the mechanism, not those empirical facts. No independent proof checker is configured.
+*Slean does not check here:* that the measurement happened, that artifact bytes are authentic, that an external clock or evaluator is reliable, that an AND/OR gate proves its target, that a human decision is wise, or that the scientific claim is true. The local Lean theorem concerns a conditional property of the mechanism, not those empirical facts. No independent proof checker is configured.
 
 This site is a local pre-publication prototype. Its examples are synthetic. Public licensing, repository visibility, domain deployment, and integrations remain separate decisions. The build runs tests and compiles examples before generating the manual. `build-info.json` identifies the source commit, tree cleanliness, schema, Lean, and selected tag; a build without a tag remains a development preview.
