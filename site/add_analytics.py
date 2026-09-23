@@ -9,14 +9,21 @@ if not pages:
     raise SystemExit("No generated HTML pages found")
 
 marker = "data-slean-analytics"
-script_url = "https://stats.yukicapital.com/js/script.js"
+script_url = "https://stats.yukicapital.com/js/pa-70RUKb_J9zQLn67oUHf2d.js"
 snippet = f'''<script {marker}>
   (() => {{
     if (window.location.hostname !== "slean.org" ||
+        document.querySelector('script[src="{script_url}"]') ||
         document.querySelector('script[data-domain="slean.org"]')) return;
+    window.plausible = window.plausible || function() {{
+      (window.plausible.q = window.plausible.q || []).push(arguments);
+    }};
+    window.plausible.init = window.plausible.init || function(options) {{
+      window.plausible.o = options || {{}};
+    }};
+    window.plausible.init();
     const script = document.createElement("script");
-    script.defer = true;
-    script.dataset.domain = "slean.org";
+    script.async = true;
     script.src = "{script_url}";
     document.head.appendChild(script);
   }})();
