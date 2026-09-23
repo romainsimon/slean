@@ -14,6 +14,7 @@ python3 prepare_locales.py
 python3 harden_verso.py
 python3 fix_viewport.py
 python3 build_identity.py stamp
+python3 add_analytics.py
 for locale_dir in _out/html-multi _out/html-multi/en; do
   mkdir -p "$locale_dir/fonts"
   mkdir -p "$locale_dir/assets/brand"
