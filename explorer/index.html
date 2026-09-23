@@ -42,15 +42,23 @@
         <nav id="journal-list" aria-label="Journal events"></nav>
       </aside>
 
-      <div class="detail-column">
-        <section class="state-section" aria-labelledby="state-heading">
-          <div class="section-heading"><div><h2 id="state-heading">State at this point</h2><p id="state-subtitle"></p></div><span id="state-status" class="state-status"></span></div>
-          <div id="decision-content" class="decision-content"></div>
-        </section>
+      <section class="state-section" aria-labelledby="state-heading">
+        <div class="section-heading"><div><h2 id="state-heading">State at this point</h2><p id="state-subtitle"></p></div><span id="state-status" class="state-status"></span></div>
+        <div id="decision-content" class="decision-content"></div>
+      </section>
+    </div>
 
-        <section class="evidence-section" aria-labelledby="evidence-heading">
-          <div class="section-heading"><div><h2 id="evidence-heading">Evidence in scope</h2><p>Records introduced by this prefix</p></div></div>
-          <div id="evidence-content" class="evidence-content"></div>
+    <div class="review-grid">
+      <section class="evidence-section" aria-labelledby="evidence-heading">
+        <div class="section-heading"><div><h2 id="evidence-heading">Evidence in scope</h2><p>Records introduced by this prefix</p></div></div>
+        <div id="evidence-content" class="evidence-content"></div>
+      </section>
+
+      <div class="review-side">
+        <section class="relation-section" aria-labelledby="relation-heading">
+          <div class="section-heading"><div><h2 id="relation-heading">Recorded relation map</h2><p>The same relations listed in Evidence. Arrows show recorded direction, not proof.</p></div></div>
+          <p class="map-mobile-hint">Swipe the map sideways to follow a relation.</p>
+          <div class="relation-map-viewport" aria-hidden="true"><div id="relation-map-content"></div></div>
         </section>
 
         <section class="event-section" aria-labelledby="event-heading">

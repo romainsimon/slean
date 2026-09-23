@@ -55,6 +55,11 @@ function thresholdText(protocol) {
   return `${protocol.metric_id} ${symbol} ${protocol.threshold} ${protocol.unit}`;
 }
 
+function observationText(item) {
+  const value = item.value === null ? "value unavailable" : `${item.value} ${item.unit}`;
+  return `${item.metric_id}: ${value} · ${label(item.status)}`;
+}
+
 function renderDecision(state) {
   const target = byId("decision-content");
   const status = byId("state-status");
@@ -117,7 +122,7 @@ function renderEvidence(state) {
   clear(target);
   addGroup(target, "Protocols", state.protocols, item => thresholdText(item));
   addGroup(target, "Observations", state.observations,
-    item => `${item.metric_id}: ${item.value} ${item.unit} · ${label(item.status)}`);
+    item => observationText(item));
   addGroup(target, "Assessments", state.assessments,
     item => `${label(item.verdict)} · ${item.rule_used} · cites ${item.observation_refs.join(", ") || "no observations"}`);
   addGroup(target, "Costs", state.costs,
@@ -126,6 +131,133 @@ function renderEvidence(state) {
     item => `${label(item.kind)}: ${item.source_ref} → ${item.target_ref}`);
   addGroup(target, "Runs and artifacts", [...state.runs, ...state.artifacts],
     item => item.input_ref ? `Input ${item.input_ref} · protocol ${item.protocol_ref}` : `${item.media_type} · ${item.digest}`);
+}
+
+function relationNode(state, id) {
+  if (recordId(caseFile.claim) === id) return {kind: "Claim", summary: caseFile.claim.text};
+  const groups = [
+    ["Protocol", state.protocols, thresholdText],
+    ["Observation", state.observations, observationText],
+    ["Assessment", state.assessments, item => `${label(item.verdict)} · ${item.rule_used}`],
+    ["Decision", state.decisions, item => `${label(item.result)} · ${item.reason}`],
+    ["Cost", state.costs, item => `${item.amount} ${item.unit} · ${label(item.category)}`],
+    ["Run", state.runs, item => `Input ${item.input_ref} · protocol ${item.protocol_ref}`],
+    ["Artifact", state.artifacts, item => `${item.media_type} · ${item.digest}`],
+  ];
+  for (const [kind, records, summarize] of groups) {
+    const record = records.find(item => recordId(item) === id);
+    if (record) return {kind, summary: summarize(record)};
+  }
+  return {kind: "Record", summary: "No display details in this projection"};
+}
+
+function renderRelationMap(state) {
+  const target = byId("relation-map-content");
+  clear(target);
+  if (!state.relations.length) {
+    target.append(node("p", "record-empty", "No recorded relation at this prefix."));
+    return;
+  }
+
+  const ids = [...new Set(state.relations.flatMap(edge => [edge.source_ref, edge.target_ref]))];
+  if (ids.length > 24 || state.relations.length > 40) {
+    target.append(node("p", "record-empty", "This relation set is too large for the local map. Use the complete Relations list above."));
+    return;
+  }
+
+  const incoming = new Map(ids.map(id => [id, 0]));
+  const outgoing = new Map(ids.map(id => [id, []]));
+  const levels = new Map(ids.map(id => [id, 0]));
+  for (const edge of state.relations) {
+    incoming.set(edge.target_ref, incoming.get(edge.target_ref) + 1);
+    outgoing.get(edge.source_ref).push(edge.target_ref);
+  }
+  const queue = ids.filter(id => incoming.get(id) === 0);
+  let visited = 0;
+  for (let index = 0; index < queue.length; index += 1) {
+    const source = queue[index];
+    visited += 1;
+    for (const destination of outgoing.get(source)) {
+      levels.set(destination, Math.max(levels.get(destination), levels.get(source) + 1));
+      incoming.set(destination, incoming.get(destination) - 1);
+      if (incoming.get(destination) === 0) queue.push(destination);
+    }
+  }
+  if (visited !== ids.length) {
+    target.append(node("p", "record-empty", "The recorded relations form a cycle. Use the complete Relations list above."));
+    return;
+  }
+
+  const columns = [];
+  for (const id of ids) {
+    const level = levels.get(id);
+    if (!columns[level]) columns[level] = [];
+    columns[level].push(id);
+  }
+  const nodeWidth = 208;
+  const nodeHeight = 108;
+  const columnGap = 116;
+  const rowGap = 26;
+  const inset = 12;
+  const width = inset * 2 + columns.length * nodeWidth + (columns.length - 1) * columnGap;
+  const height = inset * 2 + Math.max(...columns.map(column => column.length)) * (nodeHeight + rowGap) - rowGap;
+  const positions = new Map();
+  columns.forEach((column, level) => column.forEach((id, row) => {
+    positions.set(id, {x: inset + level * (nodeWidth + columnGap), y: inset + row * (nodeHeight + rowGap)});
+  }));
+
+  const stage = node("div", "relation-map-stage");
+  stage.style.width = `${width}px`;
+  stage.style.height = `${height}px`;
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.classList.add("relation-map-lines");
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  const defs = document.createElementNS(svg.namespaceURI, "defs");
+  const marker = document.createElementNS(svg.namespaceURI, "marker");
+  marker.setAttribute("id", "relation-map-arrow");
+  marker.setAttribute("viewBox", "0 0 10 10");
+  marker.setAttribute("refX", "8");
+  marker.setAttribute("refY", "5");
+  marker.setAttribute("markerWidth", "8");
+  marker.setAttribute("markerHeight", "8");
+  marker.setAttribute("orient", "auto-start-reverse");
+  const arrow = document.createElementNS(svg.namespaceURI, "path");
+  arrow.setAttribute("d", "M 0 1 L 9 5 L 0 9 z");
+  marker.append(arrow);
+  defs.append(marker);
+  svg.append(defs);
+  for (const edge of state.relations) {
+    const from = positions.get(edge.source_ref);
+    const to = positions.get(edge.target_ref);
+    const x1 = from.x + nodeWidth + 4;
+    const y1 = from.y + nodeHeight / 2;
+    const x2 = to.x - 9;
+    const y2 = to.y + nodeHeight / 2;
+    const middle = (x1 + x2) / 2;
+    const path = document.createElementNS(svg.namespaceURI, "path");
+    path.classList.add("relation-map-edge");
+    path.setAttribute("d", `M ${x1} ${y1} C ${middle} ${y1}, ${middle} ${y2}, ${x2} ${y2}`);
+    path.setAttribute("marker-end", "url(#relation-map-arrow)");
+    svg.append(path);
+    const edgeLabel = document.createElementNS(svg.namespaceURI, "text");
+    edgeLabel.classList.add("relation-map-edge-label");
+    edgeLabel.setAttribute("x", String(middle));
+    edgeLabel.setAttribute("y", String((y1 + y2) / 2 - 8));
+    edgeLabel.textContent = label(edge.kind);
+    svg.append(edgeLabel);
+  }
+  stage.append(svg);
+  for (const id of ids) {
+    const position = positions.get(id);
+    const info = relationNode(state, id);
+    const card = node("div", "relation-map-node");
+    card.style.left = `${position.x}px`;
+    card.style.top = `${position.y}px`;
+    card.dataset.recordId = id;
+    card.append(node("span", "relation-map-kind", info.kind), node("strong", "", id), node("span", "relation-map-summary", info.summary));
+    stage.append(card);
+  }
+  target.append(stage);
 }
 
 function renderEvent(prefix) {
@@ -172,6 +304,7 @@ function setPrefix(value) {
   });
   renderDecision(state);
   renderEvidence(state);
+  renderRelationMap(state);
   renderEvent(prefix);
 }
 
