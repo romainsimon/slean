@@ -1,0 +1,381 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-23T14:24:44.594Z",
+  "title": "Design System: Slean Documentation",
+  "extensions": {
+    "colorMeta": {
+      "mineral-paper": {
+        "role": "neutral",
+        "displayName": "Mineral Paper",
+        "tonalRamp": [
+          "oklch(15% 0.007 132.4)",
+          "oklch(26% 0.007 132.4)",
+          "oklch(37% 0.007 132.4)",
+          "oklch(49% 0.007 132.4)",
+          "oklch(61% 0.007 132.4)",
+          "oklch(73% 0.007 132.4)",
+          "oklch(85% 0.007 132.4)",
+          "oklch(95% 0.007 132.4)"
+        ]
+      },
+      "evergreen-ink": {
+        "role": "primary",
+        "displayName": "Evergreen Ink",
+        "tonalRamp": [
+          "oklch(15% 0.021 191.2)",
+          "oklch(26% 0.021 191.2)",
+          "oklch(37% 0.021 191.2)",
+          "oklch(49% 0.021 191.2)",
+          "oklch(61% 0.021 191.2)",
+          "oklch(73% 0.021 191.2)",
+          "oklch(85% 0.021 191.2)",
+          "oklch(95% 0.021 191.2)"
+        ]
+      },
+      "evergreen-heading": {
+        "role": "primary",
+        "displayName": "Evergreen Heading",
+        "tonalRamp": [
+          "oklch(15% 0.035 180.9)",
+          "oklch(26% 0.035 180.9)",
+          "oklch(37% 0.035 180.9)",
+          "oklch(49% 0.035 180.9)",
+          "oklch(61% 0.035 180.9)",
+          "oklch(73% 0.035 180.9)",
+          "oklch(85% 0.035 180.9)",
+          "oklch(95% 0.035 180.9)"
+        ]
+      },
+      "evergreen-secondary": {
+        "role": "primary",
+        "displayName": "Evergreen Secondary",
+        "tonalRamp": [
+          "oklch(15% 0.044 171.2)",
+          "oklch(26% 0.044 171.2)",
+          "oklch(37% 0.044 171.2)",
+          "oklch(49% 0.044 171.2)",
+          "oklch(61% 0.044 171.2)",
+          "oklch(73% 0.044 171.2)",
+          "oklch(85% 0.044 171.2)",
+          "oklch(95% 0.044 171.2)"
+        ]
+      },
+      "rail-surface": {
+        "role": "neutral",
+        "displayName": "Rail Surface",
+        "tonalRamp": [
+          "oklch(15% 0.009 145.5)",
+          "oklch(26% 0.009 145.5)",
+          "oklch(37% 0.009 145.5)",
+          "oklch(49% 0.009 145.5)",
+          "oklch(61% 0.009 145.5)",
+          "oklch(73% 0.009 145.5)",
+          "oklch(85% 0.009 145.5)",
+          "oklch(95% 0.009 145.5)"
+        ]
+      },
+      "rail-ink": {
+        "role": "neutral",
+        "displayName": "Rail Ink",
+        "tonalRamp": [
+          "oklch(15% 0.027 180.8)",
+          "oklch(26% 0.027 180.8)",
+          "oklch(37% 0.027 180.8)",
+          "oklch(49% 0.027 180.8)",
+          "oklch(61% 0.027 180.8)",
+          "oklch(73% 0.027 180.8)",
+          "oklch(85% 0.027 180.8)",
+          "oklch(95% 0.027 180.8)"
+        ]
+      },
+      "selected-chapter": {
+        "role": "neutral",
+        "displayName": "Selected Chapter",
+        "tonalRamp": [
+          "oklch(15% 0.021 166.1)",
+          "oklch(26% 0.021 166.1)",
+          "oklch(37% 0.021 166.1)",
+          "oklch(49% 0.021 166.1)",
+          "oklch(61% 0.021 166.1)",
+          "oklch(73% 0.021 166.1)",
+          "oklch(85% 0.021 166.1)",
+          "oklch(95% 0.021 166.1)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "tonalRamp": [
+          "oklch(15% 0.022 154.0)",
+          "oklch(26% 0.022 154.0)",
+          "oklch(37% 0.022 154.0)",
+          "oklch(49% 0.022 154.0)",
+          "oklch(61% 0.022 154.0)",
+          "oklch(73% 0.022 154.0)",
+          "oklch(85% 0.022 154.0)",
+          "oklch(95% 0.022 154.0)"
+        ]
+      },
+      "rust-link": {
+        "role": "primary",
+        "displayName": "Rust Link",
+        "tonalRamp": [
+          "oklch(15% 0.117 33.3)",
+          "oklch(26% 0.117 33.3)",
+          "oklch(37% 0.117 33.3)",
+          "oklch(49% 0.117 33.3)",
+          "oklch(61% 0.117 33.3)",
+          "oklch(73% 0.117 33.3)",
+          "oklch(85% 0.117 33.3)",
+          "oklch(95% 0.117 33.3)"
+        ]
+      },
+      "rust-hover": {
+        "role": "primary",
+        "displayName": "Rust Hover",
+        "tonalRamp": [
+          "oklch(15% 0.087 32.4)",
+          "oklch(26% 0.087 32.4)",
+          "oklch(37% 0.087 32.4)",
+          "oklch(49% 0.087 32.4)",
+          "oklch(61% 0.087 32.4)",
+          "oklch(73% 0.087 32.4)",
+          "oklch(85% 0.087 32.4)",
+          "oklch(95% 0.087 32.4)"
+        ]
+      },
+      "rust-focus": {
+        "role": "primary",
+        "displayName": "Rust Focus",
+        "tonalRamp": [
+          "oklch(15% 0.126 35.8)",
+          "oklch(26% 0.126 35.8)",
+          "oklch(37% 0.126 35.8)",
+          "oklch(49% 0.126 35.8)",
+          "oklch(61% 0.126 35.8)",
+          "oklch(73% 0.126 35.8)",
+          "oklch(85% 0.126 35.8)",
+          "oklch(95% 0.126 35.8)"
+        ]
+      },
+      "search-field": {
+        "role": "neutral",
+        "displayName": "Search Field",
+        "tonalRamp": [
+          "oklch(15% 0.000 89.9)",
+          "oklch(26% 0.000 89.9)",
+          "oklch(37% 0.000 89.9)",
+          "oklch(49% 0.000 89.9)",
+          "oklch(61% 0.000 89.9)",
+          "oklch(73% 0.000 89.9)",
+          "oklch(85% 0.000 89.9)",
+          "oklch(95% 0.000 89.9)"
+        ]
+      },
+      "code-surface": {
+        "role": "neutral",
+        "displayName": "Code Surface",
+        "tonalRamp": [
+          "oklch(15% 0.009 134.9)",
+          "oklch(26% 0.009 134.9)",
+          "oklch(37% 0.009 134.9)",
+          "oklch(49% 0.009 134.9)",
+          "oklch(61% 0.009 134.9)",
+          "oklch(73% 0.009 134.9)",
+          "oklch(85% 0.009 134.9)",
+          "oklch(95% 0.009 134.9)"
+        ]
+      },
+      "code-border": {
+        "role": "neutral",
+        "displayName": "Code Border",
+        "tonalRamp": [
+          "oklch(15% 0.021 150.1)",
+          "oklch(26% 0.021 150.1)",
+          "oklch(37% 0.021 150.1)",
+          "oklch(49% 0.021 150.1)",
+          "oklch(61% 0.021 150.1)",
+          "oklch(73% 0.021 150.1)",
+          "oklch(85% 0.021 150.1)",
+          "oklch(95% 0.021 150.1)"
+        ]
+      },
+      "code-ink": {
+        "role": "neutral",
+        "displayName": "Code Ink",
+        "tonalRamp": [
+          "oklch(15% 0.028 176.7)",
+          "oklch(26% 0.028 176.7)",
+          "oklch(37% 0.028 176.7)",
+          "oklch(49% 0.028 176.7)",
+          "oklch(61% 0.028 176.7)",
+          "oklch(73% 0.028 176.7)",
+          "oklch(85% 0.028 176.7)",
+          "oklch(95% 0.028 176.7)"
+        ]
+      },
+      "inline-code-surface": {
+        "role": "neutral",
+        "displayName": "Inline Code Surface",
+        "tonalRamp": [
+          "oklch(15% 0.009 134.9)",
+          "oklch(26% 0.009 134.9)",
+          "oklch(37% 0.009 134.9)",
+          "oklch(49% 0.009 134.9)",
+          "oklch(61% 0.009 134.9)",
+          "oklch(73% 0.009 134.9)",
+          "oklch(85% 0.009 134.9)",
+          "oklch(95% 0.009 134.9)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Opening manual title."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "One-sentence proposition below the title."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Chapter and section headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Explanatory paragraphs."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Chapter navigation and progression labels."
+      },
+      "code": {
+        "displayName": "Code",
+        "purpose": "Commands, JSON, and Lean declarations."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "page-scroll",
+        "value": "smooth",
+        "purpose": "Ordinary anchor navigation; auto under reduced motion."
+      },
+      {
+        "name": "chapter-menu",
+        "value": "transform 0.4s ease",
+        "purpose": "Verso mobile table-of-contents reveal."
+      },
+      {
+        "name": "proof-expansion",
+        "value": "none",
+        "purpose": "Immediate expansion of labeled Lean proof cases."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "700px"
+      },
+      {
+        "name": "wide-reading-alignment",
+        "value": "1500px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Search field",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "White Verso search control in the pale header; its focused state uses the selected tint.",
+      "html": "<div class=\"ds-search\" role=\"combobox\" aria-expanded=\"false\" contenteditable=\"true\" data-placeholder=\"Search...\"></div>",
+      "css": ".ds-search { width:24rem; max-width:100%; min-height:1.8rem; box-sizing:border-box; background:white; color:#20302f; border:0; border-bottom:1px solid #b9c8bd; padding:.3rem .5rem; font:400 .9rem system-ui,sans-serif; cursor:text; } .ds-search:empty::before { content:attr(data-placeholder); color:#888; } .ds-search:hover,.ds-search:focus { background:#d4e5dd; outline:auto; } @media (max-width:700px) { .ds-search { width:12rem; } }"
+    },
+    {
+      "name": "Chapter rail",
+      "kind": "nav",
+      "refersTo": "chapter-rail",
+      "description": "Numbered contents on a pale rail; the current chapter receives a soft fill.",
+      "html": "<nav class=\"ds-rail\" aria-label=\"Table of Contents\"><strong>Table of Contents</strong><a class=\"ds-rail-current\" href=\"#\" aria-current=\"page\">1. Start with a checked case</a><a href=\"#\">2. Read the decision</a></nav>",
+      "css": ".ds-rail { width:18.5rem; max-width:100%; padding:1.5rem 1rem; background:#e9eee9; color:#263a36; border-right:1px solid #b9c8bd; font:400 1rem/1.45 \"Slean Sans\",\"IBM Plex Sans\",sans-serif; } .ds-rail strong { display:block; margin-bottom:.8rem; font-weight:600; } .ds-rail a { display:block; padding:.3rem .5rem; color:#263a36; text-decoration:none; } .ds-rail a:hover { text-decoration:underline; } .ds-rail a:focus-visible { outline:3px solid #a44931; outline-offset:3px; } .ds-rail .ds-rail-current { background:#d4e5dd; }"
+    },
+    {
+      "name": "Chapter index row",
+      "kind": "nav",
+      "refersTo": "chapter-index-row",
+      "description": "Full-width numbered contents row on the title page.",
+      "html": "<a class=\"ds-chapter-row\" href=\"#\"><span>1.</span><span>Start with a checked case</span></a>",
+      "css": ".ds-chapter-row { display:flex; gap:.9rem; padding:.9rem .2rem; border-top:1px solid #b9c8bd; border-bottom:1px solid #b9c8bd; color:#20302f; font:600 1rem/1.45 \"Slean Sans\",\"IBM Plex Sans\",sans-serif; text-decoration:none; } .ds-chapter-row span:first-child { min-width:1.5rem; font-variant-numeric:tabular-nums; } .ds-chapter-row:hover { color:#8b3827; } .ds-chapter-row:focus-visible { outline:3px solid #a44931; outline-offset:3px; }"
+    },
+    {
+      "name": "Next chapter link",
+      "kind": "nav",
+      "refersTo": "next-chapter-link",
+      "description": "Rust sequence link at a chapter boundary.",
+      "html": "<a class=\"ds-next\" href=\"#\"><span>1. Start with a checked case</span><span aria-hidden=\"true\">→</span></a>",
+      "css": ".ds-next { display:flex; justify-content:flex-end; gap:.5rem; border-top:1px solid #b9c8bd; padding:.8rem 0; color:#8b3827; font:600 .9rem/1.45 \"Slean Sans\",\"IBM Plex Sans\",sans-serif; text-decoration:none; } .ds-next:hover { color:#652b20; text-decoration:underline; } .ds-next:focus-visible { outline:3px solid #a44931; outline-offset:3px; }"
+    },
+    {
+      "name": "Code block",
+      "kind": "custom",
+      "refersTo": "code-block",
+      "description": "Bounded panel for a command, JSON response, or Lean declaration.",
+      "html": "<pre class=\"ds-code\" tabindex=\"0\"><code>lake exe slean validate examples/valid.json</code></pre>",
+      "css": ".ds-code { max-width:100%; overflow-x:auto; padding:1rem 1.2rem; background:#ecf0ea; color:#1b2f2a; border:1px solid #c3d0c5; border-radius:8px; font:400 .92rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace; } .ds-code:focus-visible { outline:3px solid #a44931; outline-offset:3px; }"
+    },
+    {
+      "name": "Inline code",
+      "kind": "custom",
+      "refersTo": "inline-code",
+      "description": "Quiet tint for an identifier within prose.",
+      "html": "<span class=\"ds-prose\">Inspect <code class=\"ds-inline-code\">Slean.CaseFile</code> in Lean.</span>",
+      "css": ".ds-prose { color:#20302f; font:400 1rem/1.58 \"Slean Sans\",\"IBM Plex Sans\",sans-serif; } .ds-inline-code { background:#e8ece6; border-radius:3px; padding:.06em .26em; font:.91em ui-monospace,SFMono-Regular,Menlo,monospace; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Research Dossier",
+    "overview": "This is the visual system for the local Slean Verso manual in **Mode Read**. It makes a research decision legible through a chaptered reading path, executable examples, and explicit scope. The atmosphere is quiet and exact: pale mineral paper, evergreen text, rust wayfinding, rules instead of cards, and type that separates a claim from its supporting detail.\n\nThe [Lean Language Reference](https://lean-lang.org/doc/reference/latest/) informs the persistent chapter hierarchy and search placement. [The Rust Programming Language book](https://doc.rust-lang.org/book/) informs the sequence from a working case through concepts and limits, with previous and next chapter navigation. Slean adapts those principles to its five-chapter dossier; it does not copy either site's assets or copy.\n\nThe documentation system does not prescribe the future Explorer. Explorer will need its own **Mode Operate** rules for inspecting and acting on case state, while keeping Slean's evidence boundaries and identity coherent.",
+    "keyCharacteristics": [
+      "A calm, pale reading surface with a fixed chapter rail at desktop widths.",
+      "A serif hierarchy for the title and section heads; sans serif prose and controls; monospace commands and Lean declarations.",
+      "Rust links and sequential navigation, with the synthetic example and the limits visible in the reading path.",
+      "Flat surfaces, fine rules, immediate proof-case expansion, and reduced-motion support."
+    ],
+    "rules": [
+      {
+        "name": "The Rust Wayfinding Rule",
+        "body": "Use rust for prose links, previous or next chapter progression, hovered index rows, and keyboard focus, not as a claim of validation or scientific status.",
+        "section": "colors"
+      },
+      {
+        "name": "The Claim and Detail Rule",
+        "body": "Let the serif heading state the question or section; put qualifications, commands, and boundaries in readable sans serif prose and code.",
+        "section": "typography"
+      },
+      {
+        "name": "The Bounded Reading Rule",
+        "body": "Keep the document measure controlled on wide screens and preserve a continuous single-column path on mobile.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Page Rule",
+        "body": "Give documentation hierarchy through measure, tint, border, and whitespace rather than elevation.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the documentation in Mode Read: claim, example, provenance, format, and limits remain easy to find.",
+      "Do use the numbered chapter rail, search, and previous or next links to support both lookup and linear reading.",
+      "Do keep commands and Lean declarations in bounded, horizontally scrollable code panels.",
+      "Do preserve visible focus and the reduced-motion behavior."
+    ],
+    "donts": [
+      "Don't use color or decoration to imply that a synthetic example proves an empirical result.",
+      "Don't turn body prose into cards or add ambient shadows to the reading layout.",
+      "Don't copy a complete Lean Reference or Rust Book screen, its protected assets, or its prose.",
+      "Don't apply these documentation layout rules to Explorer without a separate Mode Operate design pass."
+    ]
+  }
+}

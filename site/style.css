@@ -1,0 +1,234 @@
+@font-face {
+  font-family: "Slean Sans";
+  src: url("fonts/ibm-plex-sans-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Slean Sans";
+  src: url("fonts/ibm-plex-sans-semibold.ttf") format("truetype");
+  font-weight: 600 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Slean Display";
+  src: url("fonts/literata-semibold.ttf") format("truetype");
+  font-weight: 600 800;
+  font-display: swap;
+}
+
+:root {
+  --verso-content-max-width: 48rem;
+  --verso-header-height: 4.25rem;
+  --verso-toc-width: 18.5rem;
+  --verso--content-padding-x: clamp(1.25rem, 3vw, 3.5rem);
+  --verso-structure-font-family: "Slean Sans", sans-serif;
+  --verso-text-font-family: "Slean Sans", sans-serif;
+  --verso-code-font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --verso-text-color: #20302f;
+  --verso-code-color: #20302f;
+  --verso-structure-color: #20302f;
+  --verso-toc-background-color: #e9eee9;
+  --verso-toc-text-color: #263a36;
+  --verso-selected-color: #d4e5dd;
+  --verso-burger-toc-hidden-color: #263a36;
+  --verso-burger-toc-hidden-shadow-color: #f4f7f2;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #f4f7f2;
+  color: #20302f;
+  font-family: var(--verso-text-font-family);
+  line-height: 1.58;
+  scrollbar-color: #a6b7ac #e9eee9;
+  accent-color: #a44931;
+}
+
+::selection { background: #cbded3; color: #152925; }
+
+header {
+  background: #f4f7f2;
+  border-bottom: 1px solid #b9c8bd;
+  box-shadow: none;
+}
+
+.header-logo-wrapper {
+  border-right: 1px solid #b9c8bd;
+  padding-left: 1.3rem;
+}
+
+.header-title,
+.header-title:visited {
+  font-family: "Slean Display", Georgia, serif;
+  font-weight: 600;
+  color: #18342f;
+  letter-spacing: -0.025em;
+}
+
+.header-title h1 {
+  font-family: "Slean Display", Georgia, serif;
+  font-weight: 600;
+}
+
+#search-wrapper,
+#search-wrapper .combobox,
+#search-wrapper .group,
+#cb1-input {
+  background: #f4f7f2;
+}
+
+#cb1-input { border-color: #b9c8bd; }
+
+.permalink-widget a { font-size: 0; }
+.permalink-widget a::after {
+  content: "#";
+  font-family: var(--verso-structure-font-family);
+  font-size: 0.72rem;
+}
+
+#toc {
+  border-right: 1px solid #b9c8bd;
+  box-shadow: none;
+}
+
+#toc a,
+#toc a:visited { color: #263a36; }
+
+#toc .split-toc tr:has(a[aria-current="page"]) {
+  background: #d4e5dd;
+}
+
+main .content-wrapper { padding-top: clamp(2rem, 4vw, 4.4rem); }
+
+main .titlepage { margin: 2.1rem 0 4.5rem; }
+
+main .titlepage h1 {
+  text-align: left;
+  font-family: "Slean Display", Georgia, serif;
+  font-size: clamp(3.25rem, 5vw, 5.4rem);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  color: #18342f;
+  margin: 0 0 1.8rem;
+}
+
+main .titlepage > p:first-of-type {
+  font-family: "Slean Display", Georgia, serif;
+  font-size: clamp(1.45rem, 2.5vw, 2.15rem);
+  line-height: 1.3;
+  letter-spacing: -0.018em;
+  color: #2b4d42;
+  margin: 0 0 1.3rem;
+}
+
+main .titlepage > p:not(:first-of-type) {
+  max-width: 66ch;
+  margin: 0 0 1.25rem;
+}
+
+main h1,
+main h2,
+main h3 {
+  font-family: "Slean Display", Georgia, serif;
+  font-weight: 600;
+  color: #18342f;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+main h2 { margin-top: 2.8rem; }
+main h3 { margin-top: 2.2rem; }
+
+main p,
+main li { max-width: 69ch; }
+
+main a,
+main a:visited { color: #8b3827; text-underline-offset: 0.18em; }
+main a:hover { color: #652b20; }
+
+:where(a, button, input, summary, label):focus-visible {
+  outline: 3px solid #a44931;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+main ol.section-toc {
+  padding: 0;
+  margin: 1.8rem 0 4rem;
+  border-top: 1px solid #b9c8bd;
+}
+
+main .section-toc > li {
+  border-bottom: 1px solid #b9c8bd;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+  font-weight: 600;
+}
+
+main .section-toc > li a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  padding: 0.9rem 0.2rem;
+}
+
+main .section-toc > li a:hover { color: #8b3827; text-decoration: none; }
+main .section-toc .number { min-width: 1.5rem; font-variant-numeric: tabular-nums; }
+
+.prev-next-buttons {
+  max-width: var(--verso-content-max-width);
+  border-top: 1px solid #b9c8bd;
+  padding-top: 0.8rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.prev-next-buttons > *,
+.prev-next-buttons > *:visited { color: #8b3827; }
+
+main pre,
+main code.hl.lean.block {
+  background: #ecf0ea;
+  border: 1px solid #c3d0c5;
+  border-radius: 8px;
+  color: #1b2f2a;
+  padding: 1rem 1.2rem;
+  overflow-x: auto;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+/* Verso's labeled proof case uses a max-height transition. Keep expansion immediate. */
+.hl.lean .labeled-case > :not(:first-child) { transition: none; }
+
+main p code,
+main li code {
+  background: #e8ece6;
+  border-radius: 3px;
+  padding: 0.06em 0.26em;
+  font-size: 0.91em;
+}
+
+#cb1-input { color: #20302f; }
+
+@media (max-width: 700px) {
+  :root { --verso-header-height: 3.8rem; }
+  .header-title { font-size: 1.45rem; }
+  main .content-wrapper { padding-top: 1.5rem; }
+  main .titlepage { margin: 1.6rem 0 3rem; }
+  main .titlepage h1 { font-size: clamp(3rem, 12vw, 4.2rem); }
+  main .section-toc > li a { padding: 0.9rem 0; }
+  .prev-next-buttons > div:empty { display: none; }
+  .prev-next-buttons > a { flex: 0 0 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

@@ -20,6 +20,8 @@ lake exe slean proof-statement
 
 The equivalent typed Lean example is [examples/Synthetic.lean](examples/Synthetic.lean). Its agent JSON bytes match the JSON fixture projection. All checked-in examples are synthetic. The local trace audit reads source files but never writes their converted content: `python3 tools/audit_autoresearch_trace.py <trace-directory>`. Its report contains aggregate checks and field names, while the owner-only source JSON stays in memory.
 
+The [Verso manual](site/README.md) builds locally with compiled Lean snippets. It is a development preview, not a deployed site.
+
 ## Contract and limits
 
 - `lean-toolchain` pins Lean 4.28.0. `lake-manifest.json` has no external packages; Mathlib is not required.

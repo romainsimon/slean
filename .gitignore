@@ -1,4 +1,6 @@
 /.lake/
+/site/.lake/
+/site/_out/
 *.olean
 *.ilean
 *.trace
