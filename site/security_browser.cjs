@@ -80,6 +80,54 @@ async function main() {
       assert.deepEqual(domainErrors, []);
       await domainPage.close();
 
+      // This term used to close the generated highlight title attribute and
+      // create <observation> elements when a real page word was matched.
+      const adversarialTerm = '"><observation>';
+      const termPage = await context.newPage();
+      await termPage.goto(`${origin}/${locale}?terms=${encodeURIComponent(adversarialTerm)}`);
+      await termPage.locator(".text-search-results").first().waitFor();
+      assert.equal(await termPage.locator("observation").count(), 0);
+      assert.ok(
+        (await termPage.locator(".text-search-results").first().getAttribute("title")).includes(adversarialTerm),
+        "the matched URL term should stay in a plain title attribute"
+      );
+      await termPage.close();
+
+      // The old highlighter reparsed an entire matched text node as HTML. A
+      // harmless URL term must match text containing escaped markup here.
+      const fixturePage = await context.newPage();
+      const fixtureText = `observation ${marker}`;
+      const fixtureMarkup = fixtureText
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+      await fixturePage.route(`${origin}/${locale}?terms=observation`, async (route) => {
+        const response = await route.fetch();
+        const original = await response.text();
+        assert.ok(original.includes("<section>"), "generated manual needs a section");
+        await route.fulfill({
+          response,
+          body: original.replace(
+            "<section>",
+            `<section><p id="security-highlight-fixture">${fixtureMarkup}</p>`
+          ),
+        });
+      });
+      await fixturePage.goto(`${origin}/${locale}?terms=observation`);
+      await fixturePage.locator("#security-highlight-fixture .text-search-results").waitFor();
+      assert.equal(
+        await fixturePage.locator("#security-highlight-fixture").textContent(),
+        fixtureText,
+        "matched text must stay literal"
+      );
+      assert.equal(await fixturePage.locator("#security-highlight-fixture img[onerror]").count(), 0);
+      assert.equal(
+        await fixturePage.evaluate(() => document.documentElement.dataset.sleanReviewXss),
+        undefined,
+        "highlighted escaped text must not execute"
+      );
+      await fixturePage.close();
+
       const page = await context.newPage();
       await page.goto(`${origin}/${locale}?terms=observation`);
       assert.ok(await page.locator(".text-search-results").count() > 0, "normal term highlighting");
