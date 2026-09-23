@@ -39,4 +39,4 @@ The [local Explorer](explorer/README.md) renders those checked prefixes into a s
 
 This repository has no approved public license or deployment. Apache-2.0 is a proposal for owner review, not a license grant. Do not publish, deploy, or treat a compiled dossier as scientific validation.
 
-See [product scope](PRODUCT.md), [architecture](ARCHITECTURE.md), [fixture baseline](docs/baseline.md), and [gate results](ROADMAP.md).
+See [product scope](PRODUCT.md), [architecture](ARCHITECTURE.md), [fixture baseline](docs/baseline.md), [gate results](ROADMAP.md), and the [PRD acceptance audit](docs/prd-acceptance-audit.md) for local evidence and open release or human-study gates.

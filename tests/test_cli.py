@@ -206,6 +206,14 @@ class CliTests(unittest.TestCase):
         code, receipt, _ = run_case(case, "proof")
         self.assertEqual(code, 0)
         self.assertEqual(receipt[0]["status"], "kernel_checked")
+        contrary = copy.deepcopy(case)
+        contrary["events"][3]["payload"]["value"] = "0.000"
+        contrary["events"][5]["payload"]["verdict"] = "fail"
+        contrary["events"][6]["payload"].update(result="reject", reason="Below the frozen threshold.")
+        code, contrary_receipt, _ = run_case(contrary, "proof")
+        self.assertEqual(code, 0)
+        self.assertEqual(contrary_receipt[0]["status"], "kernel_checked")
+        self.assertEqual(contrary_receipt[0]["elaborated_statement"], receipt[0]["elaborated_statement"])
         exported = run_case(case, "export", "agent")[1]
         self.assertEqual(exported["events"][-1]["payload"]["status"], "declared")
         for key, value in (
