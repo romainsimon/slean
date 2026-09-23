@@ -80,8 +80,13 @@ header .header-title-wrapper { min-width: 0; padding-left: clamp(1.25rem, 3vw, 2
   letter-spacing: -0.025em;
 }
 
-.header-title h1 { font: inherit; }
-.header-title:hover { color: var(--slean-muted); }
+.header-title h1 { display: flex; align-items: center; margin: 0; font: inherit; }
+.brand-wordmark { display: block; width: 9.5rem; height: auto; }
+.brand-mark { display: none; }
+.header-title:hover { opacity: 0.7; }
+
+#toggle-toc-click { transition: none; }
+#toggle-toc-click .line { transition-property: background-color, transform; }
 
 .language-switch {
   display: flex;
@@ -89,6 +94,7 @@ header .header-title-wrapper { min-width: 0; padding-left: clamp(1.25rem, 3vw, 2
   align-items: center;
   gap: 0.2rem;
   color: var(--slean-muted);
+  font-family: var(--verso-structure-font-family);
   font-size: 0.8rem;
   font-weight: 500;
   letter-spacing: 0.015em;
@@ -201,6 +207,13 @@ main .titlepage h1 {
   line-height: 1.16;
   letter-spacing: -0.03em;
   margin: 0 0 1.25rem;
+}
+
+.titlepage-wordmark {
+  display: block;
+  width: clamp(13rem, 29vw, 16.5rem);
+  max-width: 100%;
+  height: auto;
 }
 
 main .titlepage > p:first-of-type {
@@ -322,7 +335,9 @@ main li code {
 
   header { padding-right: calc(var(--search-bar-width) + 2rem); }
   header .header-title-wrapper { padding-left: 0; }
-  .header-title { margin-left: calc(var(--verso-burger-width) + 1.5rem); font-size: 1.35rem; }
+  .header-title { margin-left: calc(var(--verso-burger-width) + 1.5rem); }
+  .brand-wordmark { display: none; }
+  .brand-mark { display: block; width: 2.25rem; height: 2.25rem; }
   .language-switch { font-size: 0.75rem; }
   #search-wrapper { padding-right: 0.75rem; padding-left: 0.4rem; }
   #search-wrapper .combobox .group .cb_edit { min-height: 2.2rem; }
