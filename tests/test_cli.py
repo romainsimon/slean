@@ -53,12 +53,16 @@ class CliTests(unittest.TestCase):
                 self.assertEqual(a[1]["error"]["code"], reason)
 
     def test_unknown_error_and_override(self):
-        for name in ("unknown.json", "technical-error.json"):
+        for name, reason in (
+            ("unknown.json", "Synthetic measurement is unavailable."),
+            ("technical-error.json", "Synthetic measurement failed with a technical error."),
+        ):
             code, result, _ = invoke("validate", EXAMPLES / name)
             self.assertEqual((code, result["ok"]), (0, True))
             _, state, _ = invoke("replay", EXAMPLES / name)
             self.assertEqual(state["assessments"][0]["verdict"], "undetermined")
             self.assertEqual(state["decisions"][0]["result"], "defer")
+            self.assertEqual(state["decisions"][0]["reason"], reason)
         code, result, _ = invoke("validate", EXAMPLES / "override-no-reason.json")
         self.assertEqual(code, 1)
         self.assertEqual(result["error"]["code"], "override_reason")

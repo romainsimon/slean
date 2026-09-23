@@ -360,6 +360,7 @@ main li code {
   main .titlepage { margin-bottom: 2.75rem; }
   main .titlepage h1 { font-size: 2.125rem; }
   main .section-toc > li a { padding: 0.85rem 0; }
+  main pre { white-space: pre-wrap; overflow-wrap: anywhere; }
   .prev-next-buttons > div:empty { display: none; }
   .prev-next-buttons > a { flex: 0 0 100%; }
 }
