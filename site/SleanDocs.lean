@@ -49,7 +49,7 @@ The second command prints exactly:
 
 You need an authorized checkout of this repository and `elan`, which provides Lean and Lake. Follow the [official Lean installation instructions](https://lean-lang.org/install/manual/) if you do not have those tools. The repository's `lean-toolchain` selects Lean 4.28.0. This preview is not yet an anonymous public installation.
 
-Open a terminal at the repository root, where `lakefile.lean` and `examples/valid.json` live, then run:
+Open a terminal at the repository root, where `lakefile.toml` and `examples/valid.json` live, then run:
 
 ```
 lake build

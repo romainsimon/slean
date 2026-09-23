@@ -53,7 +53,7 @@ tag := "commencer-par-un-cas-verifie"
 
 Il vous faut une copie autorisée de ce dépôt et `elan`, qui fournit Lean et Lake. Suivez les [instructions officielles d'installation de Lean](https://lean-lang.org/install/manual/) si ces outils ne sont pas installés. Le fichier `lean-toolchain` du dépôt sélectionne Lean 4.28.0. Cette prévisualisation n'est pas encore une installation publique anonyme.
 
-Ouvrez un terminal à la racine du dépôt, là où se trouvent `lakefile.lean` et `examples/valid.json`, puis exécutez :
+Ouvrez un terminal à la racine du dépôt, là où se trouvent `lakefile.toml` et `examples/valid.json`, puis exécutez :
 
 ```
 lake build
