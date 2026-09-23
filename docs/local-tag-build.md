@@ -1,4 +1,4 @@
-# Local-only documentation tag build — 2026-09-23
+# Local-only documentation tag builds — 2026-09-23
 
 This is a rehearsal of the DOC-01 build at the exact documentation candidate revision in [docs PR #1](https://github.com/romainsimon/slean/pull/1). It did not create a release or public tag. The tag exists only in an isolated temporary clone.
 
@@ -17,3 +17,11 @@ This is a rehearsal of the DOC-01 build at the exact documentation candidate rev
 | Tag isolation | `git ls-remote --tags origin` returned no remote tags. No tag was pushed. |
 
 This proves that the documentation candidate builds from a clean checkout selected by an exact annotated local tag and displays that same tag in the generated manual. There is no published tag, public artifact, or live site route to compare with this build. The later `0.3.0` dependency-gate contract in [PR #4](https://github.com/romainsimon/slean/pull/4) is outside this `0.2.0` docs candidate; a separate detached integration build displayed 0.3.0 from that contract. DOC-01 remains partial until the accepted changes and the exact public tag, displayed version, compiled examples, and public artifact are checked together.
+
+## Schema 0.3 manual candidate
+
+[Docs PR #6](https://github.com/romainsimon/slean/pull/6) brings the bilingual manual onto the schema 0.3 gate branch. A second build used the same isolated clone after switching to clean, detached `HEAD` at `8a18074596e421adb5d918cfd0c2f3316c06a930`. The annotated tag `local-docs-gates-candidate-8a18074` existed only there: `git cat-file -t` returned `tag`, its `^{commit}` resolved to that full `HEAD`, and `git status --porcelain` was empty.
+
+`SLEAN_SITE_TAG=local-docs-gates-candidate-8a18074 bash site/build.sh` passed the 13-job Lean build, 20 Python tests and 309-job Verso build. `build-info.json` recorded the exact commit, `source_tree_clean: true`, that tag, schema `0.3.0` and Lean `4.28.0`. All 16 pages (eight FR, eight EN) carry the tag, and both title pages display it. The new FR `/portes-et-ou/` and EN `/en/and-or-gates/` pages were generated.
+
+The documented validation command printed exactly `{"case_id":"synthetic-decision-1","events":13,"ok":true}`. Replaying prefixes 11, 12 and 13 printed `0`, `1` and `2` dependency gates. The two synthetic variant fixtures and tests keep `unknown`/`null`/`defer` distinct from measured `"0"`/`reject`; both retain the same recorded ET/OU gates. Served browser checks covered the chapter and language switch on desktop and at 390/320 px, with no horizontal overflow. The local-only tag was not pushed. This is still not evidence of a public tag, artifact, or deployment.
