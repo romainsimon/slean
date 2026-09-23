@@ -100,7 +100,7 @@ changed["events"][3]["payload"]["status"] = "technical_error"
 changed["events"][3]["payload"]["value"] = None
 changed["events"][5]["payload"]["verdict"] = "undetermined"
 changed["events"][6]["payload"]["result"] = "defer"
-changed["events"][6]["payload"]["reason"] = "Synthetic measurement failed technically; assessment undetermined."
+changed["events"][6]["payload"]["reason"] = "Synthetic measurement failed with a technical error."
 save("technical-error.json", changed)
 
 changed = copy.deepcopy(case)
@@ -108,7 +108,7 @@ changed["events"][3]["payload"]["status"] = "unknown"
 changed["events"][3]["payload"]["value"] = None
 changed["events"][5]["payload"]["verdict"] = "undetermined"
 changed["events"][6]["payload"]["result"] = "defer"
-changed["events"][6]["payload"]["reason"] = "Synthetic observation unavailable; assessment undetermined."
+changed["events"][6]["payload"]["reason"] = "Synthetic measurement is unavailable."
 save("unknown.json", changed)
 
 # A separate V0.3 fixture records two dependency operators. They are author

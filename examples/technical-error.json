@@ -184,7 +184,7 @@
           "provenance": "synthetic://slean-v0",
           "version": 1
         },
-        "reason": "Synthetic measurement failed technically; assessment undetermined.",
+        "reason": "Synthetic measurement failed with a technical error.",
         "result": "defer"
       },
       "provenance": "synthetic://slean-v0",
