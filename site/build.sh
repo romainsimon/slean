@@ -9,6 +9,7 @@ cd "$repo_dir/site"
 lake build
 lake exe sleandocs
 python3 fix_viewport.py
+python3 add_analytics.py
 revision="$(git -C "$repo_dir" rev-parse HEAD)"
 source_tree_clean=true
 if [[ -n "$(git -C "$repo_dir" status --porcelain -- . ':(exclude)https:/')" ]]; then
