@@ -21,5 +21,5 @@ for locale_dir in _out/html-multi _out/html-multi/en; do
   cp assets/fonts/ibm-plex-sans-regular.ttf "$locale_dir/fonts/"
   cp assets/fonts/ibm-plex-sans-semibold.ttf "$locale_dir/fonts/"
   cp assets/fonts/OFL-ibm-plex-sans.txt "$locale_dir/fonts/"
-  cp assets/brand/slean-dark.svg assets/brand/slean-white.svg assets/brand/slean-mark.svg assets/brand/mutome-logo.svg assets/brand/mutome-mark.svg "$locale_dir/assets/brand/"
+  cp assets/brand/slean-dark.svg assets/brand/slean-white.svg assets/brand/slean-mark.svg assets/brand/mutome-texture.webp "$locale_dir/assets/brand/"
 done

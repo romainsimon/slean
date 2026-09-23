@@ -75,16 +75,40 @@ header .header-title-wrapper {
 }
 
 .mutome-header-link {
-  display: flex;
+  display: inline-flex;
   flex: none;
   align-items: center;
-  opacity: 0.65;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  opacity: 0.9;
 }
 
 .mutome-header-link:hover,
 .mutome-header-link:focus-visible { opacity: 1; }
-.mutome-wordmark { display: block; width: 6.25rem; height: auto; }
-.mutome-mark { display: none; }
+.mutome-stacked-wordmark {
+  position: relative;
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+.mutome-glyph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 207.48px;
+  height: 250px;
+  background: url("assets/brand/mutome-texture.webp") no-repeat;
+  background-size: 1538px 250px;
+  transform: translate(-50%, -50%) scale(0.15);
+}
+/* The six crops reproduce the closed letter stack from Mutome's wordmark. */
+.mutome-glyph:nth-child(1) { background-position: -69.21px 0; z-index: 1; }
+.mutome-glyph:nth-child(2) { width: 209.3px; background-position: -306.72px 0; z-index: 2; }
+.mutome-glyph:nth-child(3) { background-position: -546.05px 0; z-index: 3; }
+.mutome-glyph:nth-child(4) { background-position: -784.47px 0; z-index: 4; }
+.mutome-glyph:nth-child(5) { background-position: -1021.98px 0; z-index: 5; }
+.mutome-glyph:nth-child(6) { width: 208.39px; background-position: -1259.49px 0; z-index: 6; }
 
 .header-title,
 .header-title:visited {
@@ -372,8 +396,6 @@ main li code {
     margin-left: calc(var(--verso-burger-width) + 1.5rem);
     padding-left: 0;
   }
-  .mutome-wordmark { display: none; }
-  .mutome-mark { display: block; width: 1.5rem; height: 1.5rem; }
   .brand-wordmark { display: none; }
   .brand-mark { display: block; width: 2.25rem; height: 2.25rem; }
   .language-switch { font-size: 0.75rem; }
@@ -396,7 +418,7 @@ main li code {
 
 @media (max-width: 360px) {
   :root { --search-bar-width: 7rem; }
-  header .header-title-wrapper { gap: 0.35rem; margin-left: calc(var(--verso-burger-width) + 1rem); }
+  header .header-title-wrapper { flex: 0 0 auto; gap: 0.35rem; margin-left: calc(var(--verso-burger-width) + 1rem); }
   .brand-mark { width: 2rem; height: 2rem; }
   .language-switch { gap: 0.05rem; }
   .language-switch a { padding-inline: 0.15rem; }
