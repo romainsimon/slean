@@ -40,9 +40,9 @@ typography:
     letterSpacing: "-0.025em"
   body:
     fontFamily: '"Satoshi", "Slean Sans Fallback", ui-sans-serif, sans-serif'
-    fontSize: "1rem"
+    fontSize: "clamp(1.125rem, 1.35vw, 1.25rem)"
     fontWeight: 400
-    lineHeight: 1.6
+    lineHeight: 1.72
   label:
     fontFamily: '"Satoshi", "Slean Sans Fallback", ui-sans-serif, sans-serif'
     fontSize: "0.875rem"
@@ -61,6 +61,10 @@ spacing:
   content-top: "clamp(2.5rem, 4vw, 3.5rem)"
   chapter-row-block: "0.85rem"
 components:
+  language-switch:
+    textColor: "{colors.muted}"
+    activeColor: "{colors.ink}"
+    hoverColor: "{colors.focus}"
   search-field:
     backgroundColor: "{colors.page}"
     textColor: "{colors.ink}"
@@ -99,22 +103,23 @@ components:
 
 The Slean Verso manual is a quiet white reading surface in **Mode Read**. It helps an experiment owner follow a frozen protocol, an observation, a cost, and a decision through a documented case. Clear type, narrow measure, and numbered chapters carry the hierarchy. The visual system does not suggest that a local check proves an external empirical claim.
 
-Two Mutome references inform this system: `docs/DESIGN_SPEC.md` supplies the restrained white, ink, muted text, and fine-line roles; the `.lab-surface`, `.lab-header`, `.lab-main`, and `.reading` rules in `app/assets/css/main.css` demonstrate a calm one-column reading rhythm. Slean adapts those principles to its own Verso chapter rail, search, code examples, and proof boundaries. It does not reuse Mutome's content or assets.
+Mutome's `docs/DESIGN_SPEC.md` supplies the restrained white, ink, muted text, and fine-line roles. Its `.article-body` rules in `app/assets/css/main.css` establish the Satoshi essay reading rhythm: 20px prose with generous leading on desktop, 18px on mobile. Slean adapts that rhythm to its own 18–20px manual, chapter rail, search, code examples, and proof boundaries. It does not reuse Mutome's content or assets.
 
 The local [Explorer design](explorer/DESIGN.md) remains separate. These rules describe the documentation site, not an inspection tool's interaction model.
 
 **Key Characteristics:**
 
 - White page, header, and chapter rail with dark ink and fine neutral rules.
-- Satoshi for headings, prose, navigation, and controls; IBM Plex Sans when Satoshi is unavailable.
+- Satoshi for headings, essay-like prose, navigation, and controls; IBM Plex Sans when Satoshi is unavailable.
 - A fixed desktop chapter rail and a single reading column with a 45rem maximum.
-- Text links, one soft selected-chapter fill, bounded code, visible green focus, and no decorative motion.
+- French at `/`, English at `/en/`, with a chapter-preserving switch and a separate search index for each language.
+- Links without underlines, one soft selected-chapter fill, bounded code, visible green focus, and no decorative motion.
 
 ## Colors
 
 ### Primary
 
-- **Ink** (`ink`) carries headings, prose, code text, and ordinary links. A link stays underlined or gains an underline on hover; color alone does not identify it.
+- **Ink** (`ink`) carries headings, code text, the chapter rail, and sequential links. Prose links use green and medium weight without an underline; navigation links change color on hover and retain a visible focus outline.
 - **Focus Green** (`focus`) identifies keyboard focus and link hover. It does not mean that a scientific claim has passed review.
 
 ### Neutral
@@ -141,7 +146,7 @@ Satoshi files are not committed because its closed-source [ITF Free Font License
 - **Display** (`display`): title page heading, with a restrained responsive range.
 - **Lede** (`lede`): one prominent sentence directly under the title.
 - **Chapter** (`chapter`) and **Section** (`section`): bold sans headings with tight tracking; smaller subheads keep the same family.
-- **Body** (`body`): continuous prose at 1rem and 1.6 line height; paragraphs and lists also have a 70ch cap.
+- **Body** (`body`): continuous Satoshi prose at 18–20px with 1.72 line height; paragraphs and lists also have a 70ch cap.
 - **Label** (`label`): rail entries and previous/next navigation.
 - **Code** (`code`): commands, JSON, and Lean declarations in distinct monospace.
 
@@ -150,6 +155,8 @@ Satoshi files are not committed because its closed-source [ITF Free Font License
 ## Layout
 
 Verso supplies a fixed header and chapter rail. On desktop, the white rail is 17.5rem wide, separated by a fine rule. The reading pane has a 45rem maximum width and a responsive side gutter. The header is 4.5rem high; content begins with generous top space, then follows one vertical reading path. The numbered contents list and previous/next links support both lookup and sequential reading.
+
+The language switch is always visible in the header. French is the root manual and English lives in `/en/`. Each switch link points to the corresponding chapter; each manual has its own generated contents and search index. Code identifiers, commands, schema names, and proof statuses retain their exact source spelling in both languages.
 
 At 700px and below, the header becomes 4rem high and the rail moves behind the menu control. The reading pane takes the available width with a 1.25rem gutter. Code examples scroll horizontally inside their own bounds; long code does not widen the page. Keep the menu control and chapter links keyboard accessible.
 
@@ -169,7 +176,11 @@ The manual uses straight rules and restrained corners. Search and block-code con
 
 ### Search Field
 
-The header search is a white, 6px rounded field with an ink label and a fine border. It stays visible beside the site name on desktop and mobile. Focus changes the border to green and gives keyboard users a separate visible outline. Results use a white list with a fine border, soft hover row, and the only small overlay shadow.
+The header search is a white, 6px rounded field with an ink label and a fine border. It stays visible beside the language switch on desktop and mobile. Focus changes the border to green and gives keyboard users a separate visible outline. Results use a white list with a fine border, soft hover row, and the only small overlay shadow. Search text, labels, and results follow the active manual language.
+
+### Language Switch
+
+The compact `FR / EN` switch sits between the site name and search. The active language has bold ink text; the other is muted and gains green on hover. Both links remain ordinary anchors, so a reader can switch chapters without JavaScript. The document `lang` attribute and accessible switch label match the selected language.
 
 ### Chapter Rail
 
@@ -177,7 +188,7 @@ The desktop rail stays fixed beside the text. Its caption and numbers are muted;
 
 ### Chapter Index and Progression
 
-The title page lists numbered chapters as full-width text rows divided by fine lines. Hover uses green while the title stays ink. Previous and next links remain explicit text at chapter boundaries; the arrow is supplementary.
+The title page lists numbered chapters as full-width text rows divided by fine lines. Hover uses green while the title stays ink. Links remain free of underlines in every state. Previous and next links remain explicit text at chapter boundaries; the arrow is supplementary.
 
 ### Code
 
@@ -195,10 +206,11 @@ Keyboard focus is a 2px green outline, offset from the control. Ordinary anchor 
 - **Do** use ink for content, muted text for supporting labels, and green for navigation feedback.
 - **Do** keep commands and Lean declarations in bounded, horizontally scrollable code examples.
 - **Do** preserve readable mobile text, visible focus, and reduced-motion behavior.
+- **Do** keep every visible manual label and search result in the selected language.
 
 ### Don't:
 
 - **Don't** imply that a synthetic example or conditional Lean theorem certifies a measurement, evaluator, or human decision.
-- **Don't** add tinted page backgrounds, colored ordinary links, or serif headings.
+- **Don't** add tinted page backgrounds, underlined links, or serif headings.
 - **Don't** add decorative cards, gradients, ambient shadows, or motion to fill the page.
 - **Don't** apply the documentation layout rules to Explorer without a separate Mode Operate decision.

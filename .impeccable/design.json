@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-23T15:42:36.491Z",
+  "generatedAt": "2026-09-23T16:12:16Z",
   "title": "Design System: Slean Documentation",
   "extensions": {
     "colorMeta": {
@@ -169,19 +169,27 @@
   },
   "components": [
     {
+      "name": "Language switch",
+      "kind": "nav",
+      "refersTo": "language-switch",
+      "description": "Static chapter-preserving FR and EN links, with the active language in bold ink.",
+      "html": "<nav class=\"ds-language\" aria-label=\"Langue du document\"><a href=\"#\" lang=\"fr\" hreflang=\"fr\" aria-current=\"true\">FR</a><span aria-hidden=\"true\">/</span><a href=\"#\" lang=\"en\" hreflang=\"en\">EN</a></nav>",
+      "css": ".ds-language { display:flex; align-items:center; gap:.2rem; color:var(--slean-muted,#59636e); font:500 .8rem/1.5 \"Satoshi\",\"Slean Sans Fallback\",ui-sans-serif,sans-serif; } .ds-language a { color:var(--slean-muted,#59636e); padding:.4rem .25rem; text-decoration:none; } .ds-language a[aria-current=\"true\"] { color:var(--slean-ink,#17202a); font-weight:700; } .ds-language a:hover { color:var(--slean-focus,#00895f); } .ds-language a:focus-visible { outline:2px solid var(--slean-focus,#00895f); outline-offset:3px; }"
+    },
+    {
       "name": "Search field",
       "kind": "input",
       "refersTo": "search-field",
       "description": "Compact header search with a fine border and green keyboard focus.",
-      "html": "<div class=\"ds-search\" role=\"combobox\" aria-expanded=\"false\" contenteditable=\"true\" data-placeholder=\"Search...\"></div>",
-      "css": ".ds-search { width:24rem; max-width:100%; min-height:2.4rem; padding:.4rem .8rem; border:1px solid var(--slean-line,#e6e9ed); border-radius:6px; background:var(--slean-page,#fff); color:var(--slean-ink,#17202a); font:400 .875rem/1.4 \"Satoshi\",\"Slean Sans Fallback\",ui-sans-serif,sans-serif; cursor:text; } .ds-search:empty::before { content:attr(data-placeholder); color:var(--slean-muted,#59636e); } .ds-search:hover { border-color:#89949e; } .ds-search:focus-visible { border-color:var(--slean-focus,#00895f); outline:2px solid var(--slean-focus,#00895f); outline-offset:2px; } @media (max-width:700px) { .ds-search { width:min(10rem,40vw); min-height:2.2rem; } }"
+      "html": "<div class=\"ds-search\" role=\"combobox\" aria-expanded=\"false\" contenteditable=\"true\" data-placeholder=\"Rechercher\"></div>",
+      "css": ".ds-search { width:24rem; max-width:100%; min-height:2.4rem; padding:.4rem .8rem; border:1px solid var(--slean-line,#e6e9ed); border-radius:6px; background:var(--slean-page,#fff); color:var(--slean-ink,#17202a); font:400 .875rem/1.4 \"Satoshi\",\"Slean Sans Fallback\",ui-sans-serif,sans-serif; cursor:text; } .ds-search:empty::before { content:attr(data-placeholder); color:var(--slean-muted,#59636e); } .ds-search:hover { border-color:#89949e; } .ds-search:focus-visible { border-color:var(--slean-focus,#00895f); outline:2px solid var(--slean-focus,#00895f); outline-offset:2px; } @media (max-width:700px) { .ds-search { width:8rem; min-height:2.2rem; } }"
     },
     {
       "name": "Chapter rail",
       "kind": "nav",
       "refersTo": "chapter-rail",
       "description": "White numbered chapter list; current chapter has a soft fill.",
-      "html": "<nav class=\"ds-rail\" aria-label=\"Table of Contents\"><strong>Table of Contents</strong><a class=\"ds-rail-current\" href=\"#\" aria-current=\"page\"><span>1.</span> Start with a checked case</a><a href=\"#\"><span>2.</span> Read the decision</a></nav>",
+      "html": "<nav class=\"ds-rail\" aria-label=\"Sommaire\"><strong>Sommaire</strong><a class=\"ds-rail-current\" href=\"#\" aria-current=\"page\"><span>1.</span> Commencer par un cas vérifié</a><a href=\"#\"><span>2.</span> Lire la décision</a></nav>",
       "css": ".ds-rail { width:17.5rem; padding:1.6rem .75rem 2rem 1.2rem; border-right:1px solid var(--slean-line,#e6e9ed); background:var(--slean-page,#fff); color:var(--slean-ink,#17202a); font:400 .875rem/1.5 \"Satoshi\",\"Slean Sans Fallback\",ui-sans-serif,sans-serif; } .ds-rail strong { display:block; margin-bottom:.8rem; color:var(--slean-muted,#59636e); font-size:.78rem; font-weight:500; } .ds-rail a { display:flex; gap:.6rem; padding:.35rem .15rem; color:inherit; text-decoration:none; } .ds-rail a span { color:var(--slean-muted,#59636e); } .ds-rail a:hover { color:var(--slean-focus,#00895f); } .ds-rail a:focus-visible { outline:2px solid var(--slean-focus,#00895f); outline-offset:3px; } .ds-rail .ds-rail-current { background:var(--slean-soft,#f7f8fa); font-weight:700; }"
     },
     {
@@ -189,16 +197,16 @@
       "kind": "nav",
       "refersTo": "chapter-index-row",
       "description": "Numbered contents row separated by fine horizontal rules.",
-      "html": "<a class=\"ds-chapter-row\" href=\"#\"><span>1.</span><span>Start with a checked case</span></a>",
-      "css": ".ds-chapter-row { display:flex; gap:.85rem; padding:.85rem 0; border-top:1px solid var(--slean-line,#e6e9ed); border-bottom:1px solid var(--slean-line,#e6e9ed); color:var(--slean-ink,#17202a); font:500 1rem/1.6 \"Satoshi\",\"Slean Sans Fallback\",ui-sans-serif,sans-serif; text-decoration:none; } .ds-chapter-row span:first-child { min-width:1.5rem; color:var(--slean-muted,#59636e); font-variant-numeric:tabular-nums; } .ds-chapter-row:hover { color:var(--slean-focus,#00895f); } .ds-chapter-row:focus-visible { outline:2px solid var(--slean-focus,#00895f); outline-offset:3px; }"
+      "html": "<a class=\"ds-chapter-row\" href=\"#\"><span>1.</span><span>Commencer par un cas vérifié</span></a>",
+      "css": ".ds-chapter-row { display:flex; gap:.85rem; padding:.85rem 0; border-top:1px solid var(--slean-line,#e6e9ed); border-bottom:1px solid var(--slean-line,#e6e9ed); color:var(--slean-ink,#17202a); font:500 1.125rem/1.72 \"Satoshi\",\"Slean Sans Fallback\",ui-sans-serif,sans-serif; text-decoration:none; } .ds-chapter-row span:first-child { min-width:1.5rem; color:var(--slean-muted,#59636e); font-variant-numeric:tabular-nums; } .ds-chapter-row:hover { color:var(--slean-focus,#00895f); } .ds-chapter-row:focus-visible { outline:2px solid var(--slean-focus,#00895f); outline-offset:3px; }"
     },
     {
       "name": "Next chapter link",
       "kind": "nav",
       "refersTo": "next-chapter-link",
       "description": "Explicit text link at the chapter boundary.",
-      "html": "<a class=\"ds-next\" href=\"#\">1. Start with a checked case <span aria-hidden=\"true\">→</span></a>",
-      "css": ".ds-next { display:flex; justify-content:flex-end; gap:.35rem; padding:1rem 0; border-top:1px solid var(--slean-line,#e6e9ed); color:var(--slean-ink,#17202a); font:500 .875rem/1.5 \"Satoshi\",\"Slean Sans Fallback\",ui-sans-serif,sans-serif; text-decoration:none; } .ds-next:hover { color:var(--slean-focus,#00895f); text-decoration:underline; } .ds-next:focus-visible { outline:2px solid var(--slean-focus,#00895f); outline-offset:3px; }"
+      "html": "<a class=\"ds-next\" href=\"#\">1. Commencer par un cas vérifié <span aria-hidden=\"true\">→</span></a>",
+      "css": ".ds-next { display:flex; justify-content:flex-end; gap:.35rem; padding:1rem 0; border-top:1px solid var(--slean-line,#e6e9ed); color:var(--slean-ink,#17202a); font:500 .875rem/1.5 \"Satoshi\",\"Slean Sans Fallback\",ui-sans-serif,sans-serif; text-decoration:none; } .ds-next:hover { color:var(--slean-focus,#00895f); } .ds-next:focus-visible { outline:2px solid var(--slean-focus,#00895f); outline-offset:3px; }"
     },
     {
       "name": "Code block",
@@ -214,17 +222,18 @@
       "refersTo": "inline-code",
       "description": "Quiet tint for an identifier within ordinary prose.",
       "html": "<span class=\"ds-prose\">Inspect <code class=\"ds-inline-code\">Slean.CaseFile</code> in Lean.</span>",
-      "css": ".ds-prose { color:var(--slean-ink,#17202a); font:400 1rem/1.6 \"Satoshi\",\"Slean Sans Fallback\",ui-sans-serif,sans-serif; } .ds-inline-code { padding:.06em .22em; border-radius:3px; background:var(--slean-soft,#f7f8fa); font:.9em ui-monospace,SFMono-Regular,Menlo,monospace; }"
+      "css": ".ds-prose { color:var(--slean-muted,#59636e); font:400 1.125rem/1.72 \"Satoshi\",\"Slean Sans Fallback\",ui-sans-serif,sans-serif; } .ds-inline-code { padding:.06em .22em; border-radius:3px; background:var(--slean-soft,#f7f8fa); font:.9em ui-monospace,SFMono-Regular,Menlo,monospace; }"
     }
   ],
   "narrative": {
     "northStar": "The Research Dossier",
-    "overview": "The Slean Verso manual is a quiet white reading surface in **Mode Read**. It helps an experiment owner follow a frozen protocol, an observation, a cost, and a decision through a documented case. Clear type, narrow measure, and numbered chapters carry the hierarchy. The visual system does not suggest that a local check proves an external empirical claim.\n\nTwo Mutome references inform this system: `docs/DESIGN_SPEC.md` supplies the restrained white, ink, muted text, and fine-line roles; the `.lab-surface`, `.lab-header`, `.lab-main`, and `.reading` rules in `app/assets/css/main.css` demonstrate a calm one-column reading rhythm. Slean adapts those principles to its own Verso chapter rail, search, code examples, and proof boundaries. It does not reuse Mutome's content or assets.\n\nThe local [Explorer design](explorer/DESIGN.md) remains separate. These rules describe the documentation site, not an inspection tool's interaction model.",
+    "overview": "The Slean Verso manual is a quiet white reading surface in **Mode Read**. It helps an experiment owner follow a frozen protocol, an observation, a cost, and a decision through a documented case. Clear type, narrow measure, and numbered chapters carry the hierarchy. The visual system does not suggest that a local check proves an external empirical claim.\n\nMutome’s `docs/DESIGN_SPEC.md` supplies the restrained white, ink, muted text, and fine-line roles. Its `.article-body` rules in `app/assets/css/main.css` establish the Satoshi essay reading rhythm: 20px prose with generous leading on desktop, 18px on mobile. Slean adapts that rhythm to its own 18–20px manual, chapter rail, search, code examples, and proof boundaries. It does not reuse Mutome’s content or assets.\n\nThe local [Explorer design](explorer/DESIGN.md) remains separate. These rules describe the documentation site, not an inspection tool’s interaction model.",
     "keyCharacteristics": [
       "White page, header, and chapter rail with dark ink and fine neutral rules.",
-      "Satoshi for headings, prose, navigation, and controls; IBM Plex Sans when Satoshi is unavailable.",
+      "Satoshi for headings, essay-like prose, navigation, and controls; IBM Plex Sans when Satoshi is unavailable.",
       "A fixed desktop chapter rail and a single reading column with a 45rem maximum.",
-      "Text links, one soft selected-chapter fill, bounded code, visible green focus, and no decorative motion."
+      "French at /, English at /en/, with a chapter-preserving switch and a separate search index for each language.",
+      "Links without underlines, one soft selected-chapter fill, bounded code, visible green focus, and no decorative motion."
     ],
     "rules": [
       {
@@ -252,11 +261,12 @@
       "**Do** keep the path from claim to protocol, observation, cost, and decision easy to scan.",
       "**Do** use ink for content, muted text for supporting labels, and green for navigation feedback.",
       "**Do** keep commands and Lean declarations in bounded, horizontally scrollable code examples.",
-      "**Do** preserve readable mobile text, visible focus, and reduced-motion behavior."
+      "**Do** preserve readable mobile text, visible focus, and reduced-motion behavior.",
+      "**Do** keep every visible manual label and search result in the selected language."
     ],
     "donts": [
       "**Don't** imply that a synthetic example or conditional Lean theorem certifies a measurement, evaluator, or human decision.",
-      "**Don't** add tinted page backgrounds, colored ordinary links, or serif headings.",
+      "**Don't** add tinted page backgrounds, underlined links, or serif headings.",
       "**Don't** add decorative cards, gradients, ambient shadows, or motion to fill the page.",
       "**Don't** apply the documentation layout rules to Explorer without a separate Mode Operate decision."
     ]

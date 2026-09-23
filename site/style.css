@@ -53,11 +53,16 @@ body {
 }
 
 ::selection { background: #dceee8; color: var(--slean-ink); }
+a,
+a:visited,
+a:hover { text-decoration: none; }
 
 header {
   background: var(--slean-page);
   border-bottom: 1px solid var(--slean-line);
   box-shadow: none;
+  box-sizing: border-box;
+  padding-right: calc(var(--search-bar-width) + clamp(1.25rem, 3vw, 2.5rem) + 1rem);
 }
 
 header .header-logo-wrapper { flex-basis: 0; padding: 0; border: 0; }
@@ -77,6 +82,26 @@ header .header-title-wrapper { min-width: 0; padding-left: clamp(1.25rem, 3vw, 2
 
 .header-title h1 { font: inherit; }
 .header-title:hover { color: var(--slean-muted); }
+
+.language-switch {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--slean-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+}
+
+.language-switch a {
+  display: inline-block;
+  padding: 0.4rem 0.25rem;
+  color: var(--slean-muted);
+}
+
+.language-switch a[aria-current="true"] { color: var(--slean-ink); font-weight: 700; }
+.language-switch a:hover { color: var(--slean-focus); }
 
 #search-wrapper {
   background: var(--slean-page);
@@ -122,6 +147,7 @@ header .header-title-wrapper { min-width: 0; padding-left: clamp(1.25rem, 3vw, 2
 }
 
 #search-wrapper ul[role="listbox"] li { font-family: var(--verso-text-font-family); }
+#search-wrapper .search-result em { font-style: normal; font-weight: 700; text-decoration: none; }
 
 #search-wrapper [role="listbox"].focus li[aria-selected="true"],
 #search-wrapper .search-result:hover { background: var(--slean-soft); }
@@ -153,9 +179,10 @@ header .header-title-wrapper { min-width: 0; padding-left: clamp(1.25rem, 3vw, 2
 #toc .split-toc td.num { color: var(--slean-muted); padding-right: 0.6rem; }
 #toc a,
 #toc a:visited { color: var(--slean-ink); }
-#toc a:hover { color: var(--slean-focus); }
+#toc a:hover { color: var(--slean-focus); text-decoration: none; }
 #toc .split-toc tr.current { background: var(--slean-soft); }
 #toc .split-toc .current td:not(.num) { text-decoration: none; font-weight: 700; }
+#toc .split-toc .title .current { text-decoration: none; font-weight: 700; }
 
 main .content-wrapper {
   padding-top: clamp(2.5rem, 4vw, 3.5rem);
@@ -202,11 +229,19 @@ main h2 { font-size: 1.375rem; line-height: 1.35; margin-top: 3rem; }
 main h3 { font-size: 1.125rem; line-height: 1.4; margin-top: 2.5rem; }
 main p,
 main li { max-width: 70ch; }
-main p { line-height: 1.6; }
+main p,
+main li {
+  color: var(--slean-muted);
+  font-size: clamp(1.125rem, 1.35vw, 1.25rem);
+  line-height: 1.72;
+}
+
+main section > p { margin: 0 0 1.5em; }
+main strong { color: var(--slean-ink); }
 
 main a,
-main a:visited { color: var(--slean-ink); text-underline-offset: 0.2em; }
-main a:hover { color: var(--slean-focus); }
+main a:visited { color: var(--slean-focus); font-weight: 500; text-decoration: none; }
+main a:hover { color: var(--slean-ink); text-decoration: none; }
 
 :where(a, button, input, summary, label, [role="searchbox"]):focus-visible {
   outline: 2px solid var(--slean-focus);
@@ -233,8 +268,10 @@ main .section-toc > li a {
   align-items: baseline;
   gap: 0.85rem;
   padding: 0.85rem 0;
+  color: var(--slean-ink);
 }
 
+main .section-toc > li a:visited { color: var(--slean-ink); }
 main .section-toc > li a:hover { color: var(--slean-focus); text-decoration: none; }
 main .section-toc .number { min-width: 1.5rem; color: var(--slean-muted); font-variant-numeric: tabular-nums; }
 
@@ -248,7 +285,7 @@ main .section-toc .number { min-width: 1.5rem; color: var(--slean-muted); font-v
 }
 
 .prev-next-buttons > *,
-.prev-next-buttons > *:visited { color: var(--slean-ink); }
+.prev-next-buttons > *:visited { color: var(--slean-ink); text-decoration: none; }
 
 main pre,
 main code.hl.lean.block {
@@ -280,12 +317,14 @@ main li code {
     --verso-header-height: 4rem;
     --verso-toc-width: min(18rem, 86vw);
     --verso--content-padding-x: 1.25rem;
-    --search-bar-width: min(10rem, 40vw);
+    --search-bar-width: 8rem;
   }
 
+  header { padding-right: calc(var(--search-bar-width) + 2rem); }
   header .header-title-wrapper { padding-left: 0; }
   .header-title { margin-left: calc(var(--verso-burger-width) + 1.5rem); font-size: 1.35rem; }
-  #search-wrapper { padding-right: 1rem; }
+  .language-switch { font-size: 0.75rem; }
+  #search-wrapper { padding-right: 0.75rem; padding-left: 0.4rem; }
   #search-wrapper .combobox .group .cb_edit { min-height: 2.2rem; }
   #search-wrapper ul[role="listbox"] {
     width: min(21rem, calc(100vw - 2rem));
@@ -302,7 +341,10 @@ main li code {
 }
 
 @media (max-width: 360px) {
-  :root { --search-bar-width: 8.5rem; }
+  :root { --search-bar-width: 7rem; }
+  .header-title { margin-left: calc(var(--verso-burger-width) + 1rem); }
+  .language-switch { gap: 0.05rem; }
+  .language-switch a { padding-inline: 0.15rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
