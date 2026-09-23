@@ -40,9 +40,13 @@ async function main() {
   });
   try {
     const context = await browser.newContext();
-    await context.route("**/*", (route) =>
-      new URL(route.request().url()).origin === origin ? route.continue() : route.abort()
-    );
+    const analyticsRequests = [];
+    await context.route("**/*", (route) => {
+      const url = new URL(route.request().url());
+      if (url.origin === origin) return route.continue();
+      if (url.hostname === "stats.yukicapital.com") analyticsRequests.push(url.href);
+      return route.abort();
+    });
     // The marker changes only this local browser page if HTML is parsed as markup.
     const marker = '<img src=x onerror="document.documentElement.dataset.sleanReviewXss=1">';
     for (const locale of ["", "en/"]) {
@@ -149,6 +153,7 @@ async function main() {
       await page.waitForURL((url) => url.pathname === `/${locale}${target}/`);
       await page.close();
     }
+    assert.deepEqual(analyticsRequests, [], "local preview must not load production analytics");
     console.log("FR/EN URL text, search, highlights, keyboard and xref passed");
   } finally {
     await browser.close();
