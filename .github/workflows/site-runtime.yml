@@ -1,0 +1,48 @@
+name: Site final image
+
+on:
+  pull_request:
+    paths:
+      - .dockerignore
+      - Dockerfile
+      - .github/workflows/site-runtime.yml
+      - tools/smoke_site_image.sh
+      - site/**
+      - Slean/**
+      - tests/**
+      - schema/**
+      - lean-toolchain
+      - lakefile.toml
+  push:
+    branches:
+      - main
+      - codex/slean-coolify-runtime
+
+concurrency:
+  group: site-runtime-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  final-image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Build exact candidate image
+        run: |
+          test -z "$(git status --porcelain)"
+          candidate_sha="$(git rev-parse HEAD)"
+          docker build --build-arg SOURCE_COMMIT="$candidate_sha" -t slean-site:candidate .
+      - name: Smoke final image without source mount
+        run: bash tools/smoke_site_image.sh slean-site:candidate "$(git rev-parse HEAD)"
+      - name: Browser security and local analytics checks on final files
+        run: |
+          (cd site && npm ci && npx playwright install --with-deps chromium)
+          npm --prefix site run test:browser
+          npm audit --prefix site --audit-level=high
