@@ -15,6 +15,25 @@ def reportError (error : Diagnostic) : IO UInt32 := do
   IO.println (Json.mkObj [("ok", toJson false), ("error", toJson error)]).compress
   return 1
 
+def timelineSnapshot (state : State) (count : Nat) : Json := Json.mkObj [
+  ("prefix", toJson count),
+  ("protocols", toJson state.protocols),
+  ("runs", toJson state.runs),
+  ("artifacts", toJson state.artifacts),
+  ("observations", toJson state.observations),
+  ("costs", toJson state.costs),
+  ("assessments", toJson state.assessments),
+  ("decisions", toJson state.decisions),
+  ("relations", toJson state.relations)]
+
+def timelineSnapshots (caseFile : CaseFile) : Except Diagnostic (Array Json) := do
+  let mut state ← replay caseFile 0
+  let mut snapshots : Array Json := #[timelineSnapshot state 0]
+  for event in caseFile.events do
+    state ← step state event
+    snapshots := snapshots.push (timelineSnapshot state snapshots.size)
+  return snapshots
+
 def execute (args : List String) : IO UInt32 := do
   if args == ["proof-statement"] then
     IO.println (Json.mkObj [("declaration", toJson checkedDeclaration),
@@ -56,6 +75,24 @@ def execute (args : List String) : IO UInt32 := do
       | .ok state =>
         IO.println (if command == "export" then (toJson projected).compress else (view projected state).compress)
         return 0
+    if command == "timeline" then
+      let audience := rest.head?.getD "agent"
+      if rest.length > 1 || (audience != "owner" && audience != "agent") then
+        return ← reportError (diag "" "" "audience" "expected owner or agent")
+      if let .error error := replay caseFile then
+        return ← reportError error
+      let projected := project caseFile audience
+      if let .error error := replay projected then
+        return ← reportError error
+      let snapshots ← match timelineSnapshots projected with
+        | .ok snapshots => pure snapshots
+        | .error error => return ← reportError error
+      IO.println (Json.mkObj [
+        ("format", toJson "slean-explorer-timeline/0.1.0"),
+        ("audience", toJson audience),
+        ("case", toJson projected),
+        ("snapshots", toJson snapshots)]).compress
+      return 0
     if command == "proof" then
       match replay caseFile with
       | .error error => return ← reportError error
@@ -63,6 +100,6 @@ def execute (args : List String) : IO UInt32 := do
         IO.println (toJson (state.formal_claims.map proofReceipt)).compress
         return 0
     return ← reportError (diag "" "" "usage" "unknown command")
-  | _ => return ← reportError (diag "" "" "usage" "slean validate|replay|export|view|proof <case.json> [count|owner|agent], or proof-statement")
+  | _ => return ← reportError (diag "" "" "usage" "slean validate|replay|export|view|timeline|proof <case.json> [count|owner|agent], or proof-statement")
 
 def main (args : List String) : IO UInt32 := execute args

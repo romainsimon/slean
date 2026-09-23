@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Slean Explorer</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to case</a>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">S</span><span>Slean <span class="brand-sub">/ Explorer</span></span></div>
+    <div class="topbar-meta"><span id="audience-tag" class="audience-tag"></span><span class="topbar-local">Local dossier view</span></div>
+  </header>
+
+  <main id="workspace" class="workspace">
+    <section class="case-heading" aria-labelledby="case-title">
+      <div class="heading-copy">
+        <div class="case-line"><span id="case-id"></span><span id="fixture-tag" class="fixture-tag" hidden>Synthetic fixture</span></div>
+        <h1 id="case-title">Research decision</h1>
+        <p id="case-question" class="case-question"></p>
+      </div>
+      <p class="scope-note"><strong>Scope of this view</strong><br>Journal structure and stated rules are checked by Slean. Empirical truth remains unverified.</p>
+    </section>
+
+    <section class="prefix-control" aria-labelledby="prefix-heading">
+      <div class="prefix-copy"><h2 id="prefix-heading">Review a journal prefix</h2><p id="prefix-description">Choose an event to see exactly what was available then.</p></div>
+      <div class="prefix-tools">
+        <div class="prefix-count"><output id="prefix-count" for="prefix-slider"></output><span id="prefix-total"></span></div>
+        <div class="step-buttons"><button id="previous" class="tool-button" type="button" aria-label="Previous event">Previous</button><button id="next" class="tool-button" type="button" aria-label="Next event">Next</button></div>
+        <label class="visually-hidden" for="prefix-slider">Journal prefix</label><input id="prefix-slider" type="range" min="0" max="0" value="0" step="1">
+      </div>
+    </section>
+
+    <div class="explorer-grid">
+      <aside class="journal" aria-labelledby="journal-heading">
+        <div class="journal-heading"><h2 id="journal-heading">Journal</h2><span id="journal-count"></span></div>
+        <p class="journal-help">Select an event to inspect the state after it.</p>
+        <div class="mobile-journal-picker"><label for="mobile-event-select">Jump to an event</label><select id="mobile-event-select"></select></div>
+        <nav id="journal-list" aria-label="Journal events"></nav>
+      </aside>
+
+      <div class="detail-column">
+        <section class="state-section" aria-labelledby="state-heading">
+          <div class="section-heading"><div><h2 id="state-heading">State at this point</h2><p id="state-subtitle"></p></div><span id="state-status" class="state-status"></span></div>
+          <div id="decision-content" class="decision-content"></div>
+        </section>
+
+        <section class="evidence-section" aria-labelledby="evidence-heading">
+          <div class="section-heading"><div><h2 id="evidence-heading">Evidence in scope</h2><p>Records introduced by this prefix</p></div></div>
+          <div id="evidence-content" class="evidence-content"></div>
+        </section>
+
+        <section class="event-section" aria-labelledby="event-heading">
+          <div class="section-heading"><div><h2 id="event-heading">Selected event</h2><p id="event-subtitle"></p></div></div>
+          <dl id="event-facts" class="event-facts"></dl>
+          <details class="raw-event"><summary>Exact event record</summary><pre id="event-json"></pre></details>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><span>Generated from a validated local Slean timeline.</span><span id="build-revision"></span></footer>
+  <!--SLEAN_EXPLORER_DATA-->
+</body>
+</html>

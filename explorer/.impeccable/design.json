@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-23T15:00:58Z",
+  "title": "Design System: Slean Explorer",
+  "extensions": {
+    "colorMeta": {
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Mineral paper"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "White panel"
+      },
+      "side": {
+        "role": "neutral",
+        "displayName": "Pale journal"
+      },
+      "select": {
+        "role": "neutral",
+        "displayName": "Selected event"
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Evergreen ink"
+      },
+      "deep": {
+        "role": "primary",
+        "displayName": "Evergreen heading"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted detail"
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Panel line"
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Rust action"
+      },
+      "accent-dark": {
+        "role": "primary",
+        "displayName": "Rust hover"
+      },
+      "good": {
+        "role": "primary",
+        "displayName": "Recorded decision ink"
+      },
+      "quiet": {
+        "role": "neutral",
+        "displayName": "Future event ink"
+      }
+    },
+    "typographyMeta": {
+      "case-title": {
+        "displayName": "Case title",
+        "purpose": "Primary claim at the top of the workspace."
+      },
+      "section": {
+        "displayName": "Section heading",
+        "purpose": "Prefix, journal, state, evidence, and event regions."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Case question and explanatory copy."
+      },
+      "compact": {
+        "displayName": "Compact text",
+        "purpose": "Scope, metadata, and helper text."
+      },
+      "record": {
+        "displayName": "Record text",
+        "purpose": "Facts and evidence entries."
+      },
+      "raw-event": {
+        "displayName": "Raw event",
+        "purpose": "Exact JSON event record."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "step-button-feedback",
+        "value": "background-color .15s ease, border-color .15s ease",
+        "purpose": "Brief button hover feedback; removed under reduced motion."
+      },
+      {
+        "name": "page-scroll",
+        "value": "smooth",
+        "purpose": "Ordinary page scroll; auto under reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow-desktop",
+        "value": "900px"
+      },
+      {
+        "name": "mobile-stack",
+        "value": "680px"
+      },
+      {
+        "name": "compact-mobile",
+        "value": "410px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Prefix selector",
+      "kind": "custom",
+      "refersTo": "prefix-panel",
+      "description": "One selected prefix controls all visible case state.",
+      "html": "<div class=\"ds-prefix\"><strong>Review a journal prefix</strong><div class=\"ds-prefix-row\"><span>After 8 events / 8</span><button type=\"button\" disabled>Next</button></div><input type=\"range\" min=\"0\" max=\"8\" value=\"8\" aria-label=\"Journal prefix\"></div>",
+      "css": ".ds-prefix{background:var(--surface,#fff);color:var(--ink,#20302f);border:1px solid var(--line,#c8d3ca);border-radius:8px;padding:1rem 1.2rem;font:400 1rem/1.48 \"Slean Sans\",sans-serif}.ds-prefix strong{display:block;color:var(--deep,#18342f);font-size:1.04rem}.ds-prefix-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:.5rem 0}.ds-prefix-row span{font-size:.85rem;font-variant-numeric:tabular-nums}.ds-prefix-row button{border:1px solid #a9b9ad;border-radius:5px;background:#fff;color:#18342f;padding:.4rem .64rem;font:600 .82rem \"Slean Sans\",sans-serif}.ds-prefix-row button:disabled{opacity:.48;cursor:not-allowed}.ds-prefix input{width:100%;accent-color:var(--accent,#8b3827)}.ds-prefix :focus-visible{outline:3px solid var(--accent,#8b3827);outline-offset:3px}"
+    },
+    {
+      "name": "Step button",
+      "kind": "button",
+      "refersTo": "step-button",
+      "description": "Previous and Next move one projected event and disable at the bounds.",
+      "html": "<button class=\"ds-step\" type=\"button\">Previous</button>",
+      "css": ".ds-step{min-width:5.8rem;border:1px solid #a9b9ad;border-radius:5px;background:var(--surface,#fff);color:var(--deep,#18342f);padding:.4rem .64rem;font:600 .82rem \"Slean Sans\",sans-serif;cursor:pointer;transition:background-color .15s ease,border-color .15s ease}.ds-step:hover:not(:disabled){background:var(--select,#d4e5dd);border-color:#839b89}.ds-step:active:not(:disabled){background:#bed6c8}.ds-step:focus-visible{outline:3px solid var(--accent,#8b3827);outline-offset:3px}.ds-step:disabled{cursor:not-allowed;opacity:.48}@media(prefers-reduced-motion:reduce){.ds-step{transition:none}}"
+    },
+    {
+      "name": "Journal panel",
+      "kind": "card",
+      "refersTo": "journal",
+      "description": "Pale desktop container for the ordered event list.",
+      "html": "<aside class=\"ds-journal-panel\"><h2>Journal</h2><p>Select an event to inspect the state after it.</p></aside>",
+      "css": ".ds-journal-panel{background:var(--side,#e9eee9);color:var(--ink,#20302f);border:1px solid var(--line,#c8d3ca);border-radius:8px;padding:1rem .6rem 1.1rem;font:400 1rem/1.48 \"Slean Sans\",sans-serif}.ds-journal-panel h2{margin:0;color:var(--deep,#18342f);font-size:1.04rem;line-height:1.3}.ds-journal-panel p{margin:.2rem 0 0;color:var(--muted,#52645d);font-size:.83rem}"
+    },
+    {
+      "name": "Current journal event",
+      "kind": "nav",
+      "refersTo": "journal-current",
+      "description": "Current event in the pale desktop journal; future entries stay selectable.",
+      "html": "<nav class=\"ds-journal\" aria-label=\"Journal events\"><button class=\"ds-journal-item\" type=\"button\" aria-current=\"step\"><span>08</span><span><strong>relation recorded</strong><small>event-8</small></span></button></nav>",
+      "css": ".ds-journal{background:var(--side,#e9eee9);border:1px solid var(--line,#c8d3ca);border-radius:8px;padding:.6rem;font-family:\"Slean Sans\",sans-serif}.ds-journal-item{display:grid;grid-template-columns:2.1rem 1fr;gap:.2rem;width:100%;text-align:left;border:1px solid #a9c0af;border-radius:5px;background:var(--select,#d4e5dd);color:var(--ink,#20302f);padding:.6rem .5rem;font:400 .86rem/1.3 \"Slean Sans\",sans-serif;cursor:pointer}.ds-journal-item>span:first-child{font-size:.75rem;font-variant-numeric:tabular-nums}.ds-journal-item strong,.ds-journal-item small{display:block}.ds-journal-item small{color:var(--muted,#52645d);font-size:.75rem;margin-top:.15rem}.ds-journal-item:hover{background:#dce8de}.ds-journal-item:focus-visible{outline:3px solid var(--accent,#8b3827);outline-offset:3px}"
+    },
+    {
+      "name": "Detail panel",
+      "kind": "card",
+      "refersTo": "detail-panel",
+      "description": "Flat white container for state, evidence, or selected-event facts.",
+      "html": "<section class=\"ds-detail\"><h2>Evidence in scope</h2><p>Records introduced by this prefix</p></section>",
+      "css": ".ds-detail{background:var(--surface,#fff);color:var(--ink,#20302f);border:1px solid var(--line,#c8d3ca);border-radius:8px;padding:1.25rem 1.4rem;font:400 1rem/1.48 \"Slean Sans\",sans-serif}.ds-detail h2{margin:0;color:var(--deep,#18342f);font-size:1.04rem;line-height:1.3}.ds-detail p{margin:.2rem 0 0;color:var(--muted,#52645d);font-size:.83rem}@media(max-width:680px){.ds-detail{padding:1rem}}"
+    },
+    {
+      "name": "Decision recorded tag",
+      "kind": "chip",
+      "refersTo": "decision-status",
+      "description": "Labels a recorded decision without claiming empirical truth.",
+      "html": "<span class=\"ds-decision\">Decision recorded</span>",
+      "css": ".ds-decision{display:inline-flex;align-items:center;background:#dcebe0;border:1px solid #b4d0bd;border-radius:4px;color:var(--good,#215c40);padding:.18rem .48rem;font:600 .76rem \"Slean Sans\",sans-serif;letter-spacing:.01em;white-space:nowrap}"
+    },
+    {
+      "name": "Record link",
+      "kind": "button",
+      "refersTo": "record-link",
+      "description": "Jumps to the event that introduced a cited record.",
+      "html": "<button class=\"ds-record-link\" type=\"button\">assessment-1</button>",
+      "css": ".ds-record-link{border:0;background:none;padding:0;color:var(--accent,#8b3827);font:inherit;text-align:left;text-decoration:underline;text-underline-offset:.17em;cursor:pointer}.ds-record-link:hover{color:var(--accent-dark,#652b20)}.ds-record-link:focus-visible{outline:3px solid var(--accent,#8b3827);outline-offset:3px}"
+    },
+    {
+      "name": "Mobile event picker",
+      "kind": "input",
+      "refersTo": "mobile-event-picker",
+      "description": "Native event selection replaces the desktop journal list at 680px and below.",
+      "html": "<label class=\"ds-picker\" for=\"ds-event\">Jump to an event<select id=\"ds-event\"><option>Before the first event</option><option selected>08 · relation recorded</option></select></label>",
+      "css": ".ds-picker{display:block;color:var(--muted,#52645d);font:400 .78rem \"Slean Sans\",sans-serif}.ds-picker select{display:block;width:100%;margin-top:.25rem;border:1px solid #a9b9ad;border-radius:5px;background:var(--surface,#fff);color:var(--deep,#18342f);padding:.46rem .5rem;font:400 .88rem \"Slean Sans\",sans-serif}.ds-picker select:focus-visible{outline:3px solid var(--accent,#8b3827);outline-offset:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Journal at a Chosen Prefix",
+    "overview": "Explorer is a local **Mode Operate** surface for an experiment owner asking what the author had when a decision was recorded. The selected projected prefix controls the decision, evidence, and event details together. The interface makes chronological inspection the main task.\n\nIt adapts the manual's mineral paper, evergreen ink, rust wayfinding, thin rules, and IBM Plex Sans identity. The manual is **Mode Read**; Explorer uses denser sans serif data, bounded panels, and native controls so a user can compare recorded state across events. A visible scope note and audience label keep this review tool within Slean's validation boundary.",
+    "keyCharacteristics": [
+      "A prominent prefix selector above the journal and case state.",
+      "A persistent desktop journal beside decision, evidence, and event details; a native event picker on mobile.",
+      "Text labels, counts, and explicit source records carry meaning; color only reinforces state.",
+      "Flat surfaces, visible focus, immediate state changes, and no ornamental motion."
+    ],
+    "rules": [
+      {
+        "name": "The Scoped Status Rule",
+        "body": "The green decision chip means a decision is recorded at the selected prefix. It does not mean the assessment is empirically true. Rust marks navigation and record links, not proof.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Prefix Rule",
+        "body": "Slider, Previous, Next, journal buttons, record links, and the mobile picker all select the same prefix. State, evidence, selected event, count, and current marker update from that position.",
+        "section": "layout"
+      }
+    ],
+    "dos": [
+      "**Do** keep prefix selection and every visible case section synchronized.",
+      "**Do** keep recorded decisions, local assessment verdicts, and empirical truth distinct in copy and status.",
+      "**Do** expose audience and synthetic-fixture context; owner data belongs in a separate private generated artifact.",
+      "**Do** preserve native slider, select, disclosure, keyboard focus, and reduced-motion behavior."
+    ],
+    "donts": [
+      "**Don't** turn a local pass, recorded relation, or conditional formal receipt into a scientific proof claim.",
+      "**Don't** replace the mobile picker with a cramped copy of the desktop journal.",
+      "**Don't** add decorative motion or shadows to routine historical review."
+    ]
+  }
+}

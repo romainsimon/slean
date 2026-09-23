@@ -13,16 +13,19 @@ lake exe slean validate examples/valid.json
 lake exe slean replay examples/valid.json 7
 lake exe slean export examples/valid.json agent
 lake exe slean view examples/valid.json agent
+lake exe slean timeline examples/valid.json agent
 lake exe slean proof-statement
 ```
 
-`validate` returns a JSON result and a nonzero exit code on error. `replay` returns the state after a prefix of the journal. `export` writes a canonical V0 case to standard output. `view` derives observation and relation data from that projection. `proof` reports the local status of formal claims in a case. The CLI accepts `-` as an input path for standard input. Do not send a private owner export to an agent or a public channel.
+`validate` returns a JSON result and a nonzero exit code on error. `replay` returns the state after a prefix of the journal. `export` writes a canonical V0 case to standard output. `view` derives observation and relation data from that projection. `timeline` returns validated state snapshots at every projected prefix for the local Explorer. `proof` reports the local status of formal claims in a case. The CLI accepts `-` as an input path for standard input. Do not send a private owner export or Explorer artifact to an agent or a public channel.
 
 The equivalent typed Lean example is [examples/Synthetic.lean](examples/Synthetic.lean). Its agent JSON bytes match the JSON fixture projection. All checked-in examples are synthetic. The local trace audit reads source files but never writes their converted content: `python3 tools/audit_autoresearch_trace.py <trace-directory>`. Its report contains aggregate checks and field names, while the owner-only source JSON stays in memory.
 
 The [Verso manual](site/README.md) builds locally with compiled Lean snippets. It is a development preview, not a deployed site.
 
 The [same-case Blueprint prototype](blueprint/README.md) records what Blueprint already makes readable and where experimental journal review still needs Slean. The [comparison decision](docs/blueprint-comparison.md) scopes a local Explorer to journal prefixes and evidence.
+
+The [local Explorer](explorer/README.md) renders those checked prefixes into a self-contained agent view. Owner output requires an explicit audience option and separate private artifact directory.
 
 ## Contract and limits
 

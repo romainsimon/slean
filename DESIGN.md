@@ -95,7 +95,7 @@ This is the visual system for the local Slean Verso manual in **Mode Read**. It 
 
 The [Lean Language Reference](https://lean-lang.org/doc/reference/latest/) informs the persistent chapter hierarchy and search placement. [The Rust Programming Language book](https://doc.rust-lang.org/book/) informs the sequence from a working case through concepts and limits, with previous and next chapter navigation. Slean adapts those principles to its five-chapter dossier; it does not copy either site's assets or copy.
 
-The documentation system does not prescribe the future Explorer. Explorer will need its own **Mode Operate** rules for inspecting and acting on case state, while keeping Slean's evidence boundaries and identity coherent.
+The documentation system does not prescribe the local Explorer. Its separate [Mode Operate rules](explorer/DESIGN.md) cover case-state inspection while keeping Slean's evidence boundaries and identity coherent.
 
 **Key Characteristics:**
 

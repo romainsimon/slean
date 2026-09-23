@@ -3,6 +3,7 @@
 /site/_out/
 /blueprint/.lake/
 /blueprint/_out/
+/explorer/_out/
 *.olean
 *.ilean
 *.trace

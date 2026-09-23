@@ -91,6 +91,30 @@ class CliTests(unittest.TestCase):
         case["events"][1]["payload"]["identity"]["id"] = "event-2"
         self.assertEqual(run_case(case)[1]["error"]["code"], "duplicate_object")
 
+    def test_timeline_uses_validated_prefixes_and_agent_projection(self):
+        code, timeline, baseline_bytes = invoke("timeline", EXAMPLES / "valid.json", "agent")
+        self.assertEqual(code, 0)
+        self.assertEqual(timeline["format"], "slean-explorer-timeline/0.1.0")
+        self.assertEqual(timeline["audience"], "agent")
+        self.assertEqual(len(timeline["case"]["events"]), 8)
+        self.assertEqual(len(timeline["snapshots"]), 9)
+        self.assertEqual(timeline["snapshots"][0]["decisions"], [])
+        self.assertEqual(timeline["snapshots"][7]["decisions"][0]["result"], "promote")
+        self.assertEqual(timeline["snapshots"][7]["relations"], [])
+        self.assertEqual(timeline["snapshots"][8]["relations"][0]["kind"], "support")
+        projected = timeline["case"]
+        for prefix in (0, 4, 7, 8):
+            _, replayed, _ = run_case(projected, "replay", prefix)
+            for field in ("protocols", "runs", "artifacts", "observations", "costs",
+                          "assessments", "decisions", "relations"):
+                self.assertEqual(timeline["snapshots"][prefix][field], replayed[field])
+        case = fixture()
+        case["events"][9]["payload"]["value"] = "0.123"
+        self.assertEqual(run_case(case, "timeline", "agent")[2], baseline_bytes)
+        self.assertNotIn("private-observation", baseline_bytes)
+        self.assertEqual(run_case(case, "timeline", "owner")[1]["audience"], "owner")
+        self.assertEqual(invoke("timeline", EXAMPLES / "unit-mismatch.json", "agent")[1]["error"]["code"], "metric_unit")
+
     def test_exact_decimal_and_cost_cap(self):
         case = fixture()
         case["events"][3]["payload"]["value"] = "0.0010000000000000000001"
