@@ -1,87 +1,97 @@
 ---
 name: Slean Documentation
-description: A quiet research dossier for reading Slean's local checks and their limits.
+description: A clear, chaptered reading surface for Slean's checks, evidence, and limits.
 colors:
-  mineral-paper: "#f4f7f2"
-  evergreen-ink: "#20302f"
-  evergreen-heading: "#18342f"
-  evergreen-secondary: "#2b4d42"
-  rail-surface: "#e9eee9"
-  rail-ink: "#263a36"
-  selected-chapter: "#d4e5dd"
-  hairline: "#b9c8bd"
-  rust-link: "#8b3827"
-  rust-hover: "#652b20"
-  rust-focus: "#a44931"
-  search-field: "white"
-  code-surface: "#ecf0ea"
-  code-border: "#c3d0c5"
-  code-ink: "#1b2f2a"
-  inline-code-surface: "#e8ece6"
+  page: "#ffffff"
+  ink: "#17202a"
+  muted: "#59636e"
+  line: "#e6e9ed"
+  soft: "#f7f8fa"
+  focus: "#00895f"
+  selection: "#dceee8"
 typography:
+  brand:
+    fontFamily: '"Satoshi", "Slean Sans Fallback", ui-sans-serif, sans-serif'
+    fontSize: "1.5rem"
+    fontWeight: 700
+    letterSpacing: "-0.025em"
   display:
-    fontFamily: "Slean Display, Georgia, serif"
-    fontSize: "clamp(3.25rem, 5vw, 5.4rem)"
-    fontWeight: 600
-    lineHeight: 1.06
-    letterSpacing: "-0.035em"
+    fontFamily: '"Satoshi", "Slean Sans Fallback", ui-sans-serif, sans-serif'
+    fontSize: "clamp(2.125rem, 3vw, 2.5rem)"
+    fontWeight: 700
+    lineHeight: 1.16
+    letterSpacing: "-0.03em"
   lede:
-    fontFamily: "Slean Display, Georgia, serif"
-    fontSize: "clamp(1.45rem, 2.5vw, 2.15rem)"
-    lineHeight: 1.3
-    letterSpacing: "-0.018em"
-  section:
-    fontFamily: "Slean Display, Georgia, serif"
-    fontSize: "1.7rem"
-    fontWeight: 600
+    fontFamily: '"Satoshi", "Slean Sans Fallback", ui-sans-serif, sans-serif'
+    fontSize: "clamp(1.125rem, 1.5vw, 1.25rem)"
+    fontWeight: 500
     lineHeight: 1.5
+  chapter:
+    fontFamily: '"Satoshi", "Slean Sans Fallback", ui-sans-serif, sans-serif'
+    fontSize: "clamp(1.75rem, 2.5vw, 2rem)"
+    fontWeight: 700
+    lineHeight: 1.25
+    letterSpacing: "-0.025em"
+  section:
+    fontFamily: '"Satoshi", "Slean Sans Fallback", ui-sans-serif, sans-serif'
+    fontSize: "1.375rem"
+    fontWeight: 700
+    lineHeight: 1.35
     letterSpacing: "-0.025em"
   body:
-    fontFamily: "Slean Sans, sans-serif"
-    fontSize: "1rem"
+    fontFamily: '"Satoshi", "Slean Sans Fallback", ui-sans-serif, sans-serif'
+    fontSize: "clamp(1.125rem, 1.35vw, 1.25rem)"
     fontWeight: 400
-    lineHeight: 1.58
+    lineHeight: 1.72
   label:
-    fontFamily: "Slean Sans, sans-serif"
-    fontSize: "0.9rem"
-    fontWeight: 600
+    fontFamily: '"Satoshi", "Slean Sans Fallback", ui-sans-serif, sans-serif'
+    fontSize: "0.875rem"
+    fontWeight: 500
   code:
     fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace"
-    fontSize: "0.92rem"
+    fontSize: "0.875rem"
     lineHeight: 1.55
 rounded:
-  focus: "2px"
+  search-field: "6px"
+  code-block: "6px"
   inline-code: "3px"
-  code-block: "8px"
+  focus: "2px"
 spacing:
-  page-gutter: "clamp(1.25rem, 3vw, 3.5rem)"
-  chapter-row-block: "0.9rem"
-  code-block-block: "1rem"
-  code-block-inline: "1.2rem"
+  page-gutter: "clamp(1.25rem, 3vw, 2.5rem)"
+  content-top: "clamp(2.5rem, 4vw, 3.5rem)"
+  chapter-row-block: "0.85rem"
 components:
+  language-switch:
+    textColor: "{colors.muted}"
+    activeColor: "{colors.ink}"
+    hoverColor: "{colors.focus}"
   search-field:
-    backgroundColor: "{colors.search-field}"
-    textColor: "{colors.evergreen-ink}"
-    height: "auto"
+    backgroundColor: "{colors.page}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.search-field}"
+    height: "2.4rem"
+    padding: "0.4rem 0.8rem"
   chapter-rail:
-    backgroundColor: "{colors.rail-surface}"
-    textColor: "{colors.rail-ink}"
+    backgroundColor: "{colors.page}"
+    textColor: "{colors.ink}"
+    width: "17.5rem"
   chapter-rail-current:
-    backgroundColor: "{colors.selected-chapter}"
-    textColor: "{colors.rail-ink}"
+    backgroundColor: "{colors.soft}"
+    textColor: "{colors.ink}"
   chapter-index-row:
-    textColor: "{colors.evergreen-ink}"
-    padding: "0.9rem 0.2rem"
+    textColor: "{colors.ink}"
+    padding: "0.85rem 0"
   next-chapter-link:
-    textColor: "{colors.rust-link}"
+    textColor: "{colors.ink}"
     typography: "{typography.label}"
   code-block:
-    backgroundColor: "{colors.code-surface}"
-    textColor: "{colors.code-ink}"
+    backgroundColor: "{colors.soft}"
+    textColor: "{colors.ink}"
     rounded: "{rounded.code-block}"
     padding: "1rem 1.2rem"
   inline-code:
-    backgroundColor: "{colors.inline-code-surface}"
+    backgroundColor: "{colors.soft}"
+    textColor: "{colors.ink}"
     rounded: "{rounded.inline-code}"
 ---
 
@@ -91,108 +101,116 @@ components:
 
 **Creative North Star: "The Research Dossier"**
 
-This is the visual system for the local Slean Verso manual in **Mode Read**. It makes a research decision legible through a chaptered reading path, executable examples, and explicit scope. The atmosphere is quiet and exact: pale mineral paper, evergreen text, rust wayfinding, rules instead of cards, and type that separates a claim from its supporting detail.
+The Slean Verso manual is a quiet white reading surface in **Mode Read**. It helps an experiment owner follow a frozen protocol, an observation, a cost, and a decision through a documented case. Clear type, narrow measure, and numbered chapters carry the hierarchy. The visual system does not suggest that a local check proves an external empirical claim.
 
-The [Lean Language Reference](https://lean-lang.org/doc/reference/latest/) informs the persistent chapter hierarchy and search placement. [The Rust Programming Language book](https://doc.rust-lang.org/book/) informs the sequence from a working case through concepts and limits, with previous and next chapter navigation. Slean adapts those principles to its five-chapter dossier; it does not copy either site's assets or copy.
+Mutome's `docs/DESIGN_SPEC.md` supplies the restrained white, ink, muted text, and fine-line roles. Its `.article-body` rules in `app/assets/css/main.css` establish the Satoshi essay reading rhythm: 20px prose with generous leading on desktop, 18px on mobile. Slean adapts that rhythm to its own 18–20px manual, chapter rail, search, code examples, and proof boundaries. It does not reuse Mutome's content or assets.
 
-The documentation system does not prescribe the local Explorer. Its separate [Mode Operate rules](explorer/DESIGN.md) cover case-state inspection while keeping Slean's evidence boundaries and identity coherent.
+The local [Explorer design](explorer/DESIGN.md) remains separate. These rules describe the documentation site, not an inspection tool's interaction model.
 
 **Key Characteristics:**
 
-- A calm, pale reading surface with a fixed chapter rail at desktop widths.
-- A serif hierarchy for the title and section heads; sans serif prose and controls; monospace commands and Lean declarations.
-- Rust links and sequential navigation, with the synthetic example and the limits visible in the reading path.
-- Flat surfaces, fine rules, immediate proof-case expansion, and reduced-motion support.
+- White page, header, and chapter rail with dark ink and fine neutral rules.
+- Satoshi for headings, essay-like prose, navigation, and controls; IBM Plex Sans when Satoshi is unavailable.
+- A fixed desktop chapter rail and a single reading column with a 45rem maximum.
+- French at `/`, English at `/en/`, with a chapter-preserving switch and a separate search index for each language.
+- Links without underlines, one soft selected-chapter fill, bounded code, visible green focus, and no decorative motion.
 
 ## Colors
 
-The palette uses a mineral green family for reading and a restrained rust family for navigation and focus.
-
 ### Primary
 
-- **Evergreen Ink** (`evergreen-ink`) carries paragraphs and code-adjacent labels. **Evergreen Heading** (`evergreen-heading`) holds the title, brand, and section heads.
-- **Rust Link** (`rust-link`) marks reading links and chapter progression. **Rust Hover** (`rust-hover`) deepens a hovered link; **Rust Focus** (`rust-focus`) supplies the visible keyboard outline and native accent color.
+- **Ink** (`ink`) carries headings, code text, the chapter rail, and sequential links. Prose links use green and medium weight without an underline; navigation links change color on hover and retain a visible focus outline.
+- **Focus Green** (`focus`) identifies keyboard focus and link hover. It does not mean that a scientific claim has passed review.
 
 ### Neutral
 
-- **Mineral Paper** (`mineral-paper`) is the page and header ground. **Rail Surface** (`rail-surface`) separates the chapter table from the reading pane.
-- **Rail Ink** (`rail-ink`) keeps chapter labels quieter than the main title. **Evergreen Secondary** (`evergreen-secondary`) supports the opening lede.
-- **Selected Chapter** (`selected-chapter`) marks the current rail row. **Hairline** (`hairline`) divides the header, rail, chapter index, and reading progression without elevation.
-- **Search Field** (`search-field`) is a white control set inside the pale header. **Code Surface** (`code-surface`) and **Inline Code Surface** (`inline-code-surface`) set examples apart; **Code Border** (`code-border`) and **Code Ink** (`code-ink`) keep them legible.
+- **Page White** (`page`) is the reading pane, header, rail, and search field.
+- **Muted Gray** (`muted`) is for navigation captions, numbers, and secondary text.
+- **Fine Line** (`line`) separates the header, rail, contents rows, and examples.
+- **Soft Gray** (`soft`) marks the current chapter and supports code backgrounds.
+- **Selection Tint** (`selection`) makes selected text visible while retaining ink text.
 
-**The Rust Wayfinding Rule.** Use rust for prose links, previous or next chapter progression, hovered index rows, and keyboard focus, not as a claim of validation or scientific status.
+**The Evidence Color Rule.** Use color for navigation and focus, never as a substitute for a labeled check, provenance record, or review status.
 
 ## Typography
 
-**Display Font:** Self-hosted Literata, exposed as `Slean Display`, with Georgia and serif fallbacks.
-**Body Font:** Self-hosted IBM Plex Sans, exposed as `Slean Sans`, with a sans serif fallback.
+**Display and Body Font:** Satoshi from the [official Fontshare CSS API](https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap), then self-hosted IBM Plex Sans as `Slean Sans Fallback`, then the system sans stack. Both headings and prose are sans serif.
+
 **Code Font:** The platform monospace stack used by Verso.
 
-Literata gives the title and section heads an editorial voice. IBM Plex Sans makes technical prose and chapter labels compact and readable. The search field keeps Verso's standard system control type. Code keeps commands and Lean names visually distinct.
+Satoshi files are not committed because its closed-source [ITF Free Font License](https://www.fontshare.com/licenses/itf-ffl) restricts redistribution. The site loads Satoshi through Fontshare's API. The checked-in IBM Plex Sans fallback keeps the manual legible if that request is unavailable.
 
 ### Hierarchy
 
-- **Display** (`display`): the opening manual title; its size is responsive and its line height stays tight.
-- **Lede** (`lede`): one prominent sentence below the title, followed by ordinary prose.
-- **Section** (`section`): chapter and section headings. Smaller subheads keep the same family and weight.
-- **Body** (`body`): paragraphs and explanations; prose stays near a 69-character measure.
-- **Label** (`label`): compact previous and next chapter controls; rail and index rows use the body scale with stronger weight.
-- **Code** (`code`): commands, JSON output, and Lean declarations, with horizontal overflow contained inside each code panel.
+- **Brand** (`brand`): supplied charcoal Slean vector wordmark in the white header and on the title page. The mobile header uses an S mark derived from the same geometry; its larger strokes remain readable at small sizes. The supplied white wordmark is retained for a future dark surface. The font token remains the fallback for generated text.
+- **Display** (`display`): title page heading, with a restrained responsive range.
+- **Lede** (`lede`): one prominent sentence directly under the title.
+- **Chapter** (`chapter`) and **Section** (`section`): bold sans headings with tight tracking; smaller subheads keep the same family.
+- **Body** (`body`): continuous Satoshi prose at 18–20px with 1.72 line height; paragraphs and lists also have a 70ch cap.
+- **Label** (`label`): rail entries and previous/next navigation.
+- **Code** (`code`): commands, JSON, and Lean declarations in distinct monospace.
 
-**The Claim and Detail Rule.** Let the serif heading state the question or section; put qualifications, commands, and boundaries in readable sans serif prose and code.
+**The One Reading Voice Rule.** Keep titles, prose, search, and navigation in the same sans family; use monospace only for source material and commands.
 
 ## Layout
 
-The desktop manual has a fixed header and a left chapter rail (18.5rem) beside a reading pane. The content maximum is 48rem, with a responsive horizontal gutter (`page-gutter`). Body paragraphs and list items are capped near 69ch; the first title page uses wider breathing room above the chapter index. Chapter rows are numbered and separated by hairlines. Previous and next links appear at chapter boundaries.
+Verso supplies a fixed header and chapter rail. On desktop, the white rail is 17.5rem wide, separated by a fine rule. The reading pane has a 45rem maximum width and a responsive side gutter. The header is 4.5rem high; content begins with generous top space, then follows one vertical reading path. The numbered contents list and previous/next links support both lookup and sequential reading.
 
-At 700px and below, the rail becomes a menu controlled from the header and the reading pane takes the width. The header gets shorter, the title scales to the narrow viewport, and a single progression link can occupy a full row. Code blocks scroll within their own bounds rather than widening the page.
+The language switch is always visible in the header. French is the root manual and English lives in `/en/`. Each switch link points to the corresponding chapter; each manual has its own generated contents and search index. Code identifiers, commands, schema names, and proof statuses retain their exact source spelling in both languages.
 
-**The Bounded Reading Rule.** Keep the document measure controlled on wide screens and preserve a continuous single-column path on mobile.
+At 700px and below, the header becomes 4rem high and the rail moves behind the menu control. The reading pane takes the available width with a 1.25rem gutter. Code examples scroll horizontally inside their own bounds; long code does not widen the page. Keep the menu control and chapter links keyboard accessible.
+
+**The Bounded Reading Rule.** Keep prose within the 45rem reading pane and preserve one continuous column on narrow screens.
 
 ## Elevation & Depth
 
-The manual is flat. It uses no resting shadows in the header or chapter rail. Background changes, fine borders, and whitespace distinguish the reading pane, rail, code, and search control. The current chapter uses a soft filled row. Do not add floating cards or lifted panels to ordinary prose.
+The page, header, and rail are flat at rest. White space, fine borders, and one soft-gray selected row provide hierarchy. Only the search results list has a small shadow, so it reads as a temporary layer over the document. Ordinary prose and code do not become raised cards.
 
-**The Flat Page Rule.** Give documentation hierarchy through measure, tint, border, and whitespace rather than elevation.
+**The Flat Page Rule.** Use measure, spacing, border, and quiet fill before adding elevation.
 
 ## Shapes
 
-Lines and rectangular planes lead the form language. The search control and chapter rows stay square. Code blocks have gently rounded corners (`code-block`); inline code uses the smaller `inline-code` radius. The keyboard outline has a slight `focus` radius and sits outside the focused target.
+The manual uses straight rules and restrained corners. Search and block-code containers have a 6px radius; inline code has a 3px radius. Keyboard focus has a 2px outline with a slight corner radius and sits outside its target. Chapter rows and the rail remain square.
 
 ## Components
 
 ### Search Field
 
-The header contains a compact white search control with a simple lower edge. It stays visible beside the title at desktop and mobile widths. Its hover and focused states use Verso's selected tint; keyboard focus remains visible.
+The header search is a white, 6px rounded field with an ink label and a fine border. It stays visible beside the language switch on desktop and mobile. Focus changes the border to green and gives keyboard users a separate visible outline. Results use a white list with a fine border, soft hover row, and the only small overlay shadow. Search text, labels, and results follow the active manual language.
+
+### Language Switch
+
+The compact `FR / EN` switch sits between the site name and search. The active language has bold ink text; the other is muted and gains green on hover. Both links remain ordinary anchors, so a reader can switch chapters without JavaScript. The document `lang` attribute and accessible switch label match the selected language.
 
 ### Chapter Rail
 
-The desktop rail uses a pale green plane, numbered chapter entries, dark green labels, and a soft fill for the current row. On mobile, the same hierarchy moves into a dismissible menu. The menu control reports its open state and the closed rail is inert to keyboard navigation.
+The desktop rail stays fixed beside the text. Its caption and numbers are muted; chapter names are ink. The current chapter receives a soft fill and bold label. On mobile, the same navigation opens from the header menu.
 
 ### Chapter Index and Progression
 
-The title page repeats the five numbered chapters as full-width, hairline-separated evergreen links that turn rust on hover. Previous and next chapter links use rust and point along the reading sequence. Their text stays explicit; the arrow is supplementary.
+The title page lists numbered chapters as full-width text rows divided by fine lines. Hover uses green while the title stays ink. Links remain free of underlines in every state. Previous and next links remain explicit text at chapter boundaries; the arrow is supplementary.
 
 ### Code
 
-Block examples use a pale green panel, a fine border, and inner padding. Long code scrolls horizontally inside the panel. Inline code gets only a quiet tint. Labeled Lean proof cases expand immediately, so inspection is not delayed by motion.
+Block examples use soft gray, a fine line, 6px corners, and inner padding. Overflow stays inside each block. Inline code uses only a quiet tint and 3px corners. Labeled Lean proof cases expand immediately on request.
 
 ### Focus and Motion
 
-Keyboard focus uses a 3px rust outline offset from links, menu labels, buttons, and native inputs. The search combobox retains Verso's focused tint and outline. Ordinary page movement is smooth, but the reduced-motion preference makes scrolling and transitions immediate. Reading controls must remain interruptible.
+Keyboard focus is a 2px green outline, offset from the control. Ordinary anchor scrolling may be smooth; the reduced-motion preference makes it immediate and suppresses transitions. No decorative motion is added to the reading flow.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** keep the documentation in Mode Read: claim, example, provenance, format, and limits remain easy to find.
-- **Do** use the numbered chapter rail, search, and previous or next links to support both lookup and linear reading.
-- **Do** keep commands and Lean declarations in bounded, horizontally scrollable code panels.
-- **Do** preserve visible focus and the reduced-motion behavior.
+- **Do** keep the path from claim to protocol, observation, cost, and decision easy to scan.
+- **Do** use ink for content, muted text for supporting labels, and green for navigation feedback.
+- **Do** keep commands and Lean declarations in bounded, horizontally scrollable code examples.
+- **Do** preserve readable mobile text, visible focus, and reduced-motion behavior.
+- **Do** keep every visible manual label and search result in the selected language.
 
 ### Don't:
 
-- **Don't** use color or decoration to imply that a synthetic example proves an empirical result.
-- **Don't** turn body prose into cards or add ambient shadows to the reading layout.
-- **Don't** copy a complete Lean Reference or Rust Book screen, its protected assets, or its prose.
-- **Don't** apply these documentation layout rules to Explorer without a separate Mode Operate design pass.
+- **Don't** imply that a synthetic example or conditional Lean theorem certifies a measurement, evaluator, or human decision.
+- **Don't** add tinted page backgrounds, underlined links, or serif headings.
+- **Don't** add decorative cards, gradients, ambient shadows, or motion to fill the page.
+- **Don't** apply the documentation layout rules to Explorer without a separate Mode Operate decision.

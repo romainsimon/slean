@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const french = document.documentElement.lang === "fr";
   const trigger = document.getElementById("toggle-toc-click");
   const toggle = document.getElementById("toggle-toc");
   const toc = document.getElementById("toc");
@@ -10,7 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const open = toggle.checked;
       if (toc) toc.inert = window.matchMedia("(max-width: 700px)").matches && !open;
       trigger.setAttribute("aria-expanded", String(open));
-      trigger.setAttribute("aria-label", open ? "Close table of contents" : "Open table of contents");
+      trigger.setAttribute("aria-label", open
+        ? (french ? "Fermer le sommaire" : "Close table of contents")
+        : (french ? "Ouvrir le sommaire" : "Open table of contents"));
     };
     trigger.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
@@ -25,6 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   document.querySelectorAll(".permalink-widget a").forEach((link) => {
-    link.setAttribute("aria-label", "Link to this section");
+    link.setAttribute("aria-label", french ? "Lien vers cette section" : "Link to this section");
   });
 });
