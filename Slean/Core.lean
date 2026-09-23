@@ -127,6 +127,15 @@ structure Relation where
   kind : String
   deriving Repr, BEq, ToJson, FromJson
 
+/-- Canonical JSON source record for the bounded development-trace adapter.
+    Its contents are owner-only and are never an empirical or formal proof. -/
+structure SourceRecord where
+  identity : Identity
+  source_role : String
+  canonical_sha256 : String
+  raw_json : String
+  deriving ToJson, FromJson
+
 /-- Reserved dependency syntax. V0 does not evaluate general hyperdependencies. -/
 inductive DependencyExpr where
   | reference (objectId : String)
@@ -227,6 +236,7 @@ structure State where
   decisions : Array PromotionDecision := #[]
   formal_claims : Array FormalClaimRef := #[]
   relations : Array Relation := #[]
+  source_records : Array SourceRecord := #[]
   deriving Inhabited, ToJson
 
 def hasObject (state : State) (id : String) : Bool := state.object_ids.contains id
@@ -236,6 +246,11 @@ def findObservation (state : State) (id : String) : Option Observation := state.
 def findAssessment (state : State) (id : String) : Option Assessment := state.assessments.find? (·.identity.id == id)
 def findTime (state : State) (id : String) : Option String :=
   (state.object_times.find? (·.fst == id)).map (·.snd)
+
+def isSha256 (value : String) : Bool :=
+  let hex := (value.drop 7).toString
+  value.startsWith "sha256:" && hex.length == 64 &&
+    hex.toList.all (fun c => c.isDigit || ('a' <= c && c <= 'f'))
 
 /-- The only evidence path used for a routine promotion. The assessment must
     point to a prior observation from a run on the same frozen protocol. -/
@@ -343,10 +358,7 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
   | "artifact_registered" =>
     let a : ArtifactRef ← decodePayload event
     let state ← withIdentity state event a.identity
-    let digestText := (a.digest.drop 7).toString
-    if !(a.digest.startsWith "sha256:") || digestText.length != 64 ||
-        !(digestText.toList.all (fun c => c.isDigit || ('a' <= c && c <= 'f'))) ||
-        a.media_type.isEmpty then
+    if !(isSha256 a.digest) || a.media_type.isEmpty then
       throw (diag event.event_id a.identity.id "artifact" "lowercase sha256 digest and media type are required")
     return { state with artifacts := state.artifacts.push a }
   | "observation_recorded" =>
@@ -399,20 +411,33 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
     let protocol ← match findProtocol state a.protocol_ref with
       | some protocol => pure protocol
       | none => throw (diag event.event_id a.identity.id "missing_protocol" "assessment references no frozen protocol")
-    if a.observation_refs.size != 1 then
-      throw (diag event.event_id a.identity.id "observation_count" "V0 exact comparator requires one observation")
-    let observation ← match findObservation state a.observation_refs[0]! with
+    if a.observation_refs.isEmpty ||
+        (protocol.direction != "external" && a.observation_refs.size != 1) then
+      throw (diag event.event_id a.identity.id "observation_count" "exact rule needs one observation; external rule needs at least one")
+    let mut allMeasured := true
+    let mut selected : Option Observation := none
+    let mut seenRefs : Array String := #[]
+    for observationRef in a.observation_refs do
+      if seenRefs.contains observationRef then
+        throw (diag event.event_id a.identity.id "duplicate_observation_ref" "assessment repeats an observation")
+      seenRefs := seenRefs.push observationRef
+      let observation ← match findObservation state observationRef with
+        | some observation => pure observation
+        | none => throw (diag event.event_id a.identity.id "missing_observation" "assessment references no prior observation")
+      let run ← match findRun state observation.run_ref with
+        | some run => pure run
+        | none => throw (diag event.event_id a.identity.id "missing_run" "assessment observation run is missing")
+      if run.protocol_ref != protocol.identity.id then
+        throw (diag event.event_id a.identity.id "protocol_mismatch" "assessment and observation refer to different protocols")
+      if observation.observed_at > event.recorded_at then
+        throw (diag event.event_id a.identity.id "future_observation" "observation is later than assessment")
+      if observation.status != "measured" then allMeasured := false
+      if selected.isNone then selected := some observation
+    let observation ← match selected with
       | some observation => pure observation
-      | none => throw (diag event.event_id a.identity.id "missing_observation" "assessment references no prior observation")
-    let run ← match findRun state observation.run_ref with
-      | some run => pure run
-      | none => throw (diag event.event_id a.identity.id "missing_run" "assessment observation run is missing")
-    if run.protocol_ref != protocol.identity.id then
-      throw (diag event.event_id a.identity.id "protocol_mismatch" "assessment and observation refer to different protocols")
-    if observation.observed_at > event.recorded_at then
-      throw (diag event.event_id a.identity.id "future_observation" "observation is later than assessment")
+      | none => throw (diag event.event_id a.identity.id "observation_count" "assessment has no observation")
     let expected ← if protocol.direction == "external" then
-      pure (if observation.status == "measured" then "external_unverified" else "undetermined") else
+      pure (if allMeasured then "external_unverified" else "undetermined") else
       match assessExact protocol observation with
       | .ok verdict => pure verdict
       | .error message => throw (diag event.event_id a.identity.id "rule" message)
@@ -450,10 +475,162 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
     unless #["provenance", "support", "contradiction", "prerequisite", "formal_implication"].contains r.kind do
       throw (diag event.event_id r.identity.id "relation_kind" "invalid relation kind")
     return { state with relations := state.relations.push r }
+  | "source_recorded" =>
+    let record : SourceRecord ← decodePayload event
+    if event.audience != "owner" || record.identity.audience != "owner" then
+      throw (diag event.event_id record.identity.id "source_audience" "source records must remain owner-only")
+    let state ← withIdentity state event record.identity
+    let raw ← match Json.parse record.raw_json with
+      | .ok value => pure value
+      | .error _ => throw (diag event.event_id record.identity.id "source_record" "source JSON does not parse")
+    if !(#["manifest", "protocol", "event"].contains record.source_role) ||
+        !(isSha256 record.canonical_sha256) || raw.getObj?.toOption.isNone then
+      throw (diag event.event_id record.identity.id "source_record" "source role, canonical digest and JSON object are required")
+    return { state with source_records := state.source_records.push record }
   | _ => throw (diag event.event_id "" "unknown_event" s!"unknown event kind {event.kind}")
 
+private def jsonAt (value : Json) (path : List String) : Option Json :=
+  path.foldl (fun current key => current.bind (fun item => (item.getObjVal? key).toOption)) (some value)
+
+private def stringAt (value : Json) (path : List String) : Option String :=
+  (jsonAt value path).bind (fun item => (fromJson? item : Except String String).toOption)
+
+private def natAt (value : Json) (path : List String) : Option Nat :=
+  (jsonAt value path).bind (fun item => (fromJson? item : Except String Nat).toOption)
+
+/-- Cross-file source bindings, independent of the external evaluator's algorithm.
+    Canonical SHA values are supplied by the adapter; Lean checks their links,
+    not the cryptographic computation. -/
+def validateSourceTrace (state : State) : Except Diagnostic Unit := do
+  let manifests := state.source_records.filter (·.source_role == "manifest")
+  let protocols := state.source_records.filter (·.source_role == "protocol")
+  let records := state.source_records.filter (·.source_role == "event")
+  if manifests.size != 1 || protocols.size != 1 || records.isEmpty then
+    throw (diag "" "" "source_documents" "one manifest, one protocol and source events are required")
+  let manifest ← match manifests[0]? with
+    | some value => pure value
+    | none => throw (diag "" "" "source_documents" "manifest is missing")
+  let protocol ← match protocols[0]? with
+    | some value => pure value
+    | none => throw (diag "" "" "source_documents" "protocol is missing")
+  let manifestRaw ← match Json.parse manifest.raw_json with
+    | .ok value => pure value
+    | .error _ => throw (diag "" manifest.identity.id "source_manifest" "manifest JSON does not parse")
+  let attempt ← match stringAt manifestRaw ["attempt_id"] with
+    | some value => pure value
+    | none => throw (diag "" manifest.identity.id "source_manifest" "attempt_id is missing")
+  let mut sourceIds : Array String := #[]
+  let mut predictions : Array (String × Json) := #[]
+  let mut observationCount := 0
+  let mut expectedObservations : Array String := #[]
+  let mut freezeCount := 0
+  let mut completionCount := 0
+  for index in [:records.size] do
+    let record ← match records[index]? with
+      | some value => pure value
+      | none => throw (diag "" "" "source_documents" "source event is missing")
+    let raw ← match Json.parse record.raw_json with
+      | .ok value => pure value
+      | .error _ => throw (diag "" record.identity.id "source_event" "source event JSON does not parse")
+    let sourceId ← match stringAt raw ["event_id"] with
+      | some value => pure value
+      | none => throw (diag "" record.identity.id "source_event" "event_id is missing")
+    if sourceIds.contains sourceId then
+      throw (diag sourceId record.identity.id "source_duplicate_event" "source event ID is repeated")
+    sourceIds := sourceIds.push sourceId
+    if natAt raw ["sequence"] != some (index + 1) then
+      throw (diag sourceId record.identity.id "source_sequence" "source sequence is not contiguous")
+    if stringAt raw ["attempt_id"] != some attempt then
+      throw (diag sourceId record.identity.id "source_attempt" "source event belongs to another attempt")
+    let kind ← match stringAt raw ["type"] with
+      | some value => pure value
+      | none => throw (diag sourceId record.identity.id "source_event" "type is missing")
+    let payload ← match jsonAt raw ["payload"] with
+      | some value => pure value
+      | none => throw (diag sourceId record.identity.id "source_event" "payload is missing")
+    if kind == "protocol_frozen" then
+      freezeCount := freezeCount + 1
+      if index != 0 || freezeCount != 1 then
+        throw (diag sourceId record.identity.id "source_second_freeze" "exactly one first freeze is allowed")
+      let freezeHash := stringAt payload ["definition_sha256"]
+      let manifestHash := stringAt manifestRaw ["provenance", "definition_sha256"]
+      if freezeHash.isNone || freezeHash != manifestHash ||
+          freezeHash != some ((protocol.canonical_sha256.drop 7).toString) then
+        throw (diag sourceId record.identity.id "source_protocol_digest" "frozen, manifest and protocol digests differ")
+      unless state.protocols.any (·.identity.id == "protocol:" ++ sourceId) do
+        throw (diag sourceId record.identity.id "source_projection" "typed protocol does not name the source freeze")
+    else if kind == "prediction_frozen" then
+      let hash ← match stringAt payload ["prediction_sha256"] with
+        | some value => pure value
+        | none => throw (diag sourceId record.identity.id "source_prediction" "prediction hash is missing")
+      if predictions.any (·.fst == hash) then
+        throw (diag sourceId record.identity.id "source_prediction" "prediction hash is repeated")
+      predictions := predictions.push (hash, payload)
+    else if kind == "observation_recorded" then
+      observationCount := observationCount + 1
+      expectedObservations := expectedObservations.push ("observation:" ++ sourceId)
+      let hash ← match stringAt payload ["prediction_sha256"] with
+        | some value => pure value
+        | none => throw (diag sourceId record.identity.id "source_prediction_ref" "observation has no prediction hash")
+      let prediction ← match (predictions.find? (·.fst == hash)).map (·.snd) with
+        | some value => pure value
+        | none => throw (diag sourceId record.identity.id "source_prediction_ref" "observation has no prior prediction")
+      for key in ["observation_id", "phase", "condition"] do
+        if jsonAt payload [key] != jsonAt prediction [key] || (jsonAt payload [key]).isNone then
+          throw (diag sourceId record.identity.id "source_prediction_ref" s!"{key} differs from frozen prediction")
+      let typed ← match findObservation state ("observation:" ++ sourceId) with
+        | some value => pure value
+        | none => throw (diag sourceId record.identity.id "source_projection" "typed observation is missing")
+      if stringAt payload ["units"] != some typed.unit then
+        throw (diag sourceId record.identity.id "source_projection" "typed observation unit differs from source")
+      let sourceValue ← match jsonAt payload ["observation"] with
+        | some value => pure value
+        | none => throw (diag sourceId record.identity.id "source_projection" "source observation value is missing")
+      let expectedValue := if sourceValue == Json.null then none else some sourceValue.compress
+      if typed.value != expectedValue ||
+          typed.status != (if sourceValue == Json.null then "unknown" else "measured") then
+        throw (diag sourceId record.identity.id "source_projection" "typed observation value differs from source")
+    else if kind == "discrimination_completed" then
+      completionCount := completionCount + 1
+      if completionCount != 1 || index + 1 != records.size then
+        throw (diag sourceId record.identity.id "source_completion" "completion must be unique and final")
+      let result ← match jsonAt manifestRaw ["result", "discrimination"] with
+        | some value => pure value
+        | none => throw (diag sourceId record.identity.id "source_result" "manifest result is missing")
+      for key in ["decision", "observations_used", "planning_cpu_seconds", "posterior_model_probabilities"] do
+        if jsonAt payload [key] != jsonAt result [key] || (jsonAt payload [key]).isNone then
+          throw (diag sourceId record.identity.id "source_decision_provenance" s!"completion {key} differs from manifest result")
+      if natAt payload ["observations_used"] != some observationCount then
+        throw (diag sourceId record.identity.id "source_observation_count" "completion count differs from recorded observations")
+    else
+      throw (diag sourceId record.identity.id "source_event_kind" s!"unsupported source event {kind}")
+  if freezeCount != 1 || completionCount != 1 then
+    throw (diag "" "" "source_incomplete" "freeze or completion is missing")
+  if state.protocols.size != 1 || state.observations.size != observationCount ||
+      state.assessments.size != 1 || state.decisions.size != 1 then
+    throw (diag "" "" "source_projection" "typed dossier does not cover all source observations")
+  let represented := state.observations.map (·.identity.id)
+  if represented != expectedObservations then
+    throw (diag "" "" "source_projection" "typed observations omit or reorder source events")
+  let assessment ← match state.assessments[0]? with
+    | some value => pure value
+    | none => throw (diag "" "" "source_projection" "assessment is missing")
+  if assessment.observation_refs != represented then
+    throw (diag "" assessment.identity.id "source_projection" "assessment omits or reorders source observations")
+  let decision ← match state.decisions[0]? with
+    | some value => pure value
+    | none => throw (diag "" "" "source_projection" "typed decision is missing")
+  let expectedDecision := match stringAt manifestRaw ["scientific_decision"] with
+    | some "keep" => "override"
+    | some "discard" => "reject"
+    | some "inconclusive" => "defer"
+    | _ => "defer"
+  if decision.result != expectedDecision || decision.assessment_ref != assessment.identity.id then
+    throw (diag "" decision.identity.id "source_projection" "typed decision differs from source scientific decision")
+
 def replay (caseFile : CaseFile) (count : Nat := caseFile.events.size) : Except Diagnostic State := do
-  if caseFile.schema_version != "0.1.0" || caseFile.semantics_version != "0.1.0" then
+  if !(caseFile.schema_version == "0.1.0" && caseFile.semantics_version == "0.1.0") &&
+      !(caseFile.schema_version == "0.2.0" && caseFile.semantics_version == "0.2.0") then
     throw (diag "" caseFile.case_id "version" "unsupported schema or semantics version; no implicit migration")
   if caseFile.case_id.isEmpty || caseFile.version == 0 || caseFile.domain.isEmpty || caseFile.provenance.isEmpty ||
       (caseFile.audience != "agent" && caseFile.audience != "owner") ||
@@ -467,7 +644,11 @@ def replay (caseFile : CaseFile) (count : Nat := caseFile.events.size) : Except 
     throw (diag "" caseFile.case_id "prefix" "snapshot prefix exceeds event count")
   let mut state : State := { object_ids := (#[caseFile.question.identity.id, caseFile.claim.identity.id]), claim_id := caseFile.claim.identity.id }
   for event in caseFile.events.extract 0 count do
+    if caseFile.schema_version == "0.1.0" && event.kind == "source_recorded" then
+      throw (diag event.event_id "" "version" "source records require schema 0.2.0")
     state ← step state event
+  if count == caseFile.events.size && !state.source_records.isEmpty then
+    validateSourceTrace state
   return state
 
 end Slean

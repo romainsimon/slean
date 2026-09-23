@@ -123,6 +123,8 @@ class CliTests(unittest.TestCase):
         case["schema_version"] = "0.2.0"
         code, result, _ = run_case(case)
         self.assertEqual((code, result["error"]["code"]), (1, "version"))
+        case["semantics_version"] = "0.2.0"
+        self.assertEqual(run_case(case)[0], 0)
         case = fixture()
         baseline_export = run_case(case, "export", "agent")[2]
         baseline_view = run_case(case, "view", "agent")[2]

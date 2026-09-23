@@ -21,7 +21,7 @@ BIN = ROOT / ".lake/build/bin/slean"
 
 
 def read_json(path):
-    return json.loads(path.read_text(), parse_float=Decimal)
+    return json.loads(path.read_text())
 
 
 def utc_second(raw):
@@ -35,14 +35,16 @@ def ident(value, source, audience="owner"):
 
 
 def digest(value):
-    return "sha256:" + hashlib.sha256(json.dumps(value, sort_keys=True, default=str).encode()).hexdigest()
+    # Match the source runtime's canonical JSON digest, without changing its files.
+    return "sha256:" + hashlib.sha256(canonical_json(value).encode()).hexdigest()
+
+
+def canonical_json(value):
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
 
 
 def make_case(manifest, protocol, source_events):
-    """Map observed event shape; retain source fields only in the original files.
-
-    This conversion is deliberately lossy and the report names that loss.
-    """
+    """Retain each source JSON object in an owner-only in-memory dossier."""
     attempt = str(manifest["attempt_id"])
     frozen = next(e for e in source_events if e["type"] == "protocol_frozen")
     observations = [e for e in source_events if e["type"] == "observation_recorded"]
@@ -72,12 +74,32 @@ def make_case(manifest, protocol, source_events):
          "protocol_ref": "protocol:" + frozen_id, "input_ref": "source-input:" + attempt,
          "seed": "source-defined"}, frozen_id, frozen["observed_at"])
 
-    last_observation_id = None
+    emit("source_recorded", {"identity": ident("source-manifest:" + attempt, frozen_id),
+         "source_role": "manifest", "canonical_sha256": digest(manifest),
+         "raw_json": canonical_json(manifest)}, frozen_id, frozen["observed_at"])
+    emit("source_recorded", {"identity": ident("source-protocol:" + attempt, frozen_id),
+         "source_role": "protocol", "canonical_sha256": digest(protocol),
+         "raw_json": canonical_json(protocol)}, frozen_id, frozen["observed_at"])
+
+    observation_ids = []
     for source in source_events:
         source_id = str(source["event_id"])
         payload = source["payload"]
         at = source["observed_at"]
-        if source["type"] == "prediction_frozen":
+        emit("source_recorded", {"identity": ident("source-event:" + source_id, source_id),
+             "source_role": "event", "canonical_sha256": digest(source),
+             "raw_json": canonical_json(source)}, source_id, at)
+        if source["type"] == "protocol_frozen":
+            if source_id != frozen_id:
+                emit("protocol_frozen", {
+                    "identity": ident("protocol:" + source_id, source_id), "claim_ref": "claim:" + attempt,
+                    "metric_id": "source_observation", "unit": unit, "direction": "external",
+                    "threshold": "0", "inclusive": False, "data_scope": "source development trace",
+                    "evaluator_ref": str(protocol.get("selection_code_sha256", "unidentified-external-evaluator")),
+                    "cost_cap": str(manifest.get("budgets", {}).get("cpu_seconds", 0)), "cost_unit": "cpu_s",
+                    "stop_rule": "source external stop rule", "frozen_at": utc_second(at),
+                }, source_id, at)
+        elif source["type"] == "prediction_frozen":
             prediction_id = "prediction:" + source_id
             known_predictions[str(payload["prediction_sha256"])] = prediction_id
             emit("artifact_registered", {"identity": ident(prediction_id, source_id),
@@ -90,7 +112,8 @@ def make_case(manifest, protocol, source_events):
             emit("observation_recorded", {
                 "identity": ident(observation_id, source_id), "run_ref": "run:" + attempt,
                 "metric_id": "source_observation", "unit": str(payload["units"]),
-                "value": str(payload["observation"]) if payload.get("observation") is not None else None,
+                "value": format(Decimal(str(payload["observation"])), "f")
+                if payload.get("observation") is not None else None,
                 "status": "measured" if payload.get("observation") is not None else "unknown",
                 "artifact_ref": measured_id, "observed_at": utc_second(at)}, source_id, at)
             prediction_id = known_predictions.get(str(payload.get("prediction_sha256")),
@@ -98,7 +121,7 @@ def make_case(manifest, protocol, source_events):
             emit("relation_recorded", {"identity": ident("relation:" + source_id, source_id),
                  "source_ref": prediction_id, "target_ref": observation_id,
                  "kind": "provenance"}, source_id, at)
-            last_observation_id = observation_id
+            observation_ids.append(observation_id)
         elif source["type"] == "discrimination_completed":
             usage = manifest.get("usage") or {}
             cpu = usage.get("cpu_seconds")
@@ -107,7 +130,7 @@ def make_case(manifest, protocol, source_events):
                      "run_ref": "run:" + attempt, "category": "machine_time", "amount": str(cpu),
                      "unit": "cpu_s", "source": "source-manifest-usage", "coverage": "partial"}, source_id, at)
             emit("assessment_recorded", {"identity": ident("assessment:" + source_id, source_id),
-                 "protocol_ref": "protocol:" + frozen_id, "observation_refs": [last_observation_id],
+                 "protocol_ref": "protocol:" + frozen_id, "observation_refs": observation_ids,
                  "verdict": "external_unverified", "rule_used": "external"}, source_id, at)
             source_decision = manifest.get("scientific_decision")
             result = {"keep": "override", "discard": "reject", "inconclusive": "defer"}.get(source_decision, "defer")
@@ -115,8 +138,8 @@ def make_case(manifest, protocol, source_events):
                  "assessment_ref": "assessment:" + source_id, "result": result,
                  "reason": "External multi-observation decision; no Slean V0 pass is claimed."}, source_id, at)
 
-    return {"schema_version": "0.1.0", "semantics_version": "0.1.0", "case_id": attempt,
-            "version": 1, "domain": "local-development-trace", "provenance": "read-only-adapter-v0",
+    return {"schema_version": "0.2.0", "semantics_version": "0.2.0", "case_id": attempt,
+            "version": 1, "domain": "local-development-trace", "provenance": "read-only-adapter-v0.2",
             "audience": "owner",
             "question": {"identity": ident("question:" + attempt, frozen_id),
                          "text": str(manifest.get("question", "Source question"))},
@@ -136,8 +159,7 @@ def validate_case(case):
 
 
 def source_shape(manifest, protocol, events):
-    definition_hash = hashlib.sha256(json.dumps(protocol, sort_keys=True, separators=(",", ":"),
-                                                default=str).encode()).hexdigest()
+    definition_hash = digest(protocol).removeprefix("sha256:")
     return {
         "source_event_count": len(events),
         "source_event_types": dict(sorted(Counter(e["type"] for e in events).items())),
@@ -190,9 +212,26 @@ def mutation_probes(manifest, protocol, events):
     changed = copy.deepcopy(events)
     duplicate = copy.deepcopy(changed[0])
     duplicate["event_id"] = "duplicate-freeze-probe"
-    duplicate["sequence"] = len(changed) + 1
-    changed.append(duplicate)
+    changed.insert(1, duplicate)
+    for index, event in enumerate(changed, 1):
+        event["sequence"] = index
     results["second_freeze_event"] = validate_case(make_case(manifest, protocol, changed))[1] or "accepted"
+    changed = copy.deepcopy(events)
+    next(e for e in changed if e["type"] == "discrimination_completed")["payload"]["decision"] = "changed-probe"
+    results["completion_decision"] = validate_case(make_case(manifest, protocol, changed))[1] or "accepted"
+    rebound_manifest = copy.deepcopy(manifest)
+    rebound_bytes = "".join(json.dumps(e, sort_keys=True, allow_nan=False) + "\n"
+                            for e in changed).encode()
+    for artifact in rebound_manifest.get("artifacts", []):
+        if artifact["path"] == "events.jsonl":
+            artifact["size_bytes"] = len(rebound_bytes)
+            artifact["sha256"] = hashlib.sha256(rebound_bytes).hexdigest()
+    results["completion_decision_rehashed"] = (
+        validate_case(make_case(rebound_manifest, protocol, changed))[1] or "accepted")
+    converted = make_case(manifest, protocol, events)
+    assessment = next(e for e in converted["events"] if e["kind"] == "assessment_recorded")
+    assessment["payload"]["observation_refs"].pop()
+    results["omitted_assessment_observation"] = validate_case(converted)[1] or "accepted"
     return results
 
 
@@ -205,19 +244,19 @@ def loss_report(manifest, protocol, events):
         "observation_recorded": {"observation", "units", "prediction_sha256"},
         "discrimination_completed": set(),
     }
-    unmapped = {kind: sorted(set(e["payload"]) - mapped_event.get(kind, set()))
-                for kind in sorted({e["type"] for e in events})
-                for e in events if e["type"] == kind}
+    unmapped = {kind: sorted(set().union(*(set(e["payload"]) for e in events
+                                            if e["type"] == kind)) - mapped_event.get(kind, set()))
+                for kind in sorted({e["type"] for e in events})}
     return {
-        "manifest_fields_not_modeled": sorted(set(manifest) - mapped_manifest),
-        "protocol_fields_not_modeled": sorted(set(protocol) - mapped_protocol),
-        "event_payload_fields_not_modeled": unmapped,
-        "decision_critical_losses": [
-            "Only the last of the source observations enters the V0 assessment.",
-            "Model predictions, conditions, phases, posterior probabilities and audit adequacy remain in source files, not in the V0 dossier.",
-            "External decision logic is labeled external_unverified; keep maps to a reasoned override, never to pass.",
-            "Source timestamps are normalized to UTC seconds; subsecond precision is not represented.",
-            "Source artifacts are referenced by digest only; their original bytes stay in the source repository.",
+        "wire_fields_lost": [],
+        "manifest_fields_not_typed": sorted(set(manifest) - mapped_manifest),
+        "protocol_fields_not_typed": sorted(set(protocol) - mapped_protocol),
+        "event_payload_fields_not_typed": unmapped,
+        "semantic_limits": [
+            "Every source JSON object remains in owner-only records; typed observations and assessment cover all source observations.",
+            "Model comparison, posterior calculation and audit adequacy remain external and unverified by Slean.",
+            "Typed timestamps use UTC seconds; owner-only source records retain original precision.",
+            "External artifact bytes remain in the source repository and are checked by path, size and hash; they are not embedded in the case.",
         ],
     }
 
@@ -226,9 +265,8 @@ def audit(path):
     files = {name: path / name for name in ("manifest.json", "protocol.json", "events.jsonl")}
     before = {name: hashlib.sha256(file.read_bytes()).digest() for name, file in files.items()}
     manifest = read_json(files["manifest.json"])
-    # Match the source runtime's own json.loads/json.dumps digest convention.
-    protocol = json.loads(files["protocol.json"].read_text())
-    events = [json.loads(line, parse_float=Decimal) for line in files["events.jsonl"].read_text().splitlines() if line]
+    protocol = read_json(files["protocol.json"])
+    events = [json.loads(line) for line in files["events.jsonl"].read_text().splitlines() if line]
     converted = make_case(manifest, protocol, events)
     code, error = validate_case(converted)
     after = {name: hashlib.sha256(file.read_bytes()).digest() for name, file in files.items()}

@@ -6,14 +6,15 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SCHEMA = json.loads((ROOT / "schema/v0.1.0.schema.json").read_text())
+SCHEMAS = {version: json.loads((ROOT / f"schema/v{version}.schema.json").read_text())
+           for version in ("0.1.0", "0.2.0")}
 
 
-def matches(schema, value):
+def matches(schema, value, root):
     if "$ref" in schema:
-        return matches(SCHEMA["$defs"][schema["$ref"].rsplit("/", 1)[1]], value)
+        return matches(root["$defs"][schema["$ref"].rsplit("/", 1)[1]], value, root)
     if "oneOf" in schema:
-        return sum(matches(part, value) for part in schema["oneOf"]) == 1
+        return sum(matches(part, value, root) for part in schema["oneOf"]) == 1
     if "const" in schema and value != schema["const"]:
         return False
     if "enum" in schema and value not in schema["enum"]:
@@ -29,7 +30,7 @@ def matches(schema, value):
     if kind == "boolean":
         return isinstance(value, bool)
     if kind == "array":
-        return isinstance(value, list) and all(matches(schema["items"], item) for item in value)
+        return isinstance(value, list) and all(matches(schema["items"], item, root) for item in value)
     if kind == "object":
         if not isinstance(value, dict):
             return False
@@ -38,20 +39,42 @@ def matches(schema, value):
             return False
         if schema.get("additionalProperties") is False and not set(value).issubset(fields):
             return False
-        return all(matches(fields[key], item) for key, item in value.items())
+        return all(matches(fields[key], item, root) for key, item in value.items())
     return True
 
 
 class SchemaTests(unittest.TestCase):
     def test_checked_in_fixtures_share_wire_shape(self):
+        schema = SCHEMAS["0.1.0"]
         for path in sorted((ROOT / "examples").glob("*.json")):
             with self.subTest(path=path.name):
-                self.assertTrue(matches(SCHEMA, json.loads(path.read_text())))
+                self.assertTrue(matches(schema, json.loads(path.read_text()), schema))
 
     def test_extra_field_is_outside_versioned_contract(self):
         case = json.loads((ROOT / "examples/valid.json").read_text())
         case["events"][0]["payload"]["secret_extension"] = "not versioned"
-        self.assertFalse(matches(SCHEMA, case))
+        schema = SCHEMAS["0.1.0"]
+        self.assertFalse(matches(schema, case, schema))
+
+    def test_source_records_require_matching_version_and_owner_audience(self):
+        from tools.audit_autoresearch_trace import digest, make_case
+        manifest = {"attempt_id": "schema-example", "budgets": {"cpu_seconds": 1},
+                    "provenance": {}, "result": {"discrimination": {}}}
+        protocol = {"selection_code_sha256": "synthetic"}
+        source = [{"event_id": "freeze", "sequence": 1, "attempt_id": "schema-example",
+                   "type": "protocol_frozen", "observed_at": "2026-01-01T00:00:01Z",
+                   "payload": {"definition_sha256": digest(protocol)[7:]}}]
+        source += [{"event_id": "observation", "sequence": 2,
+                    "attempt_id": "schema-example", "type": "observation_recorded",
+                    "observed_at": "2026-01-01T00:00:02Z",
+                    "payload": {"observation": 1, "units": "unit", "prediction_sha256": "prediction"}}]
+        case = make_case(manifest, protocol, source)
+        schema = SCHEMAS["0.2.0"]
+        self.assertTrue(matches(schema, case, schema))
+        self.assertFalse(matches(SCHEMAS["0.1.0"], case, SCHEMAS["0.1.0"]))
+        source_record = next(e for e in case["events"] if e["kind"] == "source_recorded")
+        source_record["audience"] = "agent"
+        self.assertFalse(matches(schema, case, schema))
 
 
 if __name__ == "__main__":

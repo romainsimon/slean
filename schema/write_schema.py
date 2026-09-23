@@ -1,5 +1,6 @@
 """Write the reviewed wire-shape schema; semantic checks live in Lean replay."""
 
+import copy
 import json
 from pathlib import Path
 
@@ -82,3 +83,28 @@ schema = {
     "$defs": defs,
 }
 (HERE / "v0.1.0.schema.json").write_text(json.dumps(schema, indent=2, sort_keys=True) + "\n")
+
+# V0.2 extends the owner-only source-trace boundary without changing V0.1.
+defs_v02 = copy.deepcopy(defs)
+defs_v02["SourceIdentity"] = obj({**identity["properties"], "audience": {"const": "owner"}})
+defs_v02["SourceRecord"] = obj({
+    "identity": ref("SourceIdentity"),
+    "source_role": {"enum": ["manifest", "protocol", "event"]},
+    "canonical_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "raw_json": NONEMPTY,
+})
+defs_v02["Event"] = {"oneOf": defs["Event"]["oneOf"] + [
+    obj({**common, "kind": {"const": "source_recorded"}, "audience": {"const": "owner"},
+         "payload": ref("SourceRecord")})
+]}
+schema_v02 = {
+    **schema,
+    "$id": "urn:slean:schema:0.2.0",
+    "title": "Slean case file V0.2.0",
+    "description": "Wire shape only. Source raw_json is owner-only; Lean replay checks its cross-file links.",
+    "properties": {**schema["properties"],
+                   "schema_version": {"const": "0.2.0"},
+                   "semantics_version": {"const": "0.2.0"}},
+    "$defs": defs_v02,
+}
+(HERE / "v0.2.0.schema.json").write_text(json.dumps(schema_v02, indent=2, sort_keys=True) + "\n")
