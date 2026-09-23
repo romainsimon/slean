@@ -60,6 +60,12 @@ function observationText(item) {
   return `${item.metric_id}: ${value} · ${label(item.status)}`;
 }
 
+function gateText(item) {
+  const operator = item.operator === "all_of" ? "AND · all members" : "OR · any member";
+  const joiner = item.operator === "all_of" ? " + " : " / ";
+  return `${operator} · ${label(item.kind)}: ${item.member_refs.join(joiner)} → ${item.target_ref} · recorded, not evaluated`;
+}
+
 function renderDecision(state) {
   const target = byId("decision-content");
   const status = byId("state-status");
@@ -129,12 +135,19 @@ function renderEvidence(state) {
     item => `${item.amount} ${item.unit} · ${label(item.category)} · ${label(item.coverage)}`);
   addGroup(target, "Relations", state.relations,
     item => `${label(item.kind)}: ${item.source_ref} → ${item.target_ref}`);
+  addGroup(target, "Dependency gates", state.dependency_gates ?? [], gateText);
   addGroup(target, "Runs and artifacts", [...state.runs, ...state.artifacts],
     item => item.input_ref ? `Input ${item.input_ref} · protocol ${item.protocol_ref}` : `${item.media_type} · ${item.digest}`);
 }
 
 function relationNode(state, id) {
   if (recordId(caseFile.claim) === id) return {kind: "Claim", summary: caseFile.claim.text};
+  const gate = (state.dependency_gates ?? []).find(item => recordId(item) === id);
+  if (gate) return {
+    kind: gate.operator === "all_of" ? "AND · all members" : "OR · any member",
+    summary: `${label(gate.kind)} · ${gate.member_refs.length} members · recorded, not evaluated`,
+    isGate: true,
+  };
   const groups = [
     ["Protocol", state.protocols, thresholdText],
     ["Observation", state.observations, observationText],
@@ -154,21 +167,26 @@ function relationNode(state, id) {
 function renderRelationMap(state) {
   const target = byId("relation-map-content");
   clear(target);
-  if (!state.relations.length) {
-    target.append(node("p", "record-empty", "No recorded relation at this prefix."));
+  const gateEdges = (state.dependency_gates ?? []).flatMap(gate => [
+    ...gate.member_refs.map(member => ({source_ref: member, target_ref: recordId(gate), kind: "member"})),
+    {source_ref: recordId(gate), target_ref: gate.target_ref, kind: gate.kind},
+  ]);
+  const edges = [...state.relations, ...gateEdges];
+  if (!edges.length) {
+    target.append(node("p", "record-empty", "No recorded relation or dependency gate at this prefix."));
     return;
   }
 
-  const ids = [...new Set(state.relations.flatMap(edge => [edge.source_ref, edge.target_ref]))];
-  if (ids.length > 24 || state.relations.length > 40) {
-    target.append(node("p", "record-empty", "This relation set is too large for the local map. Use the complete Relations list above."));
+  const ids = [...new Set(edges.flatMap(edge => [edge.source_ref, edge.target_ref]))];
+  if (ids.length > 24 || edges.length > 40) {
+    target.append(node("p", "record-empty", "This dependency set is too large for the local map. Use the complete Relations and Dependency gates lists above."));
     return;
   }
 
   const incoming = new Map(ids.map(id => [id, 0]));
   const outgoing = new Map(ids.map(id => [id, []]));
   const levels = new Map(ids.map(id => [id, 0]));
-  for (const edge of state.relations) {
+  for (const edge of edges) {
     incoming.set(edge.target_ref, incoming.get(edge.target_ref) + 1);
     outgoing.get(edge.source_ref).push(edge.target_ref);
   }
@@ -184,7 +202,7 @@ function renderRelationMap(state) {
     }
   }
   if (visited !== ids.length) {
-    target.append(node("p", "record-empty", "The recorded relations form a cycle. Use the complete Relations list above."));
+    target.append(node("p", "record-empty", "The recorded dependencies form a cycle. Use the complete Relations and Dependency gates lists above."));
     return;
   }
 
@@ -226,7 +244,7 @@ function renderRelationMap(state) {
   marker.append(arrow);
   defs.append(marker);
   svg.append(defs);
-  for (const edge of state.relations) {
+  for (const edge of edges) {
     const from = positions.get(edge.source_ref);
     const to = positions.get(edge.target_ref);
     const x1 = from.x + nodeWidth + 4;
@@ -243,7 +261,7 @@ function renderRelationMap(state) {
     edgeLabel.classList.add("relation-map-edge-label");
     edgeLabel.setAttribute("x", String(middle));
     edgeLabel.setAttribute("y", String((y1 + y2) / 2 - 8));
-    edgeLabel.textContent = label(edge.kind);
+    edgeLabel.textContent = edge.kind === "member" ? "" : label(edge.kind);
     svg.append(edgeLabel);
   }
   stage.append(svg);
@@ -251,6 +269,7 @@ function renderRelationMap(state) {
     const position = positions.get(id);
     const info = relationNode(state, id);
     const card = node("div", "relation-map-node");
+    if (info.isGate) card.classList.add("is-gate");
     card.style.left = `${position.x}px`;
     card.style.top = `${position.y}px`;
     card.dataset.recordId = id;

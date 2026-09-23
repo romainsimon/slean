@@ -18,6 +18,9 @@ private def refs (event : Event) : Array String := Id.run do
     return #[field p "protocol_ref"] ++ observations
   | "decision_recorded" => return #[field p "assessment_ref"]
   | "relation_recorded" => return #[field p "source_ref", field p "target_ref"]
+  | "dependency_gate_recorded" =>
+    let members := ((p.getObjValAs? (Array String) "member_refs").toOption.getD #[])
+    return #[field p "target_ref"] ++ members
   | _ => return #[]
 
 private def objectId (event : Event) : String :=
@@ -37,6 +40,7 @@ private def canonicalPayload (event : Event) : Option Json :=
   | "decision_recorded" => (fromJson? p : Except String PromotionDecision).toOption.map toJson
   | "formal_claim_declared" => (fromJson? p : Except String FormalClaimRef).toOption.map toJson
   | "relation_recorded" => (fromJson? p : Except String Relation).toOption.map toJson
+  | "dependency_gate_recorded" => (fromJson? p : Except String DependencyGate).toOption.map toJson
   | _ => none
 
 private def normalizeFormal (event : Event) : Event := Id.run do
@@ -78,11 +82,16 @@ def view (caseFile : CaseFile) (state : State) : Json := Id.run do
   let edges := state.relations.map fun r => Json.mkObj [
     ("id", toJson r.identity.id), ("source_ref", toJson r.source_ref),
     ("target_ref", toJson r.target_ref), ("kind", toJson r.kind)]
+  let gates := state.dependency_gates.map fun g => Json.mkObj [
+    ("id", toJson g.identity.id), ("target_ref", toJson g.target_ref),
+    ("member_refs", toJson g.member_refs), ("operator", toJson g.operator),
+    ("kind", toJson g.kind)]
   return Json.mkObj [
     ("schema_version", toJson caseFile.schema_version),
     ("case_id", toJson caseFile.case_id),
     ("observations", toJson rows),
     ("relations", toJson edges),
+    ("dependency_gates", toJson gates),
     ("decisions", toJson state.decisions)]
 
 end Slean

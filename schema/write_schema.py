@@ -108,3 +108,28 @@ schema_v02 = {
     "$defs": defs_v02,
 }
 (HERE / "v0.2.0.schema.json").write_text(json.dumps(schema_v02, indent=2, sort_keys=True) + "\n")
+
+# V0.3 records explicit AND/OR dependency groups without evaluating them.
+defs_v03 = copy.deepcopy(defs_v02)
+defs_v03["DependencyGate"] = obj({
+    "identity": ref("Identity"),
+    "target_ref": NONEMPTY,
+    "member_refs": {"type": "array", "items": NONEMPTY, "minItems": 2, "uniqueItems": True},
+    "operator": {"enum": ["all_of", "any_of"]},
+    "kind": {"enum": ["support", "prerequisite"]},
+})
+defs_v03["Event"] = {"oneOf": defs_v02["Event"]["oneOf"] + [
+    obj({**common, "kind": {"const": "dependency_gate_recorded"},
+         "payload": ref("DependencyGate")})
+]}
+schema_v03 = {
+    **schema_v02,
+    "$id": "urn:slean:schema:0.3.0",
+    "title": "Slean case file V0.3.0",
+    "description": "Wire shape only. Dependency gates record all/any grouping; Lean does not evaluate their truth.",
+    "properties": {**schema_v02["properties"],
+                   "schema_version": {"const": "0.3.0"},
+                   "semantics_version": {"const": "0.3.0"}},
+    "$defs": defs_v03,
+}
+(HERE / "v0.3.0.schema.json").write_text(json.dumps(schema_v03, indent=2, sort_keys=True) + "\n")

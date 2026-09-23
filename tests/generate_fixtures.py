@@ -108,3 +108,35 @@ changed["events"][3]["payload"]["value"] = None
 changed["events"][5]["payload"]["verdict"] = "undetermined"
 changed["events"][6]["payload"]["result"] = "defer"
 save("unknown.json", changed)
+
+# A separate V0.3 fixture records two dependency operators. They are author
+# statements about references, not a second assessment or proof of the claim.
+gated = copy.deepcopy(case)
+gated["schema_version"] = "0.3.0"
+gated["semantics_version"] = "0.3.0"
+gated["question"]["text"] = "Does either synthetic input exceed a fixed threshold?"
+gated["claim"]["text"] = "At least one synthetic input exceeds 0.001."
+gated["events"] = gated["events"][:8]
+gated["events"][0]["payload"]["data_scope"] = "synthetic inputs A and B"
+gated["events"][0]["payload"]["stop_rule"] = "up to two synthetic measurements"
+gated["events"] += [
+    event(9, "run_started", {"identity": ident("run-2"), "protocol_ref": "protocol-1",
+                              "input_ref": "synthetic-input-B", "seed": "8"}),
+    event(10, "artifact_registered", {"identity": ident("artifact-2"),
+                                       "digest": "sha256:" + "c" * 64,
+                                       "media_type": "application/json"}),
+    event(11, "observation_recorded", {"identity": ident("observation-2"),
+                                        "run_ref": "run-2", "metric_id": "synthetic_delta",
+                                        "unit": "ratio", "value": "0.003", "status": "measured",
+                                        "artifact_ref": "artifact-2",
+                                        "observed_at": "2026-01-01T00:11:00Z"}),
+    event(12, "dependency_gate_recorded", {"identity": ident("gate-all-1"),
+                                             "target_ref": "decision-1",
+                                             "member_refs": ["protocol-1", "assessment-1"],
+                                             "operator": "all_of", "kind": "prerequisite"}),
+    event(13, "dependency_gate_recorded", {"identity": ident("gate-any-1"),
+                                             "target_ref": "claim-1",
+                                             "member_refs": ["observation-1", "observation-2"],
+                                             "operator": "any_of", "kind": "support"}),
+]
+save("dependency-gates.json", gated)

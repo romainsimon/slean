@@ -127,6 +127,16 @@ structure Relation where
   kind : String
   deriving Repr, BEq, ToJson, FromJson
 
+/-- A recorded grouping of prior references. This describes an author's
+    dependency claim; V0.3 does not evaluate whether its members are true. -/
+structure DependencyGate where
+  identity : Identity
+  target_ref : String
+  member_refs : Array String
+  operator : String
+  kind : String
+  deriving Repr, BEq, ToJson, FromJson
+
 /-- Canonical JSON source record for the bounded development-trace adapter.
     Its contents are owner-only and are never an empirical or formal proof. -/
 structure SourceRecord where
@@ -136,7 +146,8 @@ structure SourceRecord where
   raw_json : String
   deriving ToJson, FromJson
 
-/-- Reserved dependency syntax. V0 does not evaluate general hyperdependencies. -/
+/-- Reserved expression syntax. V0.3 records gates but does not evaluate
+    general hyperdependencies. -/
 inductive DependencyExpr where
   | reference (objectId : String)
   | allOf (members : Array DependencyExpr)
@@ -236,6 +247,7 @@ structure State where
   decisions : Array PromotionDecision := #[]
   formal_claims : Array FormalClaimRef := #[]
   relations : Array Relation := #[]
+  dependency_gates : Array DependencyGate := #[]
   source_records : Array SourceRecord := #[]
   deriving Inhabited, ToJson
 
@@ -469,12 +481,37 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
     return { state with formal_claims := state.formal_claims.push { f with status := "declared" } }
   | "relation_recorded" =>
     let r : Relation ← decodePayload event
-    let state ← withIdentity state event r.identity
     unless hasObject state r.source_ref && hasObject state r.target_ref do
-      throw (diag event.event_id r.identity.id "missing_relation_ref" "relation endpoint is missing")
+      throw (diag event.event_id r.identity.id "missing_relation_ref" "relation endpoint must be a prior object")
     unless #["provenance", "support", "contradiction", "prerequisite", "formal_implication"].contains r.kind do
       throw (diag event.event_id r.identity.id "relation_kind" "invalid relation kind")
+    for ref in #[r.source_ref, r.target_ref] do
+      if let some recordedAt := findTime state ref then
+        if recordedAt > event.recorded_at then
+          throw (diag event.event_id r.identity.id "relation_time" "relation endpoint is dated after the relation")
+    let state ← withIdentity state event r.identity
     return { state with relations := state.relations.push r }
+  | "dependency_gate_recorded" =>
+    let g : DependencyGate ← decodePayload event
+    if g.member_refs.size < 2 then
+      throw (diag event.event_id g.identity.id "gate_members" "gate requires at least two distinct members")
+    unless #["all_of", "any_of"].contains g.operator do
+      throw (diag event.event_id g.identity.id "gate_operator" "gate operator must be all_of or any_of")
+    unless #["support", "prerequisite"].contains g.kind do
+      throw (diag event.event_id g.identity.id "gate_kind" "gate kind must be support or prerequisite")
+    let mut seen : Array String := #[]
+    for member in g.member_refs do
+      if member == g.target_ref || seen.contains member then
+        throw (diag event.event_id g.identity.id "gate_members" "gate members must be unique and differ from the target")
+      seen := seen.push member
+    unless hasObject state g.target_ref && g.member_refs.all (hasObject state) do
+      throw (diag event.event_id g.identity.id "missing_gate_ref" "gate target and members must be prior objects")
+    for ref in (#[g.target_ref] ++ g.member_refs) do
+      if let some recordedAt := findTime state ref then
+        if recordedAt > event.recorded_at then
+          throw (diag event.event_id g.identity.id "gate_time" "gate reference is dated after the gate")
+    let state ← withIdentity state event g.identity
+    return { state with dependency_gates := state.dependency_gates.push g }
   | "source_recorded" =>
     let record : SourceRecord ← decodePayload event
     if event.audience != "owner" || record.identity.audience != "owner" then
@@ -630,7 +667,8 @@ def validateSourceTrace (state : State) : Except Diagnostic Unit := do
 
 def replay (caseFile : CaseFile) (count : Nat := caseFile.events.size) : Except Diagnostic State := do
   if !(caseFile.schema_version == "0.1.0" && caseFile.semantics_version == "0.1.0") &&
-      !(caseFile.schema_version == "0.2.0" && caseFile.semantics_version == "0.2.0") then
+      !(caseFile.schema_version == "0.2.0" && caseFile.semantics_version == "0.2.0") &&
+      !(caseFile.schema_version == "0.3.0" && caseFile.semantics_version == "0.3.0") then
     throw (diag "" caseFile.case_id "version" "unsupported schema or semantics version; no implicit migration")
   if caseFile.case_id.isEmpty || caseFile.version == 0 || caseFile.domain.isEmpty || caseFile.provenance.isEmpty ||
       (caseFile.audience != "agent" && caseFile.audience != "owner") ||
@@ -646,6 +684,8 @@ def replay (caseFile : CaseFile) (count : Nat := caseFile.events.size) : Except 
   for event in caseFile.events.extract 0 count do
     if caseFile.schema_version == "0.1.0" && event.kind == "source_recorded" then
       throw (diag event.event_id "" "version" "source records require schema 0.2.0")
+    if caseFile.schema_version != "0.3.0" && event.kind == "dependency_gate_recorded" then
+      throw (diag event.event_id "" "version" "dependency gates require schema 0.3.0")
     state ← step state event
   if count == caseFile.events.size && !state.source_records.isEmpty then
     validateSourceTrace state

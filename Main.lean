@@ -24,7 +24,8 @@ def timelineSnapshot (state : State) (count : Nat) : Json := Json.mkObj [
   ("costs", toJson state.costs),
   ("assessments", toJson state.assessments),
   ("decisions", toJson state.decisions),
-  ("relations", toJson state.relations)]
+  ("relations", toJson state.relations),
+  ("dependency_gates", toJson state.dependency_gates)]
 
 def timelineSnapshots (caseFile : CaseFile) : Except Diagnostic (Array Json) := do
   let mut state ← replay caseFile 0

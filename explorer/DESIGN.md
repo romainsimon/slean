@@ -105,7 +105,7 @@ It adapts the manual's mineral paper, evergreen ink, rust wayfinding, thin rules
 **Key Characteristics:**
 
 - A prominent prefix selector above the journal and case state.
-- A bounded desktop journal beside the selected state, with evidence, a recorded-relation map, and event details below; a native event picker on mobile.
+- A bounded desktop journal beside the selected state, with evidence, a recorded-dependency map, and event details below; a native event picker on mobile.
 - Text labels, counts, and explicit source records carry meaning; color only reinforces state.
 - Flat surfaces, visible focus, immediate state changes, and no ornamental motion.
 
@@ -123,7 +123,7 @@ The case title leads, section headings identify the three inspection areas, comp
 
 ## Layout
 
-The workspace is capped at 1600px with a responsive page gutter. The prefix selector spans the width. At desktop widths, the journal sits beside the selected state, then evidence, the recorded-relation map, and event details flow below in a balanced second row. The journal has its own bounded scroll when there are many events. Evidence groups use two columns. The map uses a contained horizontal scroller when its verified nodes cannot fit its panel. From 900px through 681px, the journal narrows and the lower panels stack.
+The workspace is capped at 1600px with a responsive page gutter. The prefix selector spans the width. At desktop widths, the journal sits beside the selected state, then evidence, the recorded-dependency map, and event details flow below in a balanced second row. The journal has its own bounded scroll when there are many events. Evidence groups use two columns. The map uses a contained horizontal scroller when its verified nodes cannot fit its panel. From 900px through 681px, the journal narrows and the lower panels stack.
 
 At 680px and below, the layout stacks: scope note, prefix selector, journal picker, then state, evidence, relation map, and selected event. The desktop journal list is hidden and the native select includes the before-first-event position. Evidence groups return to two columns from 680px through 411px, then become one column at 410px and below. At 410px and below, the prefix count and step buttons stack so they fit a narrow viewport. State and event facts retain compact two-column rows where space allows.
 
@@ -151,7 +151,7 @@ Desktop journal buttons show order, kind, and event ID. The selected event has a
 
 State distinguishes a pending decision from a recorded decision. It shows the recorded result, reason, cited assessment, stated rule, and frozen threshold when available. Evidence groups list only records introduced by the chosen prefix, with explicit empty states. Record links jump to the event that introduced a record. The selected event shows its metadata and a native disclosure for exact JSON; the disclosure closes when the prefix changes.
 
-The relation map repeats only recorded edges. Each arrow shows source, target, and recorded kind; node summaries reuse the same formatter as the evidence list. It is visually hidden from assistive technology because the complete relation list directly above it is the accessible equivalent. Unknown observations show an unavailable value, while a measured zero remains `0`. Cycles or large relation sets stay in the complete list instead of forcing an unreadable diagram. The map carries no independent proof status or motion.
+The dependency map repeats only recorded relations and versioned gates. Each AND/OR gate has its own tinted node between member nodes and a target, with the operator spelled out in the node and in the evidence list. Arrows show recorded direction and kind; node summaries reuse evidence values. The map is visually hidden from assistive technology because the complete Relations and Dependency gates lists directly above it are the accessible equivalent. Unknown observations show an unavailable value, while a measured zero remains `0`. Cycles or large sets stay in the complete lists instead of forcing an unreadable diagram. Gate claims are not evaluated, and the map carries no independent proof status or motion.
 
 ### Header, scope, and interaction states
 
