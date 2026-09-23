@@ -1,6 +1,6 @@
 # Local roadmap outcome
 
-The approved CEO PRD governs scope. This file records local implementation state, not a public release plan.
+The CEO Slean PRD review version 1.1 (`tasks/prd-slean-mutome-program.md` at `457660b`, SHA-256 `65e3896ce7639c4360aff0bc272eacc2c5b5135f9877e5e18791f708b9d0db01`) is the program baseline authorized for local implementation. CEO PR #17 remains open. This file records local implementation state, not a public release plan.
 
 | Issue / gate | Local result |
 |---|---|
