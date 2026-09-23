@@ -5,18 +5,49 @@ import argparse
 import html
 import json
 import os
+import re
 import subprocess
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "site" / "_out" / "html-multi"
-SCHEMA_VERSION = "0.2.0"
+SCHEMA_MARKER = "SLEANSCHEMAVERSIONTOKEN"
 LEAN_VERSION = "4.28.0"
 PREVIEW_TEXT = {
-    "fr": "Version de développement · schéma 0.2.0 · Lean 4.28.0. Aucun tag n'est sélectionné pour ce build.",
-    "en": "Development preview · schema 0.2.0 · Lean 4.28.0. No tag is selected for this build.",
+    "fr": f"Version de développement · schéma {SCHEMA_MARKER} · Lean 4.28.0. Aucun tag n'est sélectionné pour ce build.",
+    "en": f"Development preview · schema {SCHEMA_MARKER} · Lean 4.28.0. No tag is selected for this build.",
 }
+
+
+def latest_schema_version(root: Path = ROOT) -> str:
+    """Read the newest checked wire contract, rather than stamping a fixed label."""
+    versions = []
+    for path in (root / "schema").glob("v*.schema.json"):
+        match = re.fullmatch(r"v(\d+)\.(\d+)\.(\d+)\.schema\.json", path.name)
+        if not match:
+            continue
+        version = ".".join(match.groups())
+        schema = json.loads(path.read_text(encoding="utf-8"))
+        properties = schema.get("properties", {})
+        if (schema.get("$id") != f"urn:slean:schema:{version}"
+                or properties.get("schema_version", {}).get("const") != version
+                or properties.get("semantics_version", {}).get("const") != version):
+            raise ValueError(f"Version fields disagree in {path}")
+        versions.append((tuple(map(int, match.groups())), version))
+    if not versions:
+        raise ValueError("No versioned Slean schema found")
+    return max(versions)[1]
+
+
+def preview_pages(output: Path, schema_version: str) -> None:
+    for locale, relative_path in (("fr", "index.html"), ("en", "en/index.html")):
+        page = output / relative_path
+        markup = page.read_text(encoding="utf-8")
+        preview = PREVIEW_TEXT[locale]
+        if markup.count(preview) != 1:
+            raise ValueError(f"Expected one development-status sentence in {page}")
+        page.write_text(markup.replace(preview, preview.replace(SCHEMA_MARKER, schema_version), 1), encoding="utf-8")
 
 
 def git(repo: Path, *args: str) -> str:
@@ -43,7 +74,8 @@ def source_tag(tag: str | None, repo: Path = ROOT) -> str | None:
     return tag
 
 
-def stamp_pages(output: Path, tag: str, revision: str) -> int:
+def stamp_pages(output: Path, tag: str, revision: str, schema_version: str | None = None) -> int:
+    schema_version = schema_version or latest_schema_version()
     pages = sorted(output.rglob("*.html"))
     if not pages:
         raise ValueError("No generated manual pages found")
@@ -69,9 +101,9 @@ def stamp_pages(output: Path, tag: str, revision: str) -> int:
             if markup.count(preview) != 1:
                 raise ValueError(f"Expected one development-status sentence in {page}")
             replacement = (
-                f"Manuel construit depuis le tag {safe_tag} · schéma {SCHEMA_VERSION} · Lean {LEAN_VERSION}."
+                f"Manuel construit depuis le tag {safe_tag} · schéma {schema_version} · Lean {LEAN_VERSION}."
                 if root_locale == "fr" else
-                f"Manual built from tag {safe_tag} · schema {SCHEMA_VERSION} · Lean {LEAN_VERSION}."
+                f"Manual built from tag {safe_tag} · schema {schema_version} · Lean {LEAN_VERSION}."
             )
             markup = markup.replace(preview, replacement, 1)
         updated[page] = markup.replace(
@@ -103,8 +135,11 @@ def main() -> int:
             return 0
         revision = git(ROOT, "rev-parse", "HEAD")
         clean = not git(ROOT, "status", "--porcelain", "--", ".", ":(exclude)https:/")
+        schema_version = latest_schema_version()
         if tag:
-            stamp_pages(OUTPUT, tag, revision)
+            stamp_pages(OUTPUT, tag, revision, schema_version)
+        else:
+            preview_pages(OUTPUT, schema_version)
         OUTPUT.mkdir(parents=True, exist_ok=True)
         (OUTPUT / "build-info.json").write_text(
             json.dumps(
@@ -112,7 +147,7 @@ def main() -> int:
                     "source_revision": revision,
                     "source_tree_clean": clean,
                     "source_tag": tag,
-                    "schema_version": SCHEMA_VERSION,
+                    "schema_version": schema_version,
                     "lean_version": LEAN_VERSION,
                 },
                 separators=(",", ":"),

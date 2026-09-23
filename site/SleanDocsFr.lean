@@ -15,7 +15,7 @@ Dans ce manuel, un *dossier* est un fichier JSON contenant une question, un prot
 
 Le parcours ci-dessous utilise `examples/valid.json`, un cas entièrement inventé. Vous allez constater que la règle exige une mesure supérieure à `0.001`, que l'observation vaut `0.002` et que la décision enregistrée est `promote`. Vous pourrez ensuite faire échouer le même contrôle en changeant l'unité de la mesure.
 
-Version de développement · schéma 0.2.0 · Lean 4.28.0. Aucun tag n'est sélectionné pour ce build.
+Version de développement · schéma SLEANSCHEMAVERSIONTOKEN · Lean 4.28.0. Aucun tag n'est sélectionné pour ce build.
 
 Depuis la racine d'une copie locale de Slean, avec Lean installé, commencez par :
 

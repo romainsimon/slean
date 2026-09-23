@@ -15,7 +15,7 @@ In this manual, a *case* is a JSON file containing a question, a frozen protocol
 
 The walkthrough uses `examples/valid.json`, a wholly invented case. You will see a rule requiring a measurement greater than `0.001`, an observation of `0.002`, and a recorded `promote` decision. You can then make the same check fail by changing the observation's unit.
 
-Development preview · schema 0.2.0 · Lean 4.28.0. No tag is selected for this build.
+Development preview · schema SLEANSCHEMAVERSIONTOKEN · Lean 4.28.0. No tag is selected for this build.
 
 From the root of a local Slean checkout, with Lean installed, start with:
 
