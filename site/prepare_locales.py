@@ -38,6 +38,11 @@ shutil.move(str(english_render / "html-multi"), str(english))
 english_render.rmdir()
 
 routes = [("", ""), *chapters, ("find", "find")]
+mutome_stack = (
+    '<span class="mutome-stacked-wordmark" aria-hidden="true">'
+    + '<span class="mutome-glyph"></span>' * 6
+    + '</span>'
+)
 for french_slug, english_slug in routes:
     for locale, slug in (("fr", french_slug), ("en", english_slug)):
         page = (root if locale == "fr" else english) / slug / "index.html"
@@ -46,8 +51,7 @@ for french_slug, english_slug in routes:
         markup = page.read_text(encoding="utf-8")
         header_logo = (
             '<a class="mutome-header-link" href="https://mutome.com/" aria-label="Mutome">'
-            '<img class="mutome-wordmark" src="assets/brand/mutome-logo.svg" alt="" width="214" height="64">'
-            '<img class="mutome-mark" src="assets/brand/mutome-mark.svg" alt="" width="128" height="128">'
+            f'{mutome_stack}'
             '</a>'
             '<a href="" class="header-title"><h1>'
             '<img class="brand-wordmark" src="assets/brand/slean-dark.svg" alt="Slean" width="1460" height="430">'
