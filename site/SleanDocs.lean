@@ -13,7 +13,7 @@ Follow a research decision to its evidence.
 
 Slean is a Lean 4 library and JSON tool for inspecting a research dossier. It checks structure, references, chronology, exact decimal rules, and a bounded source trace. The first example is synthetic; Slean does not prove an empirical claim.
 
-Development preview · schema 0.2.0 · Lean 4.28.0. No public release tag exists yet.
+Development preview · schema 0.2.0 · Lean 4.28.0. No tag is selected for this build.
 
 Run the checked case from the repository root:
 

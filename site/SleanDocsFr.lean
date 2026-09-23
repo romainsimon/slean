@@ -13,7 +13,7 @@ Suivre une décision de recherche jusqu'aux éléments qui l'étayent.
 
 Slean est une bibliothèque Lean 4 et un outil JSON qui permettent d'examiner un dossier de recherche. Il vérifie la structure, les références, la chronologie, les règles décimales exactes et une trace source bornée. Le premier exemple est synthétique ; Slean ne démontre aucune affirmation empirique.
 
-Version de développement · schéma 0.2.0 · Lean 4.28.0. Il n'existe pas encore de version publique.
+Version de développement · schéma 0.2.0 · Lean 4.28.0. Aucun tag n'est sélectionné pour ce build.
 
 Exécutez le cas vérifié depuis la racine du dépôt :
 
