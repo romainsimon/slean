@@ -1,6 +1,6 @@
 # Local roadmap outcome
 
-The approved CEO PRD governs scope. This file records local implementation state, not a public release plan.
+The CEO Slean PRD review version 1.1 (`tasks/prd-slean-mutome-program.md` at `457660b`, SHA-256 `65e3896ce7639c4360aff0bc272eacc2c5b5135f9877e5e18791f708b9d0db01`) is the program baseline authorized for local implementation. CEO PR #17 remains open. This file records local implementation state, not a public release plan.
 
 | Issue / gate | Local result |
 |---|---|
@@ -9,8 +9,9 @@ The approved CEO PRD governs scope. This file records local implementation state
 | SL-002–003 / S1 | Typed Lean case and exact comparator; JSON import and pure replay reject the four planned defects. |
 | SL-004–006 / S2 | Deterministic snapshots, narrow proved promotion witness, conservative local proof receipt, versioned codec, and agent projection tested. |
 | INT-000 / V | The initial conversion recommended **reduce**. The 0.2 retest retained all source JSON fields, covered all 48 observations, and found one new cross-file decision check; proceed to a bounded documentation prototype. |
-| SL-007 | Verso documentation prototype built with compiled Lean snippets and a synthetic quickstart; site publication is separate. |
-| SL-008–009 | The same synthetic case compiled in Blueprint; its graph helps with authored/formal dependencies. The local Explorer consumes validated prefix snapshots, defaults to the agent projection, and shows decisions, evidence, a bounded 2D map of actual relations and versioned AND/OR gate assertions, and event records. The gates are not evaluated as proof. No representative 3D comparison has been run, so 3D remains deferred. |
+| SL-007 / W1 | This integrated candidate includes the French and English manual, a reader-first synthetic case, schema 0.3 ET/OU guidance, versioned build identity, Mutome and Slean header links, and a production-only Plausible loader. The local [annotated-tag rehearsals](docs/local-tag-build.md) are historical evidence; DOC-01 still needs a public tag and artifact checked together. |
+| SL-008 / E1 | This candidate includes the validated-prefix Explorer with accessible list, chronology, exact detail, 2D relation map, and explicit ET/OU records. The [UI gate evidence](docs/ui-gate-evidence.md) remains local; these capabilities are not yet merged into `main`. |
+| SL-009 / E2 | The 2D/table view remains the baseline. A [disposable local 2D/3D candidate](https://github.com/romainsimon/slean/commit/9d575f21d435ab1c10e000ee612a19ffb10d3e50) uses the same checked synthetic 0.3 dossier, prefix and text table, with keyboard controls and no timed motion. No representative with/without-Z dependency task or target-reviewer result exists, so no 3D benefit is claimed or shipped. The [study protocol](docs/3d-task-study-protocol.md) records the required inputs and proposed decision rule. |
 | INT-001–002, B1 | External-owner integrations and scientific campaigns remain outside this repository and authorization. |
 
-See the [historical gate V](docs/gate-v.md), [retest](docs/gate-v-retest.md), and [UI gate evidence](docs/ui-gate-evidence.md) for evidence and limits. A remote `main` now exists, so feature branches can be reviewed through pull requests. A local prototype or open pull request does not establish a public tag, merge, site publication, or deployment.
+See the [PRD acceptance audit](docs/prd-acceptance-audit.md), [historical gate V](docs/gate-v.md), and [retest](docs/gate-v-retest.md) for evidence and limits. This branch assembles the open candidate stack for one review and test run. It does not establish a public tag, merge into `main`, site publication, or deployment.
