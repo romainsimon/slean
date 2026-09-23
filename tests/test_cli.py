@@ -126,9 +126,25 @@ class CliTests(unittest.TestCase):
         case["events"][4]["payload"]["amount"] = "10.01"
         code, result, _ = run_case(case)
         self.assertEqual((code, result["error"]["code"]), (1, "cost_cap_exceeded"))
+        case["events"][4]["payload"]["coverage"] = "partial"
+        code, result, _ = run_case(case)
+        self.assertEqual((code, result["error"]["code"]), (1, "cost_cap_exceeded"))
         case = fixture()
         case["events"][4]["payload"]["amount"] = "-1"
         self.assertEqual(run_case(case)[1]["error"]["code"], "cost")
+
+    def test_audiences_follow_the_wire_contract(self):
+        for field in ("question", "claim"):
+            case = fixture()
+            case[field]["identity"]["audience"] = "private"
+            self.assertEqual(run_case(case)[1]["error"]["code"], "audience")
+        case = fixture()
+        case["events"][0]["audience"] = "private"
+        case["events"][0]["payload"]["identity"]["audience"] = "private"
+        self.assertEqual(run_case(case)[1]["error"]["code"], "audience")
+        case = fixture()
+        case["events"][0]["payload"]["identity"]["audience"] = "private"
+        self.assertEqual(run_case(case)[1]["error"]["code"], "audience")
 
     def test_decision_cannot_predate_assessment(self):
         case = fixture()

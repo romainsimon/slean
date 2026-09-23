@@ -153,6 +153,9 @@ structure Diagnostic where
 def diag (eventId objectId code message : String) : Diagnostic :=
   { event_id := eventId, object_id := objectId, code, message }
 
+private def validAudience (audience : String) : Bool :=
+  audience == "agent" || audience == "owner"
+
 structure Decimal where
   numerator : Int
   places : Nat
@@ -303,6 +306,8 @@ def identityError (state : State) (event : Event) (identity : Identity) : Option
     return some (diag event.event_id identity.id "identity" "ID, positive version, domain and provenance are required")
   if hasObject state identity.id || state.event_ids.contains identity.id then
     return some (diag event.event_id identity.id "duplicate_object" "object ID is already used")
+  if !validAudience identity.audience then
+    return some (diag event.event_id identity.id "audience" "object audience must be agent or owner")
   if identity.audience != event.audience then
     return some (diag event.event_id identity.id "audience" "event and object audience differ")
   return none
@@ -327,6 +332,8 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
   if event.version == 0 || event.domain.isEmpty || event.provenance.isEmpty ||
       event.actor.isEmpty || !(validTimestamp event.recorded_at) then
     throw (diag event.event_id "" "event_metadata" "version, domain, provenance, actor and canonical UTC recorded_at are required")
+  if !validAudience event.audience then
+    throw (diag event.event_id "" "audience" "event audience must be agent or owner")
   let state := { state with event_ids := state.event_ids.push event.event_id }
   match event.kind with
   | "protocol_frozen" =>
@@ -396,14 +403,15 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
     let protocol ← match findProtocol state run.protocol_ref with
       | some protocol => pure protocol
       | none => throw (diag event.event_id c.identity.id "missing_protocol" "run protocol is missing")
-    if c.unit == protocol.cost_unit && c.coverage == "complete" then
+    -- A partial coverage amount is still known cost and a lower bound.
+    if c.unit == protocol.cost_unit then
       let mut total : Decimal := { numerator := 0, places := 0 }
       for prior in state.costs do
-        if prior.run_ref == c.run_ref && prior.unit == c.unit && prior.coverage == "complete" then
+        if prior.run_ref == c.run_ref && prior.unit == c.unit then
           total := addDecimal total ((parseDecimal prior.amount).toOption.get!)
       total := addDecimal total ((parseDecimal c.amount).toOption.get!)
       if compareDecimal total ((parseDecimal protocol.cost_cap).toOption.get!) == .gt then
-        throw (diag event.event_id c.identity.id "cost_cap_exceeded" "observed complete cost exceeds declared cap")
+        throw (diag event.event_id c.identity.id "cost_cap_exceeded" "recorded cost exceeds declared cap")
     return { state with costs := state.costs.push c }
   | "assessment_recorded" =>
     let a : Assessment ← decodePayload event
@@ -633,13 +641,15 @@ def replay (caseFile : CaseFile) (count : Nat := caseFile.events.size) : Except 
       !(caseFile.schema_version == "0.2.0" && caseFile.semantics_version == "0.2.0") then
     throw (diag "" caseFile.case_id "version" "unsupported schema or semantics version; no implicit migration")
   if caseFile.case_id.isEmpty || caseFile.version == 0 || caseFile.domain.isEmpty || caseFile.provenance.isEmpty ||
-      (caseFile.audience != "agent" && caseFile.audience != "owner") ||
+      !validAudience caseFile.audience ||
       caseFile.question.identity.id.isEmpty || caseFile.claim.identity.id.isEmpty ||
       caseFile.question.identity.id == caseFile.claim.identity.id ||
       caseFile.question.identity.version == 0 || caseFile.claim.identity.version == 0 ||
       caseFile.question.identity.domain.isEmpty || caseFile.claim.identity.domain.isEmpty ||
       caseFile.question.identity.provenance.isEmpty || caseFile.claim.identity.provenance.isEmpty then
     throw (diag "" caseFile.case_id "case" "case, question, claim, version and provenance are required")
+  if !validAudience caseFile.question.identity.audience || !validAudience caseFile.claim.identity.audience then
+    throw (diag "" caseFile.case_id "audience" "question and claim audiences must be agent or owner")
   if count > caseFile.events.size then
     throw (diag "" caseFile.case_id "prefix" "snapshot prefix exceeds event count")
   let mut state : State := { object_ids := (#[caseFile.question.identity.id, caseFile.claim.identity.id]), claim_id := caseFile.claim.identity.id }
