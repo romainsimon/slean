@@ -42,23 +42,26 @@ run_meta do
   unless axioms.toList.all (fun ax => ax == ``propext || ax == ``Quot.sound) do
     throwError "formal claim uses sorry or an unapproved axiom: {axioms.toList}"
 
-def formalStatus (claim : FormalClaimRef) : String :=
+def formalAttestationEligible (claim : FormalClaimRef) : Bool :=
   if claim.declaration == checkedDeclaration &&
       claim.statement == checkedStatement &&
-      claim.toolchain == checkedToolchain then "kernel_checked" else "declared"
+      claim.toolchain == checkedToolchain then true else false
 
 def proofReceipt (claim : FormalClaimRef) : Json :=
-  let status := formalStatus claim
+  let eligible := formalAttestationEligible claim
   Json.mkObj [
     ("claim_id", toJson claim.identity.id),
-    ("status", toJson status),
+    -- A local match has no source revision or build identity. Only the clean
+    -- build attester can promote this receipt to kernel_checked.
+    ("status", toJson "declared"),
+    ("attestation_eligible", toJson eligible),
     ("declaration", toJson claim.declaration),
     ("elaborated_statement", toJson claim.statement),
     ("toolchain", toJson claim.toolchain),
-    ("dependencies", toJson (if status == "kernel_checked" then checkedDependencies else #[])),
-    ("axioms", toJson (if status == "kernel_checked" then #["propext", "Quot.sound"] else #[])),
-    ("verifier", toJson (if status == "kernel_checked" then
-      "local Lean build and Slean statement/dependency/axiom pins; exporter is not kernel-verified" else
+    ("dependencies", toJson (if eligible then checkedDependencies else #[])),
+    ("axioms", toJson (if eligible then #["propext", "Quot.sound"] else #[])),
+    ("verifier", toJson (if eligible then
+      "local theorem pin matches; exact-build attestation is required for kernel_checked" else
       "unverified declaration"))]
 
 end Slean

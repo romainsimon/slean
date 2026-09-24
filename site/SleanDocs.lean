@@ -205,7 +205,7 @@ Schema 0.2 can keep owner-only source records. The bounded adapter checks source
 - `view <case.json> agent|owner`: which observations, decisions, and relations are visible to that audience?
 - `export <case.json> agent|owner`: produce a versioned envelope with the canonical case and Lean version. Review it before sharing. Use `export-case` only when a consumer needs the legacy raw case.
 - `timeline <case.json> agent|owner`: get checked states at every visible prefix for the local Explorer.
-- `proof <case.json>` and `proof-statement`: inspect local formal statuses, direct project dependencies and the project's one pinned theorem statement. For a clean committed build, `python3 tools/attest_proof.py examples/formal-claim.json` links a receipt to exact build digests. This uses trusted Lake, CLI and Python code; it is not an independent recheck.
+- `proof <case.json>` and `proof-statement`: inspect declared claims, local attestation eligibility, direct project dependencies and the project's one pinned theorem statement. For a clean committed build, `python3 tools/attest_proof.py examples/formal-claim.json` issues `kernel_checked` only with exact build and audience-filtered export digests. This uses trusted Lake, CLI and Python code; it is not an independent recheck.
 
 Commands that read a case also accept `-` for standard input. For example, from the repository root:
 
@@ -227,7 +227,7 @@ The typed API can build the same kind of case. These declarations are checked as
 #check Slean.DependencyGate
 ```
 
-`examples/Synthetic.lean` contains the complete typed case. `bash tests/check.sh` compiles it and compares its bytes with the JSON fixture's `export-case agent` projection. Imported JSON proof-status text never grants `kernel_checked`; that status is reserved for the pinned local declaration checked by the Lean kernel.
+`examples/Synthetic.lean` contains the complete typed case. `bash tests/check.sh` compiles it and compares its bytes with the JSON fixture's `export-case agent` projection. Imported JSON proof-status text never grants `kernel_checked`; the CLI keeps even a matching local declaration at `declared` until the clean-build attester binds its receipt to exact artifacts.
 
 # Limits and development status
 

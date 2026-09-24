@@ -312,7 +312,8 @@ class CliTests(unittest.TestCase):
         self.assertEqual(case["events"][-1]["payload"]["statement"], pin["elaborated_statement"])
         code, receipt, _ = run_case(case, "proof")
         self.assertEqual(code, 0)
-        self.assertEqual(receipt[0]["status"], "kernel_checked")
+        self.assertEqual(receipt[0]["status"], "declared")
+        self.assertTrue(receipt[0]["attestation_eligible"])
         self.assertEqual(receipt[0]["dependencies"], pin["dependencies"])
         self.assertIn("Slean.promotionEvidence", receipt[0]["dependencies"])
         contrary = copy.deepcopy(case)
@@ -321,22 +322,26 @@ class CliTests(unittest.TestCase):
         contrary["events"][6]["payload"].update(result="reject", reason="Below the frozen threshold.")
         code, contrary_receipt, _ = run_case(contrary, "proof")
         self.assertEqual(code, 0)
-        self.assertEqual(contrary_receipt[0]["status"], "kernel_checked")
+        self.assertEqual(contrary_receipt[0]["status"], "declared")
+        self.assertTrue(contrary_receipt[0]["attestation_eligible"])
         self.assertEqual(contrary_receipt[0]["elaborated_statement"], receipt[0]["elaborated_statement"])
         exported = run_case(case, "export", "agent")[1]
         self.assertEqual(exported["case"]["events"][-1]["payload"]["status"], "declared")
-        self.assertEqual(run_case(exported, "proof")[1][0]["status"], "kernel_checked")
+        self.assertEqual(run_case(exported, "proof")[1][0]["status"], "declared")
+        self.assertTrue(run_case(exported, "proof")[1][0]["attestation_eligible"])
         for key, value in (
             ("declaration", "Test.sorry"), ("declaration", "Test.unauthorizedAxiom"),
             ("statement", "substituted statement"), ("toolchain", "other toolchain")):
             bad = copy.deepcopy(case)
             bad["events"][-1]["payload"][key] = value
             self.assertEqual(run_case(bad, "proof")[1][0]["status"], "declared")
+            self.assertFalse(run_case(bad, "proof")[1][0]["attestation_eligible"])
             self.assertEqual(run_case(bad, "proof")[1][0]["dependencies"], [])
         forged = copy.deepcopy(case)
         forged["events"][-1]["payload"]["statement"] = "forged"
         forged["events"][-1]["payload"]["status"] = "kernel_checked"
         self.assertEqual(run_case(forged, "proof")[1][0]["status"], "declared")
+        self.assertFalse(run_case(forged, "proof")[1][0]["attestation_eligible"])
 
 
 if __name__ == "__main__":

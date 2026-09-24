@@ -69,27 +69,34 @@ def attest(case_path: Path, audience: str) -> dict:
 
     command(str(BIN), "validate", str(case_path))
     exported = command(str(BIN), "export", str(case_path), audience)
+    projected_export_id = "sha256:" + hashlib.sha256(exported.encode("utf-8")).hexdigest()
     pin = json.loads(command(str(BIN), "proof-statement"))
     receipts = json.loads(command(str(BIN), "proof", "-", input_text=exported))
     if not isinstance(receipts, list) or not receipts:
         raise ValueError("case has no formal claim to attest")
     for receipt in receipts:
-        if receipt["status"] == "kernel_checked":
+        if receipt["status"] != "declared":
+            raise ValueError("CLI emitted a formal status before exact-build attestation")
+        if receipt["attestation_eligible"] is True:
             for key in ("declaration", "elaborated_statement", "toolchain", "dependencies"):
                 if receipt[key] != pin[key]:
                     raise ValueError(f"checked proof {key} differs from the reviewed pin")
+            receipt["status"] = "kernel_checked"
             receipt["exact_build_ref"] = build_id
-        elif receipt["status"] == "declared":
+            receipt["exact_export_ref"] = projected_export_id
+        elif receipt["attestation_eligible"] is False:
             receipt["exact_build_ref"] = None
+            receipt["exact_export_ref"] = None
         else:
-            raise ValueError("CLI emitted an unsupported formal status")
+            raise ValueError("CLI emitted an invalid attestation eligibility flag")
     if built != {name: digest(path) for name, path in BUILD_FILES.items()}:
         raise ValueError("build artifacts changed during receipt generation")
     require_clean()
     if command("git", "rev-parse", "HEAD") != source_revision:
         raise ValueError("source revision changed during receipt generation")
     return {"format": "slean-proof-attestation/0.1.0", "build_id": build_id,
-            "build": build, "audience": audience, "receipts": receipts,
+            "build": build, "audience": audience, "projected_export_id": projected_export_id,
+            "receipts": receipts,
             "trust_limit": "Lake, the CLI exporter and this Python attester are trusted code; this is not an independent kernel recheck."}
 
 

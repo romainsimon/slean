@@ -221,7 +221,7 @@ tag := "format-et-api"
 - `view <dossier.json> agent|owner` : quelles observations, décisions et relations sont visibles pour cette audience ?
 - `export <dossier.json> agent|owner` : produire une enveloppe versionnée avec le dossier canonique et la version de Lean. Révisez le contenu avant partage. Utilisez `export-case` seulement si un consommateur attend l'ancien dossier brut.
 - `timeline <dossier.json> agent|owner` : obtenir les états vérifiés de tous les préfixes visibles, utilisés par l'Explorer local.
-- `proof <dossier.json>` et `proof-statement` : examiner les statuts formels locaux, les dépendances du projet et l'unique énoncé de théorème fixé par le projet. Sur un commit propre, `python3 tools/attest_proof.py examples/formal-claim.json` relie le reçu aux empreintes du build exact. Lake, le CLI et ce script Python restent dans la chaîne de confiance ; il ne s'agit pas d'une revérification indépendante.
+- `proof <dossier.json>` et `proof-statement` : examiner les déclarations, leur admissibilité locale à l'attestation, les dépendances du projet et l'unique énoncé de théorème fixé par le projet. Sur un commit propre, `python3 tools/attest_proof.py examples/formal-claim.json` n'émet `kernel_checked` qu'avec les empreintes du build exact et de l'export filtré pour son public. Lake, le CLI et ce script Python restent dans la chaîne de confiance ; il ne s'agit pas d'une revérification indépendante.
 
 Les commandes qui lisent un dossier acceptent aussi `-` comme chemin d'entrée standard. Par exemple, depuis la racine du dépôt :
 
@@ -243,7 +243,7 @@ L'API typée permet de construire le même type de dossier. Ces déclarations so
 #check Slean.DependencyGate
 ```
 
-`examples/Synthetic.lean` contient le cas typé complet. `bash tests/check.sh` le compile et compare ses octets à la projection `export-case agent` de la fixture JSON. Un statut de preuve importé depuis JSON n'accorde jamais `kernel_checked` ; ce statut est réservé à la déclaration locale fixée et contrôlée par le noyau Lean.
+`examples/Synthetic.lean` contient le cas typé complet. `bash tests/check.sh` le compile et compare ses octets à la projection `export-case agent` de la fixture JSON. Un statut de preuve importé depuis JSON n'accorde jamais `kernel_checked` ; le CLI conserve aussi une déclaration locale concordante à `declared` jusqu'à ce que l'attestation sur un build propre relie son reçu aux artefacts exacts.
 
 # Limites et état du développement
 %%%
