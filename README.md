@@ -1,44 +1,67 @@
-# Slean V0 research dossier
+<h1 align="center">
+  <img src="site/assets/brand/slean-dark.svg" alt="Slean" width="148">
+</h1>
 
-Slean is a local, pre-publication Lean 4 prototype for checking the structure and decision history of a research dossier. It does not evaluate the truth of an empirical claim. The [gate V retest](docs/gate-v-retest.md) found one useful cross-file check and permits a bounded documentation prototype; the [earlier negative result](docs/gate-v.md) remains available.
+<p align="center">
+  A Lean 4 and JSON tool for validating and replaying research dossiers.
+</p>
 
-## Build and inspect
+<p align="center">
+  <img src="assets/slean-readme-banner.png" alt="A research record flowing from branching evidence through proof-like marks to a checked result." width="100%">
+</p>
 
-Install `elan`, then run:
+> **Status:** Early, local V0 research prototype. The repository is private; no public license or contribution guide is available.
+
+Slean represents a research case as a versioned journal of its frozen protocol, runs, observations, costs, assessments, and decisions. It exists to make the records behind a decision inspectable and replayable. Slean checks how the journal hangs together; it does not determine whether an empirical conclusion is true.
+
+## What it checks
+
+- IDs, references, event order, causal timing, units, exact-decimal threshold rules, and recorded cost caps.
+- Journal prefixes and audience-filtered JSON exports, so a reader can inspect only the records visible to that audience.
+- Source-trace links between manifests, protocols, events, and recorded outcomes. Imported external assessments remain `external_unverified` unless Slean itself can compute the narrow local rule.
+
+## A small example
+
+The synthetic case in [`examples/valid.json`](examples/valid.json) freezes a `>= 0.001` rule, records a measurement of `0.002` and a cost of `2.50 cpu_s` under a `10.00 cpu_s` cap, then records `pass` and `promote`.
 
 ```sh
-lake build
-bash tests/check.sh
 lake exe slean validate examples/valid.json
-lake exe slean replay examples/valid.json 7
-lake exe slean export examples/valid.json agent
-lake exe slean view examples/valid.json agent
-lake exe slean timeline examples/valid.json agent
-lake exe slean proof-statement
-# After committing a clean candidate, bind one formal claim to its exact build:
-python3 tools/attest_proof.py examples/formal-claim.json
 ```
 
-`validate` returns a JSON result and a nonzero exit code on error. `replay` returns the state after a prefix of the journal. `export` writes a versioned envelope with the canonical case and Lean version; the CLI can read that envelope again. `export-case` writes only the legacy canonical case for existing fixture consumers. `view` derives observation, relation and recorded dependency-gate data from the projection. `timeline` returns validated state snapshots at every projected prefix for the local Explorer. `proof` reports `declared` plus whether a claim matches the local theorem pin. Only the clean-build attester can issue `kernel_checked`, with exact build and projected-export references. The CLI accepts `-` as an input path for standard input. Do not send a private owner export or Explorer artifact to an agent or a public channel.
+```json
+{"case_id":"synthetic-decision-1","events":10,"ok":true}
+```
 
-The equivalent typed Lean example is [examples/Synthetic.lean](examples/Synthetic.lean). Its agent JSON bytes match the JSON fixture projection. All checked-in examples are synthetic. The local trace audit reads source files but never writes their converted content: `python3 tools/audit_autoresearch_trace.py <trace-directory>`. Its report contains aggregate checks and field names, while the owner-only source JSON stays in memory.
+These values are synthetic. A local `pass` means the encoded rule passed for its cited record; it is not evidence that a real-world claim is true.
 
-The [Verso manual](site/README.md) builds locally with compiled Lean snippets. It is a development preview, not a deployed site.
+## Quickstart
 
-The [same-case Blueprint prototype](blueprint/README.md) records what Blueprint already makes readable and where experimental journal review still needs Slean. The [comparison decision](docs/blueprint-comparison.md) scopes a local Explorer to journal prefixes and evidence.
+Install Lean using the [official setup guide](https://lean-lang.org/install/). The [`lean-toolchain`](lean-toolchain) file pins Lean 4.28.0, which `elan` selects for this project.
 
-The [local Explorer](explorer/README.md) renders those checked prefixes into a self-contained agent view. Owner output requires an explicit audience option and separate private artifact directory.
+With access to this private repository, clone it and run the validator from the repository root:
 
-## Contract and limits
+```sh
+git clone https://github.com/romainsimon/slean.git
+cd slean
+lake build
+lake exe slean validate examples/valid.json
+```
 
-- `lean-toolchain` pins Lean 4.28.0. `lake-manifest.json` has no external packages; Mathlib is not required.
-- `schema/v0.1.0.schema.json` specifies the original wire shape; `schema/v0.2.0.schema.json` adds owner-only source records; `schema/v0.3.0.schema.json` adds explicit AND/OR dependency gates. Lean replay is normative for references, chronology, exact decisions, and stated cost caps across all runs of a frozen protocol. Gates are recorded claims, not evaluated truth. Unsupported or mismatched schema and semantics versions fail; there is no implicit migration.
-- One exact decimal metric and one prior observation can support an automatic `pass` or `fail`. External rules may cite many prior observations, but stay `external_unverified`. Unknown and technical errors stay `undetermined`.
-- The 0.2 source-trace adapter retains every parsed manifest, protocol, and event JSON object in owner-only records. It checks source sequence, the single freeze, prediction links, completion-to-manifest agreement, observation count, and typed coverage. The Python adapter computes canonical SHA-256; Lean checks its links, not the hash computation or external evaluator.
-- A routine `promote` needs prior passing evidence. A human `override` needs a reason and does not become a `pass`.
-- The only claim eligible for `kernel_checked` is the pinned theorem in `Slean/Proof.lean`. The CLI lists its direct Slean dependencies and approved axioms but returns `declared` until attestation. Imported JSON status never grants a checked status. `tools/attest_proof.py` builds a clean revision and links the checked receipt to exact executable, module, Lake manifest and toolchain digests, plus the SHA-256 of the audience-filtered `slean export` stdout bytes (including its final newline). Lake, the CLI exporter and the Python attester remain in the trust boundary; no independent checker is configured.
-- Agent projection filters hidden events before it computes the view. An owner-only case header is redacted. Agent-visible objects must be safe for that audience.
+Run the local build and test checks with:
 
-This repository has no approved public license or deployment. Apache-2.0 is a proposal for owner review, not a license grant. Do not publish, deploy, or treat a compiled dossier as scientific validation.
+```sh
+bash tests/check.sh
+```
 
-See [product scope](PRODUCT.md), [architecture](ARCHITECTURE.md), [fixture baseline](docs/baseline.md), [gate results](ROADMAP.md), and the [PRD acceptance audit](docs/prd-acceptance-audit.md) for local evidence and open release or human-study gates.
+## Maturity and limits
+
+This is a local research prototype, not a general scientific evaluator or released software package. The [Gate V retest](docs/gate-v-retest.md) supports continuing a bounded structural prototype; representative reviewer value remains unmeasured. Slean does not execute experiments, recompute an external multi-observation assessment, or certify measurements, evaluators, human decisions, or scientific claims.
+
+## Further reading
+
+- [Product scope](PRODUCT.md)
+- [Architecture and trust boundary](ARCHITECTURE.md)
+- [Versioned schemas](schema/README.md)
+- [Verso manual and local build](site/README.md)
+- [Local Explorer prototype](explorer/README.md)
+- [Gate V retest and evidence limits](docs/gate-v-retest.md)
