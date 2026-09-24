@@ -63,11 +63,11 @@ observed in the original source and did not change its files.
 ## What is new compared with the source flow
 
 The source runtime's `verify_manifest` checks the schema version and listed
-artifact paths, sizes, and hashes. On a **synthetic** manifest and completion
-event, the real `verify_manifest` function accepted an event whose decision
-conflicted with `manifest.result.discrimination.decision` when the event file's
-hash entry was self-consistent. This is expected from its code: that function
-does not compare event payloads to the manifest. The source
+artifact paths, sizes, and hashes. The exact historical function accepted a
+completion event whose decision conflicted with
+`manifest.result.discrimination.decision` when the event file's hash entry was
+self-consistent. This is expected from its code: that function does not
+compare event payloads to the manifest. The source
 `replay_discrimination` compares a fresh run's result with the source manifest,
 but does not read source event payloads. The latter conclusion is from code
 inspection, not from running a modified private replay. The Slean check binds
@@ -79,14 +79,28 @@ valid-choice conflict is credible for the actual event shape and was rejected
 by Slean on the real trace. Slean also rejects an unsupported choice when the
 event and manifest agree on that value.
 
-A later read-only differential check executed the exact `verify_manifest` body
-from Autoresearch source commit `5c1ff43b73151b00bbf06b494c96f6774ee09cf2`
-in isolation on a minimal synthetic triplet. It accepted a self-consistently
-hashed event with one valid source decision while the manifest stored a
-different valid source decision. The Slean probe above used an in-memory copy
-of the source-produced 98-event trace, not this minimal triplet. No modified
-private trace was written to disk, and no defect was observed in the original
-unmodified trace.
+The first differential check used a minimal synthetic triplet. A later,
+reproducible full-trace check runs
+[`tools/compare_autoresearch_verifier.py`](../tools/compare_autoresearch_verifier.py)
+against the source-produced 98-event development trace. It extracts only
+`file_hash`, `artifacts`, and `verify_manifest` from the trace's Autoresearch
+source commit `5c1ff43b73151b00bbf06b494c96f6774ee09cf2` and from
+Autoresearch `main` at `2f5d7fb03ea85508050fff3eb78266a06282c2e2`.
+That SHA was remote `main` in a read-only lookup on 2026-09-24. It has
+additional artifact-inventory and final-evaluation-seal checks;
+its event-to-manifest decision gap remains. Both source revisions and Slean
+accept the unmodified trace. The check then changes the completion to a
+different, same-length valid source decision in memory and refreshes the event
+artifact hash in an in-memory manifest. Both source verifiers accept that full
+trace; Slean rejects it with `source_decision_provenance`. All parsed source
+fields remain in owner-only records. The original three source files
+have identical hashes before and after, and no modified trace or converted
+dossier is written to disk or stdout. The helper prints only aggregate facts.
+No defect was observed in the original unmodified trace.
+
+Run the optional comparison with a local read-only source checkout and the
+development trace directory as its two arguments. The normal Slean build and
+test suite do not need that checkout.
 
 The original runtime already checks artifact integrity and recomputes its own
 scientific result. Slean's added control concerns agreement **between** its
@@ -102,10 +116,9 @@ Blueprint prototype has yet measured that extension's cost.
 The source was one existing development run, not an established representative
 sample of campaigns or reviewer tasks. Every rejected discrepancy in this
 retest was injected into an in-memory copy; none was found in the unmodified
-trace. The comparison with the source verifier used a synthetic manifest and
-completion event, plus source-code inspection. It demonstrates a plausible
-cross-file gap on the real event shape, not an observed source failure or time
-saved for a researcher.
+trace. The full-trace differential confirms a cross-file gap in the pinned
+source verifier for this actual event shape. It does not show an observed
+source failure or time saved for a researcher.
 
 The PRD asks for a new useful control on a development trace and excludes a
 fixture-only defect. It does not set a numeric time-saving threshold or require
