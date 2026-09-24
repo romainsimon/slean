@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-image_ref="${1:?usage: smoke_site_image.sh IMAGE COMMIT_SHA [SCHEMA_VERSION [SOURCE_TAG]]}"
-expected_sha="${2:?usage: smoke_site_image.sh IMAGE COMMIT_SHA [SCHEMA_VERSION [SOURCE_TAG]]}"
-expected_schema="${3:-0.3.0}"
-expected_tag="${4:-}"
-[[ "$expected_sha" =~ ^[0-9a-f]{40}$ ]] || { echo "Expected a full Git SHA" >&2; exit 1; }
+image_ref="${1:?usage: smoke_site_image.sh IMAGE IMAGE_SOURCE_SHA [ARTIFACT_SOURCE_SHA [SCHEMA_VERSION [SOURCE_TAG]]]}"
+image_source_sha="${2:?usage: smoke_site_image.sh IMAGE IMAGE_SOURCE_SHA [ARTIFACT_SOURCE_SHA [SCHEMA_VERSION [SOURCE_TAG]]]}"
+artifact_source_sha="${3:-$image_source_sha}"
+expected_schema="${4:-0.3.0}"
+expected_tag="${5:-}"
+[[ "$image_source_sha" =~ ^[0-9a-f]{40}$ ]] || { echo "Expected a full image-source Git SHA" >&2; exit 1; }
+[[ "$artifact_source_sha" =~ ^[0-9a-f]{40}$ ]] || { echo "Expected a full artifact-source Git SHA" >&2; exit 1; }
 [[ "$expected_schema" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Expected a schema version" >&2; exit 1; }
 
 container_name="slean-smoke-${RANDOM}-${RANDOM}"
@@ -47,13 +49,14 @@ for route in / /en/ /portes-et-ou/ /en/and-or-gates/ /find/ /en/find/ /assets/br
 done
 
 label_sha="$(docker image inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "$image_ref")"
-[[ "$label_sha" == "$expected_sha" ]] || { echo "Image revision label mismatch" >&2; exit 1; }
+[[ "$label_sha" == "$image_source_sha" ]] || { echo "Image revision label mismatch" >&2; exit 1; }
 
 docker cp "$container_id:/usr/share/nginx/html/." "$artifact_dir/"
-EXPECTED_SHA="$expected_sha" EXPECTED_SCHEMA="$expected_schema" EXPECTED_TAG="$expected_tag" SLEAN_ARTIFACT_DIR="$artifact_dir" python3 - <<'PY'
+EXPECTED_ARTIFACT_SHA="$artifact_source_sha" EXPECTED_SCHEMA="$expected_schema" EXPECTED_TAG="$expected_tag" SLEAN_ARTIFACT_DIR="$artifact_dir" python3 - <<'PY'
 import html
 import json
 import os
+import re
 from pathlib import Path
 
 root = Path(os.environ["SLEAN_ARTIFACT_DIR"])
@@ -61,7 +64,7 @@ pages = list(root.rglob("*.html"))
 script = "https://stats.yukicapital.com/js/pa-70RUKb_J9zQLn67oUHf2d.js"
 old_scripts = ("https://stats.yukicapital.com/js/script.js", "https://plausible.io/js/")
 info = json.loads((root / "build-info.json").read_text())
-assert info["source_revision"] == os.environ["EXPECTED_SHA"]
+assert info["source_revision"] == os.environ["EXPECTED_ARTIFACT_SHA"]
 assert info["source_tree_clean"] is True
 assert info["schema_version"] == os.environ["EXPECTED_SCHEMA"]
 if os.environ["EXPECTED_TAG"]:
@@ -74,10 +77,14 @@ for page in pages:
         safe_tag = html.escape(os.environ["EXPECTED_TAG"], quote=True)
         assert markup.count(f'name="slean-build-tag" content="{safe_tag}"') == 1, page
         assert markup.count('class="slean-build-footer"') == 1, page
+        footer = re.search(r'<footer class="slean-build-footer"[^>]*>(.*?)</footer>', markup, re.DOTALL)
+        assert footer is not None, page
+        assert os.environ["EXPECTED_TAG"] in html.unescape(footer.group(1)), page
+        assert os.environ["EXPECTED_ARTIFACT_SHA"][:12] in footer.group(1), page
     assert markup.count("data-slean-analytics") == 1, page
     assert markup.count(script) == 2, page
     assert not any(old in markup for old in old_scripts), page
 assert not any(path.name in {".git", ".env"} for path in root.rglob("*"))
-print("Final image: exact SHA, healthy, 16 pages, one Plausible loader per page")
+print("Final image: exact image and artifact SHAs, healthy, 16 pages, one Plausible loader per page")
 PY
 SLEAN_TEST_ORIGIN="$origin" npm --prefix site run test:browser

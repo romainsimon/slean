@@ -17,10 +17,11 @@ For a local Nginx runtime check when the Lean-built artifact already exists, use
 
 ```sh
 bash tools/smoke_prebuilt_site_image.sh \
-  site/_out/html-multi <full-commit-sha> 0.3.0 <local-annotated-tag> slean-site:prebuilt-smoke
+  site/_out/html-multi <image-source-sha> <artifact-source-sha> \
+  0.3.0 <local-annotated-tag> slean-site:prebuilt-smoke
 ```
 
-The target receives `site/_out/html-multi` through the named `prebuilt-site` build context. It inherits the same Nginx runtime base, revision label, port, and health check as production, but does not execute the pinned Lean builder or `site/build.sh`. The default final `runtime` target and CI's ordinary `docker build` still execute that builder. A successful prebuilt smoke checks runtime packaging only; it cannot substitute for the normal final-image build or authorize publication or deployment.
+The image-source SHA must be the current clean checkout and becomes the OCI revision label. The artifact-source SHA must match `build-info.json` and the displayed page identity; it may name an earlier tagged site build. The target receives that artifact through the named `prebuilt-site` build context. It inherits the same Nginx runtime base, port, and health check as production, but does not execute the pinned Lean builder or `site/build.sh`. The default final `runtime` target and CI's ordinary `docker build` still execute that builder. Its two-argument smoke call defaults the artifact SHA to the image SHA. A successful prebuilt smoke checks runtime packaging only; it cannot substitute for the normal final-image build or authorize publication or deployment.
 Add `--check-only` before the artifact directory to validate the artifact without Docker.
 
 The site uses the supplied Slean vector wordmark in the header and on both title pages. The charcoal and white variants are kept in `assets/brand/`; the white variant is available for future dark surfaces. The mobile header and favicon use a small S mark derived from the same vector geometry. The PNG exports are omitted because the SVGs stay sharp at any size. The build copies these assets into both language outputs.
