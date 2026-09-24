@@ -1,6 +1,6 @@
 # Local Explorer
 
-The Explorer shows a validated dossier at each projected journal prefix. It consumes `slean timeline`, which validates the full input case before projecting the requested audience, then replays each projected prefix. The page can inspect a decision, its assessment and frozen rule, records available at that point, actual recorded relations and explicit AND/OR gate assertions in a list and 2D map, and the exact selected event. It does not execute research or certify an empirical claim.
+The Explorer shows a validated dossier at each projected journal prefix. It consumes `slean timeline`, which validates the full input case before projecting the requested audience, then replays each projected prefix. An invalid owner-only record still blocks an agent timeline, but its diagnostic IDs and fields are masked; run `slean validate` locally or use the owner timeline for detail. The page can inspect a decision, its assessment and frozen rule, records available at that point, actual recorded relations and explicit AND/OR gate assertions in a list and 2D map, and the exact selected event. It does not execute research or certify an empirical claim.
 
 ## Build and open
 

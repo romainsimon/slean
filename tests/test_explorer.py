@@ -64,6 +64,29 @@ class ExplorerTests(unittest.TestCase):
             self.assertNotIn('</script><script>alert', html)
             self.assertIn('\\u003c/script\\u003e', html)
 
+    def test_agent_renderer_masks_owner_diagnostic_and_emits_no_artifact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            case = json.loads((EXAMPLES / "valid.json").read_text())
+            owner_event = case["events"][8]
+            owner_event["event_id"] = "private-owner-event-sentinel"
+            owner_event["payload"]["digest"] = "invalid"
+            input_path = Path(directory) / "case.json"
+            input_path.write_text(json.dumps(case), encoding="utf-8")
+
+            agent_output = Path(directory) / "agent"
+            rejected = render(input_path, agent_output)
+            self.assertNotEqual(rejected.returncode, 0)
+            self.assertIn("invalid_case", rejected.stderr)
+            self.assertNotIn("private-owner-event-sentinel", rejected.stderr)
+            self.assertNotIn("private-artifact-1", rejected.stderr)
+            self.assertFalse(agent_output.exists())
+
+            owner_output = Path(directory) / "owner"
+            owner_rejected = render(input_path, owner_output, "--audience", "owner")
+            self.assertNotEqual(owner_rejected.returncode, 0)
+            self.assertIn("artifact private-owner-event-sentinel", owner_rejected.stderr)
+            self.assertFalse(owner_output.exists())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -119,6 +119,45 @@ class CliTests(unittest.TestCase):
         self.assertEqual(run_case(case, "timeline", "owner")[1]["audience"], "owner")
         self.assertEqual(invoke("timeline", EXAMPLES / "unit-mismatch.json", "agent")[1]["error"]["code"], "metric_unit")
 
+    def test_agent_timeline_does_not_expose_owner_validation_diagnostic(self):
+        case = fixture()
+        owner_event = case["events"][8]
+        owner_event["event_id"] = "private-owner-event-sentinel"
+        owner_event["payload"]["digest"] = "invalid"
+        code, agent, agent_bytes = run_case(case, "timeline", "agent")
+        self.assertEqual(code, 1)
+        self.assertEqual(agent["error"], {
+            "event_id": "", "object_id": "", "code": "invalid_case",
+            "message": "agent timeline unavailable; validate the source locally for details"})
+        self.assertNotIn("private-owner-event-sentinel", agent_bytes)
+        self.assertNotIn("private-artifact-1", agent_bytes)
+        code, owner, _ = run_case(case, "timeline", "owner")
+        self.assertEqual(code, 1)
+        self.assertEqual(owner["error"]["code"], "artifact")
+        self.assertEqual(owner["error"]["event_id"], "private-owner-event-sentinel")
+
+        noncanonical = fixture()
+        noncanonical["private-field-sentinel"] = "private-value-sentinel"
+        code, agent, agent_bytes = run_case(noncanonical, "timeline", "agent")
+        self.assertEqual((code, agent["error"]["code"]), (1, "invalid_case"))
+        self.assertNotIn("private-field-sentinel", agent_bytes)
+        self.assertNotIn("private-value-sentinel", agent_bytes)
+        self.assertEqual(run_case(noncanonical, "timeline", "owner")[1]["error"]["code"],
+                         "unexpected_field")
+
+        collision = fixture()
+        private_id = collision["events"][8]["payload"]["identity"]["id"]
+        agent_event = collision["events"][9]
+        agent_event["audience"] = "agent"
+        agent_event["payload"]["identity"]["audience"] = "agent"
+        agent_event["payload"]["identity"]["id"] = private_id
+        code, agent, agent_bytes = run_case(collision, "timeline", "agent")
+        self.assertEqual((code, agent["error"]["code"]), (1, "invalid_case"))
+        self.assertNotIn(private_id, agent_bytes)
+        code, owner, _ = run_case(collision, "timeline", "owner")
+        self.assertEqual((code, owner["error"]["code"]), (1, "duplicate_object"))
+        self.assertEqual(owner["error"]["object_id"], private_id)
+
     def test_versioned_dependency_gates_and_audience_projection(self):
         case = fixture("dependency-gates.json")
         self.assertEqual(run_case(case)[0], 0)

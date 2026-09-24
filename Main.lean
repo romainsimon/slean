@@ -25,6 +25,39 @@ def reportError (error : Diagnostic) : IO UInt32 := do
   IO.println (Json.mkObj [("ok", toJson false), ("error", toJson error)]).compress
   return 1
 
+def reportPrivateTimelineError : IO UInt32 :=
+  reportError (diag "" "" "invalid_case" "agent timeline unavailable; validate the source locally for details")
+
+def agentTimelineHasOwnerContent (caseFile : CaseFile) : Bool :=
+  caseFile.audience == "owner" ||
+    caseFile.question.identity.audience == "owner" ||
+    caseFile.claim.identity.audience == "owner" ||
+    caseFile.events.any (fun event => event.audience == "owner")
+
+def agentTimelineHasOwnerId (caseFile : CaseFile) (id : String) : Bool :=
+  if id.isEmpty then false
+  else
+    (caseFile.audience == "owner" && caseFile.case_id == id) ||
+      (caseFile.question.identity.audience == "owner" && caseFile.question.identity.id == id) ||
+      (caseFile.claim.identity.audience == "owner" && caseFile.claim.identity.id == id) ||
+      caseFile.events.any (fun event =>
+        if event.audience != "owner" then false
+        else
+          match event.payload.getObjVal? "identity" with
+          | .ok identity => (identity.getObjValAs? String "id").toOption == some id
+          | .error _ => false)
+
+/-- A full-case diagnostic is safe to show in an agent timeline only when its
+    event is agent-visible. An owner event can make validation fail before the
+    projection is built, but its IDs and fields must not leave that boundary. -/
+def agentTimelineDiagnosticVisible (caseFile : CaseFile) (error : Diagnostic) : Bool :=
+  if agentTimelineHasOwnerId caseFile error.object_id then false
+  else if error.event_id.isEmpty then
+    !agentTimelineHasOwnerContent caseFile
+  else
+    caseFile.events.any (fun event => event.event_id == error.event_id && event.audience == "agent") &&
+      !(caseFile.events.any (fun event => event.event_id == error.event_id && event.audience == "owner"))
+
 def timelineSnapshot (state : State) (count : Nat) : Json := Json.mkObj [
   ("prefix", toJson count),
   ("protocols", toJson state.protocols),
@@ -54,12 +87,18 @@ def execute (args : List String) : IO UInt32 := do
     return 0
   match args with
   | command :: path :: rest =>
+    let agentTimeline := command == "timeline" && rest.head?.getD "agent" == "agent"
     let caseResult ← readCase path
     let (caseFile, canonicalInput) ← match caseResult with
       | .ok pair => pure pair
-      | .error message => return ← reportError (diag "" "" "json" message)
+      | .error message =>
+        if agentTimeline then
+          return ← reportError (diag "" "" "json" "agent timeline input is invalid")
+        return ← reportError (diag "" "" "json" message)
     let agentProjection := (command == "export" || command == "export-case" || command == "view") && rest.head? == some "agent"
     if !canonicalInput && !agentProjection then
+      if agentTimeline && agentTimelineHasOwnerContent caseFile then
+        return ← reportPrivateTimelineError
       return ← reportError (diag "" caseFile.case_id "unexpected_field" "case has unsupported or noncanonical fields")
     if command == "validate" then
       match replay caseFile with
@@ -94,6 +133,8 @@ def execute (args : List String) : IO UInt32 := do
       if rest.length > 1 || (audience != "owner" && audience != "agent") then
         return ← reportError (diag "" "" "audience" "expected owner or agent")
       if let .error error := replay caseFile then
+        if agentTimeline && !agentTimelineDiagnosticVisible caseFile error then
+          return ← reportPrivateTimelineError
         return ← reportError error
       let projected := project caseFile audience
       if let .error error := replay projected then
