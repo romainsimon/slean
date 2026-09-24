@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "site" / "_out" / "html-multi"
 SCHEMA_MARKER = "SLEANSCHEMAVERSIONTOKEN"
 LEAN_VERSION = "4.28.0"
+FULL_REVISION = re.compile(r"[0-9a-f]{40}\Z")
 PREVIEW_TEXT = {
     "fr": f"Version de développement · schéma {SCHEMA_MARKER} · Lean 4.28.0. Aucun tag n'est sélectionné pour ce build.",
     "en": f"Development preview · schema {SCHEMA_MARKER} · Lean 4.28.0. No tag is selected for this build.",
@@ -57,6 +58,57 @@ def git(repo: Path, *args: str) -> str:
     if result.returncode:
         raise ValueError(f"Git {args[0]} failed: {result.stderr.strip()}")
     return result.stdout.strip()
+
+
+def git_root(repo: Path) -> Path | None:
+    """Return this source root's Git root when metadata is available."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"], cwd=repo,
+            capture_output=True, text=True, check=False,
+        )
+    except OSError:
+        return None
+    if result.returncode:
+        return None
+    root = Path(result.stdout.strip()).resolve()
+    return root if root == repo.resolve() else None
+
+
+def source_identity(
+    repo: Path = ROOT, source_commit: str | None = None
+) -> tuple[str, bool | None]:
+    """Resolve an exact source SHA and report cleanliness only when Git can prove it."""
+    expected = source_commit if source_commit is not None else os.environ.get("SOURCE_COMMIT")
+    has_git = git_root(repo) is not None
+    if expected is None:
+        if not has_git:
+            raise ValueError("SOURCE_COMMIT is required when Git metadata is unavailable")
+        expected = git(repo, "rev-parse", "HEAD")
+    if not FULL_REVISION.fullmatch(expected):
+        raise ValueError("SOURCE_COMMIT must be a full 40-character lowercase Git SHA")
+
+    if not has_git:
+        return expected, None
+
+    revision = git(repo, "rev-parse", "HEAD")
+    if revision != expected:
+        raise ValueError("SOURCE_COMMIT does not match Git HEAD")
+    clean = not git(repo, "status", "--porcelain")
+    return revision, clean
+
+
+def image_preflight(
+    repo: Path = ROOT, source_commit: str | None = None
+) -> tuple[str, bool | None]:
+    """Validate an image's supplied SHA and reject a known dirty Git checkout."""
+    expected = source_commit if source_commit is not None else os.environ.get("SOURCE_COMMIT")
+    if not expected:
+        raise ValueError("SOURCE_COMMIT is required for an image build")
+    revision, clean = source_identity(repo, expected)
+    if clean is False:
+        raise ValueError("An image build requires a clean Git checkout")
+    return revision, clean
 
 
 def source_tag(tag: str | None, repo: Path = ROOT) -> str | None:
@@ -127,14 +179,18 @@ def stamp_pages(output: Path, tag: str, revision: str, schema_version: str | Non
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("preflight", "stamp"))
+    parser.add_argument("action", choices=("preflight", "image-preflight", "stamp"))
     args = parser.parse_args()
     try:
-        tag = source_tag(os.environ.get("SLEAN_SITE_TAG"))
+        if args.action == "image-preflight":
+            image_preflight(ROOT)
+            source_tag(os.environ.get("SLEAN_SITE_TAG"), ROOT)
+            return 0
+
+        revision, clean = source_identity(ROOT)
+        tag = source_tag(os.environ.get("SLEAN_SITE_TAG"), ROOT)
         if args.action == "preflight":
             return 0
-        revision = git(ROOT, "rev-parse", "HEAD")
-        clean = not git(ROOT, "status", "--porcelain", "--", ".", ":(exclude)https:/")
         schema_version = latest_schema_version()
         if tag:
             stamp_pages(OUTPUT, tag, revision, schema_version)

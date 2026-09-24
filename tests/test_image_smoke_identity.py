@@ -14,10 +14,10 @@ TAG = "local-site-test"
 SCRIPT_URL = "https://stats.yukicapital.com/js/pa-70RUKb_J9zQLn67oUHf2d.js"
 
 
-def site_artifact(root: Path, source_sha: str) -> None:
+def site_artifact(root: Path, source_sha: str, source_tree_clean: bool | None = True) -> None:
     (root / "build-info.json").write_text(json.dumps({
         "source_revision": source_sha,
-        "source_tree_clean": True,
+        "source_tree_clean": source_tree_clean,
         "source_tag": TAG,
         "schema_version": "0.3.0",
         "lean_version": "4.28.0",
@@ -136,9 +136,25 @@ class ImageSmokeIdentityTests(unittest.TestCase):
                               label_sha=self.image_sha)
             self.assertEqual(good.returncode, 0, good.stderr)
             self.assertIn("exact image and artifact SHAs", good.stdout)
+            self.assertIn("clean source checkout", good.stdout)
             self.assertIn("stop mock-container-id", log.read_text())
             self.assertIn("container rm mock-container-id", log.read_text())
 
+            site_artifact(artifact, ARTIFACT_SHA, source_tree_clean=None)
+            unknown_cleanliness = self.smoke(
+                artifact, bin_dir, log, self.image_sha, ARTIFACT_SHA,
+                label_sha=self.image_sha,
+            )
+            self.assertEqual(unknown_cleanliness.returncode, 0, unknown_cleanliness.stderr)
+            self.assertIn("source cleanliness unavailable", unknown_cleanliness.stdout)
+
+            site_artifact(artifact, ARTIFACT_SHA, source_tree_clean=False)
+            dirty_source = self.smoke(artifact, bin_dir, log, self.image_sha, ARTIFACT_SHA,
+                                      label_sha=self.image_sha)
+            self.assertNotEqual(dirty_source.returncode, 0)
+            self.assertIn("AssertionError", dirty_source.stderr)
+
+            site_artifact(artifact, ARTIFACT_SHA)
             wrong_label = self.smoke(artifact, bin_dir, log, self.image_sha, ARTIFACT_SHA,
                                      label_sha=ARTIFACT_SHA)
             self.assertNotEqual(wrong_label.returncode, 0)

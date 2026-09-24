@@ -26,11 +26,9 @@ RUN set -eu; \
 WORKDIR /src
 COPY . .
 ARG SOURCE_COMMIT
-RUN test -n "$SOURCE_COMMIT" \
-    && test "$(git rev-parse HEAD)" = "$SOURCE_COMMIT" \
-    && test -z "$(git status --porcelain)" \
-    && bash site/build.sh \
-    && SOURCE_COMMIT="$SOURCE_COMMIT" python3 -c 'import json, os; from pathlib import Path; p=Path("site/_out/html-multi"); d=json.loads((p/"build-info.json").read_text()); assert d["source_revision"] == os.environ["SOURCE_COMMIT"] and d["source_tree_clean"] is True; assert len(list(p.rglob("*.html"))) == 16'
+RUN SOURCE_COMMIT="$SOURCE_COMMIT" python3 site/build_identity.py image-preflight \
+    && SOURCE_COMMIT="$SOURCE_COMMIT" bash site/build.sh \
+    && SOURCE_COMMIT="$SOURCE_COMMIT" python3 -c 'import json, os; from pathlib import Path; p=Path("site/_out/html-multi"); d=json.loads((p/"build-info.json").read_text()); assert d["source_revision"] == os.environ["SOURCE_COMMIT"] and d["source_tree_clean"] in (True, None); assert len(list(p.rglob("*.html"))) == 16'
 
 FROM nginx:1.28.1-alpine AS runtime-base
 ARG SOURCE_COMMIT
