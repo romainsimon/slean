@@ -24,6 +24,28 @@ adequacy were not reproduced or proved by Lean. The adapter wrote no private
 case or export to disk. A synthetic contract test verifies owner round-trip and
 that source records do not enter the agent export.
 
+A later Slean-only guard checks every converted owner source record against its
+parsed input object, source role, owner audience, canonical JSON and SHA-256.
+The loss report now names missing or changed source paths instead of assuming
+`wire_fields_lost: []`. It also lists source event envelope fields and nested
+budget/usage fields that remain outside the typed model. Synthetic regressions
+remove a nested manifest field while rehashing the altered record and omit an
+event record; both are reported as preservation failures. At code commit
+`094ad321f537d4891b2ed7e60bfea65935aec500`, the read-only CLI was rerun
+on the same 98-event development trace. It exited 0 and reported 297 converted
+events, valid artifact hashes, unchanged source files, Slean validation
+accepted, no lost wire fields or source-record integrity errors, and
+`source_preservation_verified: true`. All eight in-memory probes returned their
+expected diagnostics and `structural_gate_passed` was true. The aggregate report
+did not write the converted dossier or source values to disk or stdout. This
+run does not authenticate the source values. An unrecognized scientific
+decision in a completed source trace now fails conversion instead of silently
+becoming `defer`.
+The audit command also emits `structural_gate_passed` and exits nonzero when
+source shape, artifact hashes, preservation, Slean validation or the named
+mutation probes fail. A failed run still prints its aggregate JSON report.
+This is a structural evidence gate, not a claim of scientific value.
+
 The following probes changed copies held in memory. They were not faults
 observed in the original source and did not change its files.
 
@@ -34,24 +56,51 @@ observed in the original source and did not change its files.
 | Observation after assessment | `future_observation` |
 | Changed protocol file | `source_protocol_digest` |
 | Second freeze | `source_second_freeze` |
-| Completion decision conflicts with manifest result | `source_decision_provenance` |
-| Same conflict with refreshed event artifact hash metadata | `source_decision_provenance` |
+| A different valid source decision conflicts with manifest result | `source_decision_provenance` |
+| Same valid-choice conflict with refreshed event artifact hash metadata | `source_decision_provenance` |
 | Assessment omits one source observation | `source_projection` |
 
 ## What is new compared with the source flow
 
 The source runtime's `verify_manifest` checks the schema version and listed
-artifact paths, sizes, and hashes. On a **synthetic** manifest and completion
-event, the real `verify_manifest` function accepted an event whose decision
-conflicted with `manifest.result.discrimination.decision` when the event file's
-hash entry was self-consistent. This is expected from its code: that function
-does not compare event payloads to the manifest. The source
+artifact paths, sizes, and hashes. The exact historical function accepted a
+completion event whose decision conflicted with
+`manifest.result.discrimination.decision` when the event file's hash entry was
+self-consistent. This is expected from its code: that function does not
+compare event payloads to the manifest. The source
 `replay_discrimination` compares a fresh run's result with the source manifest,
 but does not read source event payloads. The latter conclusion is from code
 inspection, not from running a modified private replay. The Slean check binds
 the source completion event to the manifest result and source observation
-count, even with a refreshed hash entry. The changed completion is credible
-for the actual event shape; the in-memory probe rejected it on the real trace.
+count, even with a refreshed hash entry. The current in-memory probe selects a
+different choice from the source discriminator's `H0`, `H1`, `neither`, and
+`abstain` results. It no longer relies on an invented decision value. The
+valid-choice conflict is credible for the actual event shape and was rejected
+by Slean on the real trace. Slean also rejects an unsupported choice when the
+event and manifest agree on that value.
+
+The first differential check used a minimal synthetic triplet. A later,
+reproducible full-trace check runs
+[`tools/compare_autoresearch_verifier.py`](../tools/compare_autoresearch_verifier.py)
+against the source-produced 98-event development trace. It extracts only
+`file_hash`, `artifacts`, and `verify_manifest` from the trace's Autoresearch
+source commit `5c1ff43b73151b00bbf06b494c96f6774ee09cf2` and from
+Autoresearch `main` at `2f5d7fb03ea85508050fff3eb78266a06282c2e2`.
+That SHA was remote `main` in a read-only lookup on 2026-09-24. It has
+additional artifact-inventory and final-evaluation-seal checks;
+its event-to-manifest decision gap remains. Both source revisions and Slean
+accept the unmodified trace. The check then changes the completion to a
+different, same-length valid source decision in memory and refreshes the event
+artifact hash in an in-memory manifest. Both source verifiers accept that full
+trace; Slean rejects it with `source_decision_provenance`. All parsed source
+fields remain in owner-only records. The original three source files
+have identical hashes before and after, and no modified trace or converted
+dossier is written to disk or stdout. The helper prints only aggregate facts.
+No defect was observed in the original unmodified trace.
+
+Run the optional comparison with a local read-only source checkout and the
+development trace directory as its two arguments. The normal Slean build and
+test suite do not need that checkout.
 
 The original runtime already checks artifact integrity and recomputes its own
 scientific result. Slean's added control concerns agreement **between** its
@@ -62,13 +111,32 @@ Its documented features do not include this experimental event-to-result
 validator. A custom Blueprint extension could implement one; no same-case
 Blueprint prototype has yet measured that extension's cost.
 
+## Value evidence boundary
+
+The source was one existing development run, not an established representative
+sample of campaigns or reviewer tasks. Every rejected discrepancy in this
+retest was injected into an in-memory copy; none was found in the unmodified
+trace. The full-trace differential confirms a cross-file gap in the pinned
+source verifier for this actual event shape. It does not show an observed
+source failure or time saved for a researcher.
+
+The PRD asks for a new useful control on a development trace and excludes a
+fixture-only defect. It does not set a numeric time-saving threshold or require
+an observed production incident. This retest supports a candidate structural
+control because the mutation uses the development trace's event shape and the
+existing verifier comparison is source-backed. Its usefulness on a
+representative workload remains unmeasured. An empty wire-fields-lost list
+means every parsed source JSON field is retained in owner-only records; it does
+not mean model comparison, posterior calculation or audit adequacy is typed or
+recomputed by Slean.
+
 ## Decision and limits
 
-**V result: continue to a bounded documentation prototype.** This establishes
-one useful structural check beyond the existing source verifier on the actual
-trace shape, without discarding source fields. It does not establish improved
-scientific accuracy, a safe publication, or value for a general DSL. The
-canonical SHA fields are computed by the trusted Python adapter; Lean checks
+**V result: continue to a bounded documentation prototype.** This records a
+limited implementation decision after the earlier reduce result. The injected
+cross-file discrepancy is detectable, but the retest does not establish
+scientific accuracy, a safe publication, measured reviewer value, or value for
+a general DSL. The canonical SHA fields are computed by the trusted Python adapter; Lean checks
 their links but does not recompute SHA-256. Source artifact bytes stay in the
 source repository. Some fields remain present only in owner source records and
 are not typed decision rules. Typed times use UTC seconds, while owner records

@@ -20,6 +20,8 @@ def checked_timeline(path: Path, audience: str) -> dict:
     try:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError as error:
+        if audience == "agent":
+            raise ValueError("Slean returned no agent timeline") from error
         raise ValueError(f"Slean returned no JSON result: {result.stderr.strip()}") from error
     if result.returncode:
         diagnostic = payload.get("error", {})

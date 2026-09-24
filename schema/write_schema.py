@@ -108,3 +108,49 @@ schema_v02 = {
     "$defs": defs_v02,
 }
 (HERE / "v0.2.0.schema.json").write_text(json.dumps(schema_v02, indent=2, sort_keys=True) + "\n")
+
+# V0.3 records explicit AND/OR dependency groups without evaluating them.
+defs_v03 = copy.deepcopy(defs_v02)
+defs_v03["DependencyGate"] = obj({
+    "identity": ref("Identity"),
+    "target_ref": NONEMPTY,
+    "member_refs": {"type": "array", "items": NONEMPTY, "minItems": 2, "uniqueItems": True},
+    "operator": {"enum": ["all_of", "any_of"]},
+    "kind": {"enum": ["support", "prerequisite"]},
+})
+defs_v03["Event"] = {"oneOf": defs_v02["Event"]["oneOf"] + [
+    obj({**common, "kind": {"const": "dependency_gate_recorded"},
+         "payload": ref("DependencyGate")})
+]}
+schema_v03 = {
+    **schema_v02,
+    "$id": "urn:slean:schema:0.3.0",
+    "title": "Slean case file V0.3.0",
+    "description": "Wire shape only. Dependency gates record all/any grouping; Lean does not evaluate their truth.",
+    "properties": {**schema_v02["properties"],
+                   "schema_version": {"const": "0.3.0"},
+                   "semantics_version": {"const": "0.3.0"}},
+    "$defs": defs_v03,
+}
+(HERE / "v0.3.0.schema.json").write_text(json.dumps(schema_v03, indent=2, sort_keys=True) + "\n")
+
+# Export is a separate versioned envelope. Its case field retains the exact
+# existing case schema; no 0.1–0.3 input is silently upgraded.
+export_v01 = {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:slean:export:0.1.0",
+    "title": "Slean export envelope V0.1.0",
+    "description": "Lean version describes the exporter, not an independent proof or source attestation.",
+    **obj({
+        "format": {"const": "slean-export/0.1.0"},
+        "lean_version": {"const": "4.28.0"},
+        "case": {"oneOf": [{"$ref": f"#/$defs/case_v{version.replace('.', '_')}"}
+                           for version in ("0.1.0", "0.2.0", "0.3.0")]},
+    }),
+    "$defs": {
+        "case_v0_1_0": schema,
+        "case_v0_2_0": schema_v02,
+        "case_v0_3_0": schema_v03,
+    },
+}
+(HERE / "export-v0.1.0.schema.json").write_text(json.dumps(export_v01, indent=2, sort_keys=True) + "\n")
