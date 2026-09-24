@@ -376,14 +376,34 @@ def audit(path):
     code, error = validate_case(converted)
     after = {name: hashlib.sha256(file.read_bytes()).digest() for name, file in files.items()}
     losses = loss_report(manifest, protocol, events, converted)
-    return {**source_shape(manifest, protocol, events),
-            "source_artifact_hashes_valid": source_artifacts_valid(path, manifest),
+    shape = source_shape(manifest, protocol, events)
+    artifact_hashes_valid = source_artifacts_valid(path, manifest)
+    files_unchanged = before == after
+    preservation_verified = not losses["wire_fields_lost"] and not losses["source_record_integrity_errors"]
+    probes = mutation_probes(manifest, protocol, events)
+    expected_probes = {
+        "unit_mismatch": "metric_unit",
+        "missing_prediction": "missing_relation_ref",
+        "future_observation": "future_observation",
+        "changed_protocol_file": "source_protocol_digest",
+        "second_freeze_event": "source_second_freeze",
+        "completion_decision": "source_decision_provenance",
+        "completion_decision_rehashed": "source_decision_provenance",
+        "omitted_assessment_observation": "source_projection",
+    }
+    structural_gate_passed = (all(shape[key] for key in (
+        "source_sequence_contiguous", "source_event_ids_unique",
+        "source_freeze_matches_manifest", "source_definition_matches_file")) and
+        artifact_hashes_valid and files_unchanged and preservation_verified and
+        code == 0 and probes == expected_probes)
+    return {**shape,
+            "source_artifact_hashes_valid": artifact_hashes_valid,
             "converted_event_count": len(converted["events"]),
             "slean_validation": "accepted" if code == 0 else f"rejected:{error}",
-            "source_files_unchanged": before == after,
-            "source_preservation_verified": not losses["wire_fields_lost"] and
-                not losses["source_record_integrity_errors"],
-            "mutation_probes_on_memory_copy": mutation_probes(manifest, protocol, events),
+            "source_files_unchanged": files_unchanged,
+            "source_preservation_verified": preservation_verified,
+            "mutation_probes_on_memory_copy": probes,
+            "structural_gate_passed": structural_gate_passed,
             "losses": losses}
 
 
@@ -394,7 +414,10 @@ def main():
     if not BIN.exists():
         parser.error("build Slean first with lake build")
     try:
-        print(json.dumps(audit(args.trace_dir), sort_keys=True, indent=2))
+        report = audit(args.trace_dir)
+        print(json.dumps(report, sort_keys=True, indent=2))
+        if not report["structural_gate_passed"]:
+            raise SystemExit(1)
     except (KeyError, ValueError, OSError) as error:
         parser.error(f"unsupported or unreadable source trace: {type(error).__name__}")
 

@@ -34,6 +34,10 @@ event record; both are reported as preservation failures. This follow-up did
 not rerun the private trace or authenticate its source values. An unrecognized
 scientific decision in a completed source trace now fails conversion instead
 of silently becoming `defer`.
+The audit command also emits `structural_gate_passed` and exits nonzero when
+source shape, artifact hashes, preservation, Slean validation or the named
+mutation probes fail. A failed run still prints its aggregate JSON report.
+This is a structural evidence gate, not a claim of scientific value.
 
 The following probes changed copies held in memory. They were not faults
 observed in the original source and did not change its files.
