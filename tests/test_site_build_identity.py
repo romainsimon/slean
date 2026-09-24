@@ -79,6 +79,13 @@ class BuildIdentityTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "clean Git checkout"):
                 identity.image_preflight(repo, revision)
 
+    def test_unreadable_git_metadata_is_not_treated_as_an_archive(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            (repo / ".git").write_text("invalid gitdir pointer\n")
+            with self.assertRaisesRegex(ValueError, "Git metadata is present but cannot be verified"):
+                identity.image_preflight(repo, "a" * 40)
+
     def test_schema_identity_follows_checked_wire_contract(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

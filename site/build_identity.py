@@ -81,6 +81,8 @@ def source_identity(
     """Resolve an exact source SHA and report cleanliness only when Git can prove it."""
     expected = source_commit if source_commit is not None else os.environ.get("SOURCE_COMMIT")
     has_git = git_root(repo) is not None
+    if (repo / ".git").exists() and not has_git:
+        raise ValueError("Git metadata is present but cannot be verified")
     if expected is None:
         if not has_git:
             raise ValueError("SOURCE_COMMIT is required when Git metadata is unavailable")

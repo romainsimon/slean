@@ -12,6 +12,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 HERE = Path(__file__).resolve().parent
 MARKER = ".slean-explorer.json"
+sys.path.insert(0, str(ROOT / "site"))
+from build_identity import source_identity as resolve_source_identity
 
 
 def checked_timeline(path: Path, audience: str) -> dict:
@@ -34,14 +36,8 @@ def checked_timeline(path: Path, audience: str) -> dict:
 
 
 def source_identity() -> dict:
-    revision = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
-    ).stdout.strip()
-    dirty = subprocess.run(
-        ["git", "status", "--porcelain", "--", ".", ":(exclude)https:/"],
-        cwd=ROOT, capture_output=True, text=True, check=True
-    ).stdout.strip()
-    return {"base_revision": revision, "source_tree_clean": not bool(dirty)}
+    revision, clean = resolve_source_identity(ROOT)
+    return {"base_revision": revision, "source_tree_clean": clean}
 
 
 def prepare_output(path: Path, case_id: str, audience: str) -> None:

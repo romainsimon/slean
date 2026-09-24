@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import subprocess
 import tempfile
 import unittest
@@ -74,9 +75,12 @@ elif args[0] == "cp":
 class ImageSmokeIdentityTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.image_sha = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
-        ).strip()
+        cls.image_sha = os.environ.get("SOURCE_COMMIT")
+        if cls.image_sha is None:
+            cls.image_sha = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+            ).strip()
+        assert re.fullmatch(r"[0-9a-f]{40}", cls.image_sha)
         assert cls.image_sha != ARTIFACT_SHA
 
     def helper(self, artifact: Path, image_sha: str, artifact_sha: str,
@@ -112,7 +116,7 @@ class ImageSmokeIdentityTests(unittest.TestCase):
             self.assertEqual(self.helper(artifact, self.image_sha, ARTIFACT_SHA).returncode, 0)
             wrong_head = self.helper(artifact, ARTIFACT_SHA, self.image_sha)
             self.assertNotEqual(wrong_head.returncode, 0)
-            self.assertIn("Image source SHA must match current HEAD", wrong_head.stderr)
+            self.assertIn("Image source SHA must match", wrong_head.stderr)
             for artifact_sha, schema, tag in (
                 (self.image_sha, "0.3.0", TAG),
                 (ARTIFACT_SHA, "0.2.0", TAG),

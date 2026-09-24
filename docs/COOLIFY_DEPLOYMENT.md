@@ -1,8 +1,8 @@
 # Slean Coolify deployment candidate
 
-This describes the intended configuration for the existing `slean.org` application (`iegozztocwpvv1xzodzynpec`). It has not been applied. The source remains `romainsimon/slean`, branch `main`, base directory `/`, and domain `https://slean.org`.
+This describes the required configuration for the existing `slean.org` application (`iegozztocwpvv1xzodzynpec`). The source is `romainsimon/slean`, branch `main`, base directory `/`, and domain `https://slean.org`.
 
-After the reviewed PR stack is assembled into one exact candidate, its `final-image` workflow passes, and a recovery image is retained, change only these application fields before merging to `main`:
+After the reviewed PR stack is assembled into one exact candidate, the final image is tested, and a recovery image is retained, check these application fields before merging to `main`:
 
 ```json
 {
@@ -22,7 +22,7 @@ Every image build requires `SOURCE_COMMIT` as a full, lowercase 40-character Git
 
 The final Nginx image listens on port 80 and checks `/` and `/en/` from inside the container. Keep the existing domain and automatic deployment behavior. Do not add a separate build or start command.
 
-Before a first deployment, retain a tested image and its compatible application settings as a recovery path. At the time this file was written, the existing Slean container had never become healthy, so it cannot serve as a rollback image. The `final-image` workflow must pass on the SHA selected for release; a successful source build or HTTP preview does not prove the final image.
+Before a first deployment, retain a tested image and its compatible application settings as a recovery path. At the time this file was written, the existing Slean container had never become healthy, so it cannot serve as a rollback image. Test the final image for the exact release SHA in CI when the workflow is available, or locally when GitHub Actions is unavailable. A successful source build or HTTP preview does not prove the final image.
 
 Run the read-only portfolio audit and the exact candidate check before changing the live application:
 

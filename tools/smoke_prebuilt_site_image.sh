@@ -24,10 +24,19 @@ image_ref="${6:-}"
 [[ "$artifact_source_sha" =~ ^[0-9a-f]{40}$ ]] || { echo 'Expected a full artifact-source Git SHA' >&2; exit 2; }
 [[ "$expected_schema" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'Expected a schema version' >&2; exit 2; }
 git check-ref-format "refs/tags/$expected_tag" || { echo 'Expected a valid source tag' >&2; exit 2; }
-[[ "$(git -C "$repo_dir" rev-parse HEAD)" == "$image_source_sha" ]] || { echo 'Image source SHA must match current HEAD' >&2; exit 1; }
-if [[ "$check_only" == false && -n "$(git -C "$repo_dir" status --porcelain=v1)" ]]; then
-  echo 'Image source checkout must be clean' >&2
-  exit 1
+if [[ -e "$repo_dir/.git" ]]; then
+  current_head="$(git -C "$repo_dir" rev-parse HEAD)" || { echo 'Image source Git metadata is unreadable' >&2; exit 1; }
+  [[ "$current_head" == "$image_source_sha" ]] || { echo 'Image source SHA must match current HEAD' >&2; exit 1; }
+  if [[ "$check_only" == false && -n "$(git -C "$repo_dir" status --porcelain=v1)" ]]; then
+    echo 'Image source checkout must be clean' >&2
+    exit 1
+  fi
+else
+  [[ "${SOURCE_COMMIT:-}" == "$image_source_sha" ]] || { echo 'Image source SHA must match SOURCE_COMMIT in an archive' >&2; exit 1; }
+  if [[ "$check_only" == false ]]; then
+    echo 'Building a prebuilt image requires a verifiable Git checkout' >&2
+    exit 1
+  fi
 fi
 
 SLEAN_ARTIFACT_DIR="$artifact_dir" EXPECTED_ARTIFACT_SHA="$artifact_source_sha" EXPECTED_SCHEMA="$expected_schema" EXPECTED_TAG="$expected_tag" python3 - <<'PY'
