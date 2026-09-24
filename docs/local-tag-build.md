@@ -1,6 +1,6 @@
-# Local-only documentation tag builds — 2026-09-23
+# Local-only documentation tag builds — 2026-09-23 to 2026-09-24
 
-This is a rehearsal of the DOC-01 build at the exact documentation candidate revision in [docs PR #1](https://github.com/romainsimon/slean/pull/1). It did not create a release or public tag. The tag exists only in an isolated temporary clone.
+This file records local-only DOC-01 rehearsals for docs PR #1, docs PR #6, and the combined PR #17 candidate. The annotated tags were created only in isolated clones; none was pushed or made into a release. The first rehearsal below used the exact documentation revision in [docs PR #1](https://github.com/romainsimon/slean/pull/1).
 
 | Check | Observed result |
 |---|---|
