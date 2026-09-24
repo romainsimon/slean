@@ -1,44 +1,46 @@
-# Slean V0 research dossier
+# Slean
 
-Slean is a local, pre-publication Lean 4 prototype for checking the structure and decision history of a research dossier. It does not evaluate the truth of an empirical claim. The [gate V retest](docs/gate-v-retest.md) found one useful cross-file check and permits a bounded documentation prototype; the [earlier negative result](docs/gate-v.md) remains available.
+Slean is a local Lean 4 prototype for checking the structure and decision history of research dossiers.
 
-## Build and inspect
+![An abstract network of branching research paths, with dark blue and coral nodes on a light background.](assets/slean-banner.jpg)
 
-Install `elan`, then run:
+## Why Slean
+
+A decision can depend on a frozen protocol, earlier events, observations, costs, and outcomes. Slean brings those records into one versioned journal so their links and history can be inspected at a chosen prefix.
+
+See [product scope](PRODUCT.md) and the [architecture and trust boundary](ARCHITECTURE.md).
+
+## What works today
+
+- A Lean CLI that reads JSON cases using the versioned schema and semantics pairs 0.1.0, 0.2.0, and 0.3.0.
+- Structural checks for IDs, references, event order, units, one exact-decimal threshold rule, and recorded protocol cost caps.
+- Replay and validated views of journal prefixes, plus audience-filtered exports.
+- A typed Lean example and a matching synthetic JSON fixture, with a [local Explorer](explorer/README.md) for inspecting validated prefixes.
+
+The examples are synthetic. Slean checks the dossier's recorded structure; it does not establish that measurements are valid or external assessments are correct. Recorded dependency gates are not evaluated for truth.
+
+## Get started
+
+Install [elan](https://github.com/leanprover/elan#installation); the repository's [`lean-toolchain`](lean-toolchain) pins Lean 4.28.0. Then clone the repository and run the build, checks, and example validator:
 
 ```sh
+git clone https://github.com/romainsimon/slean.git
+cd slean
 lake build
 bash tests/check.sh
 lake exe slean validate examples/valid.json
-lake exe slean replay examples/valid.json 7
-lake exe slean export examples/valid.json agent
-lake exe slean view examples/valid.json agent
-lake exe slean timeline examples/valid.json agent
-lake exe slean proof-statement
-# After committing a clean candidate, bind one formal claim to its exact build:
-python3 tools/attest_proof.py examples/formal-claim.json
 ```
 
-`validate` returns a JSON result and a nonzero exit code on error. `replay` returns the state after a prefix of the journal. `export` writes a versioned envelope with the canonical case and Lean version; the CLI can read that envelope again. `export-case` writes only the legacy canonical case for existing fixture consumers. `view` derives observation, relation and recorded dependency-gate data from the projection. `timeline` returns validated state snapshots at every projected prefix for the local Explorer. `proof` reports `declared` plus whether a claim matches the local theorem pin. Only the clean-build attester can issue `kernel_checked`, with exact build and projected-export references. The CLI accepts `-` as an input path for standard input. Do not send a private owner export or Explorer artifact to an agent or a public channel.
+The example validator prints:
 
-The equivalent typed Lean example is [examples/Synthetic.lean](examples/Synthetic.lean). Its agent JSON bytes match the JSON fixture projection. All checked-in examples are synthetic. The local trace audit reads source files but never writes their converted content: `python3 tools/audit_autoresearch_trace.py <trace-directory>`. Its report contains aggregate checks and field names, while the owner-only source JSON stays in memory.
+```json
+{"case_id":"synthetic-decision-1","events":10,"ok":true}
+```
 
-The [Verso manual](site/README.md) builds locally with compiled Lean snippets. It is a development preview, not a deployed site.
+## Contributing
 
-The [same-case Blueprint prototype](blueprint/README.md) records what Blueprint already makes readable and where experimental journal review still needs Slean. The [comparison decision](docs/blueprint-comparison.md) scopes a local Explorer to journal prefixes and evidence.
+There is no separate contribution guide yet. Keep changes focused, add regression coverage when behavior changes, and run `lake build` and `bash tests/check.sh` before opening a pull request. The check script builds the Lean project, runs the Python tests, and checks parity between the typed Lean example and the JSON fixture.
 
-The [local Explorer](explorer/README.md) renders those checked prefixes into a self-contained agent view. Owner output requires an explicit audience option and separate private artifact directory.
+## License
 
-## Contract and limits
-
-- `lean-toolchain` pins Lean 4.28.0. `lake-manifest.json` has no external packages; Mathlib is not required.
-- `schema/v0.1.0.schema.json` specifies the original wire shape; `schema/v0.2.0.schema.json` adds owner-only source records; `schema/v0.3.0.schema.json` adds explicit AND/OR dependency gates. Lean replay is normative for references, chronology, exact decisions, and stated cost caps across all runs of a frozen protocol. Gates are recorded claims, not evaluated truth. Unsupported or mismatched schema and semantics versions fail; there is no implicit migration.
-- One exact decimal metric and one prior observation can support an automatic `pass` or `fail`. External rules may cite many prior observations, but stay `external_unverified`. Unknown and technical errors stay `undetermined`.
-- The 0.2 source-trace adapter retains every parsed manifest, protocol, and event JSON object in owner-only records. It checks source sequence, the single freeze, prediction links, completion-to-manifest agreement, observation count, and typed coverage. The Python adapter computes canonical SHA-256; Lean checks its links, not the hash computation or external evaluator.
-- A routine `promote` needs prior passing evidence. A human `override` needs a reason and does not become a `pass`.
-- The only claim eligible for `kernel_checked` is the pinned theorem in `Slean/Proof.lean`. The CLI lists its direct Slean dependencies and approved axioms but returns `declared` until attestation. Imported JSON status never grants a checked status. `tools/attest_proof.py` builds a clean revision and links the checked receipt to exact executable, module, Lake manifest and toolchain digests, plus the SHA-256 of the audience-filtered `slean export` stdout bytes (including its final newline). Lake, the CLI exporter and the Python attester remain in the trust boundary; no independent checker is configured.
-- Agent projection filters hidden events before it computes the view. An owner-only case header is redacted. Agent-visible objects must be safe for that audience.
-
-This repository has no approved public license or deployment. Apache-2.0 is a proposal for owner review, not a license grant. Do not publish, deploy, or treat a compiled dossier as scientific validation.
-
-See [product scope](PRODUCT.md), [architecture](ARCHITECTURE.md), [fixture baseline](docs/baseline.md), [gate results](ROADMAP.md), and the [PRD acceptance audit](docs/prd-acceptance-audit.md) for local evidence and open release or human-study gates.
+No public license has been selected, and this repository has no `LICENSE` file. The license decision is pending owner review; see the [project roadmap](ROADMAP.md).
