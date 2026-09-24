@@ -205,7 +205,7 @@ Schema 0.2 can keep owner-only source records. The bounded adapter checks source
 - `view <case.json> agent|owner`: which observations, decisions, and relations are visible to that audience?
 - `export <case.json> agent|owner`: produce a versioned envelope with the canonical case and Lean version. Review it before sharing. Use `export-case` only when a consumer needs the legacy raw case.
 - `timeline <case.json> agent|owner`: get checked states at every visible prefix for the local Explorer.
-- `proof <case.json>` and `proof-statement`: inspect local formal statuses, direct project dependencies and the project's one pinned theorem statement. For a clean committed build, `python3 tools/attest_proof.py path/to/formal-case.json` links a receipt to exact build digests. This uses trusted Lake, CLI and Python code; it is not an independent recheck.
+- `proof <case.json>` and `proof-statement`: inspect local formal statuses, direct project dependencies and the project's one pinned theorem statement. For a clean committed build, `python3 tools/attest_proof.py examples/formal-claim.json` links a receipt to exact build digests. This uses trusted Lake, CLI and Python code; it is not an independent recheck.
 
 Commands that read a case also accept `-` for standard input. For example, from the repository root:
 

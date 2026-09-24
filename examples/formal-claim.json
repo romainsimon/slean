@@ -1,0 +1,306 @@
+{
+  "audience": "agent",
+  "case_id": "synthetic-decision-1",
+  "claim": {
+    "identity": {
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "id": "claim-1",
+      "provenance": "synthetic://slean-v0",
+      "version": 1
+    },
+    "text": "The synthetic metric exceeds 0.001 on the stated input."
+  },
+  "domain": "synthetic-computation",
+  "events": [
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-1",
+      "kind": "protocol_frozen",
+      "payload": {
+        "claim_ref": "claim-1",
+        "cost_cap": "10.00",
+        "cost_unit": "cpu_s",
+        "data_scope": "synthetic input A",
+        "direction": "gte",
+        "evaluator_ref": "synthetic-evaluator-v1",
+        "frozen_at": "2026-01-01T00:01:00Z",
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "protocol-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "inclusive": false,
+        "metric_id": "synthetic_delta",
+        "stop_rule": "one synthetic measurement",
+        "threshold": "0.001",
+        "unit": "ratio"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:01:00Z",
+      "sequence": 1,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-2",
+      "kind": "run_started",
+      "payload": {
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "run-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "input_ref": "synthetic-input-A",
+        "protocol_ref": "protocol-1",
+        "seed": "7"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:02:00Z",
+      "sequence": 2,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-3",
+      "kind": "artifact_registered",
+      "payload": {
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "artifact-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "media_type": "application/json"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:03:00Z",
+      "sequence": 3,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-4",
+      "kind": "observation_recorded",
+      "payload": {
+        "artifact_ref": "artifact-1",
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "observation-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "metric_id": "synthetic_delta",
+        "observed_at": "2026-01-01T00:04:00Z",
+        "run_ref": "run-1",
+        "status": "measured",
+        "unit": "ratio",
+        "value": "0.002"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:04:00Z",
+      "sequence": 4,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-5",
+      "kind": "cost_recorded",
+      "payload": {
+        "amount": "2.50",
+        "category": "machine_time",
+        "coverage": "complete",
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "cost-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "run_ref": "run-1",
+        "source": "synthetic-meter",
+        "unit": "cpu_s"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:05:00Z",
+      "sequence": 5,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-6",
+      "kind": "assessment_recorded",
+      "payload": {
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "assessment-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "observation_refs": [
+          "observation-1"
+        ],
+        "protocol_ref": "protocol-1",
+        "rule_used": "exact_v0",
+        "verdict": "pass"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:06:00Z",
+      "sequence": 6,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-7",
+      "kind": "decision_recorded",
+      "payload": {
+        "assessment_ref": "assessment-1",
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "decision-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "reason": "Synthetic threshold passed.",
+        "result": "promote"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:07:00Z",
+      "sequence": 7,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-8",
+      "kind": "relation_recorded",
+      "payload": {
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "relation-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "kind": "support",
+        "source_ref": "observation-1",
+        "target_ref": "claim-1"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:08:00Z",
+      "sequence": 8,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "owner",
+      "domain": "synthetic-computation",
+      "event_id": "event-9",
+      "kind": "artifact_registered",
+      "payload": {
+        "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "identity": {
+          "audience": "owner",
+          "domain": "synthetic-computation",
+          "id": "private-artifact-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "media_type": "application/json"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:09:00Z",
+      "sequence": 9,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "owner",
+      "domain": "synthetic-computation",
+      "event_id": "event-10",
+      "kind": "observation_recorded",
+      "payload": {
+        "artifact_ref": "private-artifact-1",
+        "identity": {
+          "audience": "owner",
+          "domain": "synthetic-computation",
+          "id": "private-observation-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "metric_id": "synthetic_delta",
+        "observed_at": "2026-01-01T00:10:00Z",
+        "run_ref": "run-1",
+        "status": "measured",
+        "unit": "ratio",
+        "value": "0.009"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:10:00Z",
+      "sequence": 10,
+      "version": 1
+    },
+    {
+      "actor": "synthetic-author",
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "event_id": "event-11",
+      "kind": "formal_claim_declared",
+      "payload": {
+        "declaration": "Slean.promotionEvidence_has_frozen_observation",
+        "identity": {
+          "audience": "agent",
+          "domain": "synthetic-computation",
+          "id": "formal-1",
+          "provenance": "synthetic://slean-v0",
+          "version": 1
+        },
+        "statement": "forall (state : Slean.State) (decision : Slean.PromotionDecision), (Eq.{1} Bool (Option.isSome.{0} (Prod.{0, 0} Slean.FrozenProtocol Slean.Observation) (Slean.promotionEvidence state decision)) Bool.true) -> (Exists.{1} Slean.Assessment (fun (assessment : Slean.Assessment) => Exists.{1} Slean.FrozenProtocol (fun (protocol : Slean.FrozenProtocol) => Exists.{1} Slean.Run (fun (run : Slean.Run) => Exists.{1} Slean.Observation (fun (observation : Slean.Observation) => Exists.{1} String (fun (observationRef : String) => And (Eq.{1} (Option.{0} Slean.Assessment) (Slean.findAssessment state (Slean.PromotionDecision.assessment_ref decision)) (Option.some.{0} Slean.Assessment assessment)) (And (Eq.{1} String (Slean.Assessment.verdict assessment) \"pass\") (And (Eq.{1} (Option.{0} String) (GetElem?.getElem?.{0, 0, 0} (Array.{0} String) Nat String (fun (xs : Array.{0} String) (i : Nat) => LT.lt.{0} Nat instLTNat i (Array.size.{0} String xs)) (Array.instGetElem?NatLtSize.{0} String) (Slean.Assessment.observation_refs assessment) (OfNat.ofNat.{0} Nat 0 (instOfNatNat 0))) (Option.some.{0} String observationRef)) (And (Eq.{1} (Option.{0} Slean.Observation) (Slean.findObservation state observationRef) (Option.some.{0} Slean.Observation observation)) (And (Eq.{1} (Option.{0} Slean.Run) (Slean.findRun state (Slean.Observation.run_ref observation)) (Option.some.{0} Slean.Run run)) (And (Eq.{1} (Option.{0} Slean.FrozenProtocol) (Slean.findProtocol state (Slean.Run.protocol_ref run)) (Option.some.{0} Slean.FrozenProtocol protocol)) (Eq.{1} String (Slean.Identity.id (Slean.FrozenProtocol.identity protocol)) (Slean.Assessment.protocol_ref assessment)))))))))))))",
+        "status": "declared",
+        "toolchain": "leanprover/lean4:v4.28.0"
+      },
+      "provenance": "synthetic://slean-v0",
+      "recorded_at": "2026-01-01T00:11:00Z",
+      "sequence": 11,
+      "version": 1
+    }
+  ],
+  "provenance": "synthetic://slean-v0",
+  "question": {
+    "identity": {
+      "audience": "agent",
+      "domain": "synthetic-computation",
+      "id": "question-1",
+      "provenance": "synthetic://slean-v0",
+      "version": 1
+    },
+    "text": "Does a synthetic candidate exceed a fixed threshold?"
+  },
+  "schema_version": "0.1.0",
+  "semantics_version": "0.1.0",
+  "version": 1
+}

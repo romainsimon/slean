@@ -16,7 +16,7 @@ lake exe slean view examples/valid.json agent
 lake exe slean timeline examples/valid.json agent
 lake exe slean proof-statement
 # After committing a clean candidate, bind one formal claim to its exact build:
-python3 tools/attest_proof.py path/to/formal-case.json
+python3 tools/attest_proof.py examples/formal-claim.json
 ```
 
 `validate` returns a JSON result and a nonzero exit code on error. `replay` returns the state after a prefix of the journal. `export` writes a versioned envelope with the canonical case and Lean version; the CLI can read that envelope again. `export-case` writes only the legacy canonical case for existing fixture consumers. `view` derives observation, relation and recorded dependency-gate data from the projection. `timeline` returns validated state snapshots at every projected prefix for the local Explorer. `proof` reports the local status of formal claims in a case. The CLI accepts `-` as an input path for standard input. Do not send a private owner export or Explorer artifact to an agent or a public channel.

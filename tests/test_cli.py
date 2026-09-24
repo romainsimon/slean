@@ -308,16 +308,8 @@ class CliTests(unittest.TestCase):
 
     def test_formal_status_requires_local_pin(self):
         _, pin, _ = invoke("proof-statement")
-        case = fixture()
-        case["events"].append({
-            "event_id": "event-11", "sequence": 11, "kind": "formal_claim_declared",
-            "version": 1, "domain": "synthetic-computation", "provenance": "synthetic://slean-v0",
-            "actor": "synthetic-author", "recorded_at": "2026-01-01T00:11:00Z",
-            "audience": "agent", "payload": {
-                "identity": {"id": "formal-1", "version": 1, "domain": "synthetic-computation",
-                             "provenance": "synthetic://slean-v0", "audience": "agent"},
-                "declaration": pin["declaration"], "statement": pin["elaborated_statement"],
-                "toolchain": pin["toolchain"], "status": "kernel_checked"}})
+        case = fixture("formal-claim.json")
+        self.assertEqual(case["events"][-1]["payload"]["statement"], pin["elaborated_statement"])
         code, receipt, _ = run_case(case, "proof")
         self.assertEqual(code, 0)
         self.assertEqual(receipt[0]["status"], "kernel_checked")
