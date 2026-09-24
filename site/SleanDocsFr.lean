@@ -112,6 +112,8 @@ Le cas valide raconte une chaîne courte, dans cet ordre :
 
 Le seuil est strict parce que le protocole combine `direction: "gte"` et `inclusive: false` : `0.002 > 0.001`. Slean vérifie aussi que les références existent et que l'évaluation et la décision ne précèdent pas leurs éléments d'appui. `pass` est le verdict de l'évaluation ; `promote` est une décision distincte. Une dérogation humaine `override` exige une justification et ne devient pas un `pass`.
 
+Le plafond de `10.00 cpu_s` concerne ce protocole figé pour l'ensemble de ses essais. Chaque montant enregistré en `cpu_s` compte, même si sa couverture est partielle. Un second essai qui ajoute `7.51 cpu_s` après les `2.50 cpu_s` du premier est refusé avec `cost_cap_exceeded` ; une autre unité de coût reste enregistrée sans conversion.
+
 Vous pouvez figer la lecture au moment exact de la décision :
 
 ```

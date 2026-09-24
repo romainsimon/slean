@@ -204,6 +204,46 @@ class CliTests(unittest.TestCase):
         case["events"][4]["payload"]["amount"] = "-1"
         self.assertEqual(run_case(case)[1]["error"]["code"], "cost")
 
+    def test_protocol_cost_cap_covers_all_runs(self):
+        case = fixture()
+        run = copy.deepcopy(case["events"][1])
+        run.update(event_id="event-11", sequence=11, recorded_at="2026-01-01T00:11:00Z")
+        run["payload"]["identity"]["id"] = "run-2"
+        cost = copy.deepcopy(case["events"][4])
+        cost.update(event_id="event-12", sequence=12, recorded_at="2026-01-01T00:12:00Z")
+        cost["payload"]["identity"]["id"] = "cost-2"
+        cost["payload"]["run_ref"] = "run-2"
+        cost["payload"]["amount"] = "7.50"
+        case["events"].extend([run, cost])
+        self.assertEqual(run_case(case)[0], 0)
+
+        cost["payload"]["amount"] = "7.51"
+        code, result, _ = run_case(case)
+        self.assertEqual(code, 1)
+        self.assertEqual(result["error"]["code"], "cost_cap_exceeded")
+        self.assertEqual(result["error"]["event_id"], "event-12")
+        self.assertEqual(result["error"]["object_id"], "cost-2")
+
+        separate = fixture()
+        protocol = copy.deepcopy(separate["events"][0])
+        protocol.update(event_id="event-11", sequence=11, recorded_at="2026-01-01T00:11:00Z")
+        protocol["payload"]["identity"].update(id="protocol-2", version=2)
+        protocol["payload"]["frozen_at"] = protocol["recorded_at"]
+        run.update(event_id="event-12", sequence=12, recorded_at="2026-01-01T00:12:00Z")
+        run["payload"]["protocol_ref"] = "protocol-2"
+        cost.update(event_id="event-13", sequence=13, recorded_at="2026-01-01T00:13:00Z")
+        cost["payload"]["amount"] = "8.00"
+        separate["events"].extend([protocol, run, cost])
+        self.assertEqual(run_case(separate)[0], 0)
+
+    def test_required_cost_fields_match_schema(self):
+        case = fixture()
+        case["events"][0]["payload"]["cost_unit"] = ""
+        self.assertEqual(run_case(case)[1]["error"]["code"], "protocol")
+        case = fixture()
+        case["events"][4]["payload"]["category"] = ""
+        self.assertEqual(run_case(case)[1]["error"]["code"], "cost")
+
     def test_audiences_follow_the_wire_contract(self):
         for field in ("question", "claim"):
             case = fixture()

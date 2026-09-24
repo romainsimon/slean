@@ -354,7 +354,7 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
       throw (diag event.event_id p.identity.id "protocol_revision" "frozen protocol ID cannot be reused; create a new ID and version")
     let state ← withIdentity state event p.identity
     unless p.claim_ref == state.claim_id && p.metric_id != "" && p.unit != "" && p.data_scope != "" &&
-        p.evaluator_ref != "" && p.stop_rule != "" && p.frozen_at == event.recorded_at do
+        p.evaluator_ref != "" && p.cost_unit != "" && p.stop_rule != "" && p.frozen_at == event.recorded_at do
       throw (diag event.event_id p.identity.id "protocol" "missing protocol field or frozen_at differs from event")
     if (p.direction != "external" && (parseDecimal p.threshold).toOption.isNone) ||
         (parseDecimal p.cost_cap).toOption.isNone ||
@@ -408,22 +408,26 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
     let run ← match findRun state c.run_ref with
       | some run => pure run
       | none => throw (diag event.event_id c.identity.id "missing_run" "cost references no run")
-    if (parseDecimal c.amount).toOption.isNone || c.unit.isEmpty || c.source.isEmpty || c.coverage.isEmpty then
-      throw (diag event.event_id c.identity.id "cost" "cost requires exact amount, unit, source and coverage")
+    if (parseDecimal c.amount).toOption.isNone || c.category.isEmpty || c.unit.isEmpty ||
+        c.source.isEmpty || c.coverage.isEmpty then
+      throw (diag event.event_id c.identity.id "cost" "cost requires category, exact amount, unit, source and coverage")
     if ((parseDecimal c.amount).toOption.get!).numerator < 0 then
       throw (diag event.event_id c.identity.id "cost" "cost cannot be negative")
     let protocol ← match findProtocol state run.protocol_ref with
       | some protocol => pure protocol
       | none => throw (diag event.event_id c.identity.id "missing_protocol" "run protocol is missing")
+    -- The cap belongs to the frozen protocol, not to an individual run.
     -- A partial coverage amount is still known cost and a lower bound.
     if c.unit == protocol.cost_unit then
       let mut total : Decimal := { numerator := 0, places := 0 }
       for prior in state.costs do
-        if prior.run_ref == c.run_ref && prior.unit == c.unit then
-          total := addDecimal total ((parseDecimal prior.amount).toOption.get!)
+        if prior.unit == c.unit then
+          if let some priorRun := findRun state prior.run_ref then
+            if priorRun.protocol_ref == protocol.identity.id then
+              total := addDecimal total ((parseDecimal prior.amount).toOption.get!)
       total := addDecimal total ((parseDecimal c.amount).toOption.get!)
       if compareDecimal total ((parseDecimal protocol.cost_cap).toOption.get!) == .gt then
-        throw (diag event.event_id c.identity.id "cost_cap_exceeded" "recorded cost exceeds declared cap")
+        throw (diag event.event_id c.identity.id "cost_cap_exceeded" "recorded protocol cost exceeds declared cap")
     return { state with costs := state.costs.push c }
   | "assessment_recorded" =>
     let a : Assessment ← decodePayload event

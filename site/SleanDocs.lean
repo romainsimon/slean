@@ -104,6 +104,8 @@ The valid case records a short chain, in this order:
 
 The threshold is strict because the protocol combines `direction: "gte"` with `inclusive: false`: `0.002 > 0.001`. Slean also checks that references exist and that the assessment and decision do not precede their evidence. `pass` is the assessment's verdict; `promote` is a separate decision. A human `override` needs a reason and does not become a `pass`.
 
+The `10.00 cpu_s` cap applies to this frozen protocol across all its runs. Each recorded `cpu_s` amount counts, including one with partial coverage. A second run that adds `7.51 cpu_s` after the first run's `2.50 cpu_s` is rejected as `cost_cap_exceeded`; another cost unit is recorded without conversion.
+
 You can freeze the reading at the decision itself:
 
 ```
