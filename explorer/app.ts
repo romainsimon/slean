@@ -62,7 +62,7 @@ interface ExplorerBundle {
     events: TimelineEvent[];
   };
   snapshots: Snapshot[];
-  build: { base_revision: string; source_tree_clean: boolean };
+  build: { base_revision: string; source_tree_clean: boolean | null };
 }
 
 function byId<T extends HTMLElement = HTMLElement>(id: string): T {
@@ -417,7 +417,10 @@ function initialize() {
   const slider = byId<HTMLInputElement>("prefix-slider");
   slider.max = String(events.length);
   byId("journal-count").textContent = `${events.length} events`;
-  byId("build-revision").textContent = `Base ${data.build.base_revision.slice(0, 8)}${data.build.source_tree_clean ? "" : " · source tree changed"}`;
+  const sourceStatus = data.build.source_tree_clean === null
+    ? " · source cleanliness unknown"
+    : data.build.source_tree_clean ? "" : " · source tree changed";
+  byId("build-revision").textContent = `Base ${data.build.base_revision.slice(0, 8)}${sourceStatus}`;
 
   const journal = byId("journal-list");
   const mobileSelect = byId<HTMLSelectElement>("mobile-event-select");
