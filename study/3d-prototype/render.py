@@ -2,6 +2,7 @@
 """Build two local study conditions from one checked, agent-projected timeline."""
 
 import argparse
+import hashlib
 import json
 import re
 import shutil
@@ -21,13 +22,17 @@ def replace_once(source: str, old: str, new: str) -> str:
     return source.replace(old, new)
 
 
-def embedded_bundle(html: str) -> dict:
+def embedded_bundle_text(html: str) -> str:
     matches = re.findall(
         r'<script id="slean-data" type="application/json">(.*?)</script>', html, re.DOTALL
     )
     if len(matches) != 1:
         raise ValueError("Expected one checked Explorer timeline bundle")
-    return json.loads(matches[0])
+    return matches[0]
+
+
+def sha256(data: bytes) -> str:
+    return "sha256:" + hashlib.sha256(data).hexdigest()
 
 
 def study_page(html: str, prefix: int, spatial: bool) -> str:
@@ -72,7 +77,10 @@ def main() -> int:
         baseline = output / "2d"
         baseline_page = render_explorer(args.case.resolve(), baseline, "agent")
         original_html = baseline_page.read_text(encoding="utf-8")
-        bundle = embedded_bundle(original_html)
+        bundle_text = embedded_bundle_text(original_html)
+        bundle = json.loads(bundle_text)
+        if bundle["build"].get("source_tree_clean") is not True:
+            raise ValueError("Study conditions require a clean source revision")
         if bundle["case"]["schema_version"] != "0.3.0":
             raise ValueError("The study candidate requires a checked 0.3.0 case")
         events = bundle["case"]["events"]
@@ -92,9 +100,9 @@ def main() -> int:
                 shutil.copyfile(HERE / "three-d.js", folder / "three-d.js")
             (folder / "index.html").write_text(study_page(original_html, prefix, mode), encoding="utf-8")
 
-        if embedded_bundle((baseline / "index.html").read_text(encoding="utf-8")) != embedded_bundle(
-            (spatial / "index.html").read_text(encoding="utf-8")
-        ):
+        baseline_html = (baseline / "index.html").read_text(encoding="utf-8")
+        spatial_html = (spatial / "index.html").read_text(encoding="utf-8")
+        if embedded_bundle_text(baseline_html) != embedded_bundle_text(spatial_html):
             raise ValueError("Study conditions do not share an identical checked timeline")
         (output / "study-manifest.json").write_text(
             json.dumps(
@@ -105,6 +113,13 @@ def main() -> int:
                     "audience": bundle["audience"],
                     "prefix": prefix,
                     "source_revision": bundle["build"]["base_revision"],
+                    "source_tree_clean": True,
+                    "input_case_sha256": sha256(args.case.resolve().read_bytes()),
+                    "projected_bundle_sha256": sha256(bundle_text.encode("utf-8")),
+                    "condition_page_sha256": {
+                        "2d": sha256(baseline_html.encode("utf-8")),
+                        "3d": sha256(spatial_html.encode("utf-8")),
+                    },
                     "identical_checked_bundle": True,
                 },
                 indent=2,

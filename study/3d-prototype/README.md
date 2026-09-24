@@ -1,8 +1,9 @@
 # Local 2D/3D study prototype
 
 This directory prepares two **local, disposable conditions** for the SL-009
-comparison. It is not a default Explorer view and records no participant or
-study result. The only included input is the checked synthetic 0.3 dossier.
+comparison on the current integrated Slean candidate. It is not a default
+Explorer view and records no participant or study result. The only included
+input is the checked synthetic 0.3 dossier.
 
 ```sh
 lake build
@@ -27,4 +28,7 @@ remains the text fallback. There is no camera animation or timed motion.
 
 The manifest's `prepared_not_run` status means that no representative dossier,
 reviewer, task result, or decision about 3D usefulness has been recorded. Use
-the separate task-study protocol before drawing a conclusion about SL-009.
+the separate task-study protocol before drawing a conclusion about SL-009. The
+manifest also names the clean source revision, input case, exact agent-projected
+bundle, and each condition page by SHA-256 so the study inputs can be frozen
+before a reviewer sees either view.
