@@ -114,7 +114,6 @@ def main() -> int:
                     "prefix": prefix,
                     "source_revision": bundle["build"]["base_revision"],
                     "source_tree_clean": True,
-                    "input_case_sha256": sha256(args.case.resolve().read_bytes()),
                     "projected_bundle_sha256": sha256(bundle_text.encode("utf-8")),
                     "condition_page_sha256": {
                         "2d": sha256(baseline_html.encode("utf-8")),

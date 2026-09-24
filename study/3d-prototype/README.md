@@ -29,6 +29,7 @@ remains the text fallback. There is no camera animation or timed motion.
 The manifest's `prepared_not_run` status means that no representative dossier,
 reviewer, task result, or decision about 3D usefulness has been recorded. Use
 the separate task-study protocol before drawing a conclusion about SL-009. The
-manifest also names the clean source revision, input case, exact agent-projected
-bundle, and each condition page by SHA-256 so the study inputs can be frozen
-before a reviewer sees either view.
+manifest also names the clean source revision, projected case ID, exact
+agent-projected bundle, and each condition page by SHA-256 so the shared study
+inputs can be frozen before a reviewer sees either view. It does not include a
+hash of the raw owner input; keep any owner-only provenance separately.
