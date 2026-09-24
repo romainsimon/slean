@@ -57,6 +57,11 @@ The final sentence of `ROADMAP.md` on `main` still says no remote `main` commit 
 | VIS-02 | **Candidate; local PRD checks met.** The [same-case Blueprint comparison](blueprint-comparison.md) names prefix review, decision state, cost and audience projection as tasks the tested Blueprint prototype does not cover without an extension. [Explorer PR #3](https://github.com/romainsimon/slean/pull/3) records desktop/mobile, keyboard and reduced-motion browser checks; [PR #4](https://github.com/romainsimon/slean/pull/4) retains them with explicit gates and audience checks. The refreshed stacked [PR #13](https://github.com/romainsimon/slean/pull/13) at `509f14d` adds strict TypeScript and a byte-stable generated JavaScript artifact, checked above. | The PRs are unmerged and the comparison uses a synthetic dossier. A reviewer value study could inform later product direction but is not a VIS-02 criterion. |
 | INT-01 | **External.** GERMINAL owns its adapter and reserved suites. | Not tested in Slean and not authorized by this audit. |
 
+The [manual payload baseline](manual-payload-baseline.md) measures the clean
+`a4bcf5d` artifact, whose `site/` source is unchanged through draft PR #21.
+It records page and local-resource bytes without claiming browser load time or
+production performance.
+
 ## Packaging and release readiness
 
 | Gate | Current evidence | Required next evidence |
