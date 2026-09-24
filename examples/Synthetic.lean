@@ -72,4 +72,4 @@ def syntheticCase : CaseFile :=
   (parseDecimal "0.01" |>.toOption.get!)) == .eq
 #guard (assessExact protocol observation).toOption == some "pass"
 
-def main : IO Unit := IO.println (toJson syntheticCase).compress
+def main : IO Unit := IO.println (toJson (project syntheticCase "agent")).compress

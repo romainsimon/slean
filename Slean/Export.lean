@@ -29,7 +29,11 @@ private def canonicalPayload (event : Event) : Option Json :=
   let p := event.payload
   match event.kind with
   | "protocol_frozen" => (fromJson? p : Except String FrozenProtocol).toOption.map toJson
-  | "run_started" => (fromJson? p : Except String Run).toOption.map toJson
+  | "run_started" =>
+    -- An input_ref is opaque: it may name an owner-only artifact or source.
+    -- Its value must not affect agent export bytes or derived views.
+    (fromJson? p : Except String Run).toOption.map fun run =>
+      toJson { run with input_ref := "[redacted]" }
   | "artifact_registered" => (fromJson? p : Except String ArtifactRef).toOption.map toJson
   | "observation_recorded" => (fromJson? p : Except String Observation).toOption.map toJson
   | "cost_recorded" => (fromJson? p : Except String CostEntry).toOption.map toJson
