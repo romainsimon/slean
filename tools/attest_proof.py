@@ -31,6 +31,14 @@ def command(*args: str, input_text: str | None = None) -> str:
     return result.stdout.strip()
 
 
+def command_bytes(*args: str) -> bytes:
+    result = subprocess.run(args, cwd=ROOT, capture_output=True, check=False)
+    if result.returncode:
+        error = result.stderr or result.stdout
+        raise ValueError(f"{args[0]} failed ({result.returncode}): {error.decode(errors='replace').strip()}")
+    return result.stdout
+
+
 def digest(path: Path) -> str:
     if not path.is_file():
         raise ValueError(f"build artifact is missing: {path.relative_to(ROOT)}")
@@ -68,8 +76,9 @@ def attest(case_path: Path, audience: str) -> dict:
     build_id = "sha256:" + hashlib.sha256(build_bytes).hexdigest()
 
     command(str(BIN), "validate", str(case_path))
-    exported = command(str(BIN), "export", str(case_path), audience)
-    projected_export_id = "sha256:" + hashlib.sha256(exported.encode("utf-8")).hexdigest()
+    exported_bytes = command_bytes(str(BIN), "export", str(case_path), audience)
+    projected_export_id = "sha256:" + hashlib.sha256(exported_bytes).hexdigest()
+    exported = exported_bytes.decode("utf-8")
     pin = json.loads(command(str(BIN), "proof-statement"))
     receipts = json.loads(command(str(BIN), "proof", "-", input_text=exported))
     if not isinstance(receipts, list) or not receipts:
