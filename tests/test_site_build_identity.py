@@ -3,9 +3,11 @@
 import importlib.util
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,6 +21,64 @@ def git(repo: Path, *args: str) -> None:
 
 
 class BuildIdentityTests(unittest.TestCase):
+    def test_image_preflight_and_stamped_identity_work_without_git_metadata(self):
+        source_sha = "0123456789abcdef0123456789abcdef01234567"
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory) / "source"
+            output = repo / "site" / "_out" / "html-multi"
+            schema_dir = repo / "schema"
+            output.mkdir(parents=True)
+            schema_dir.mkdir()
+            self.assertFalse((repo / ".git").exists())
+
+            (schema_dir / "v0.3.0.schema.json").write_text(json.dumps({
+                "$id": "urn:slean:schema:0.3.0",
+                "properties": {
+                    "schema_version": {"const": "0.3.0"},
+                    "semantics_version": {"const": "0.3.0"},
+                },
+            }))
+            (output / "index.html").write_text(identity.PREVIEW_TEXT["fr"])
+            (output / "en").mkdir()
+            (output / "en/index.html").write_text(identity.PREVIEW_TEXT["en"])
+
+            self.assertEqual(identity.image_preflight(repo, source_sha), (source_sha, None))
+            with self.assertRaisesRegex(ValueError, "full 40-character lowercase"):
+                identity.image_preflight(repo, "not-a-full-sha")
+            with self.assertRaisesRegex(ValueError, "required for an image build"):
+                identity.image_preflight(repo, "")
+
+            with (mock.patch.object(identity, "ROOT", repo),
+                  mock.patch.object(identity, "OUTPUT", output),
+                  mock.patch.dict(
+                      "os.environ",
+                      {"SOURCE_COMMIT": source_sha, "SLEAN_SITE_TAG": ""},
+                      clear=False,
+                  ),
+                  mock.patch.object(sys, "argv", ["build_identity.py", "stamp"])):
+                self.assertEqual(identity.main(), 0)
+
+            info = json.loads((output / "build-info.json").read_text())
+            self.assertEqual(info["source_revision"], source_sha)
+            self.assertIsNone(info["source_tree_clean"])
+
+    def test_image_preflight_checks_sha_and_cleanliness_when_git_is_available(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            git(repo, "init", "-q")
+            (repo / "source.txt").write_text("source\n", encoding="utf-8")
+            git(repo, "add", "source.txt")
+            git(repo, "-c", "user.name=Slean Test", "-c", "user.email=test@example.invalid", "commit", "-qm", "source")
+            revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
+
+            self.assertEqual(identity.image_preflight(repo, revision), (revision, True))
+            with self.assertRaisesRegex(ValueError, "does not match Git HEAD"):
+                identity.image_preflight(repo, "f" * 40)
+
+            (repo / "source.txt").write_text("changed\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "clean Git checkout"):
+                identity.image_preflight(repo, revision)
+
     def test_schema_identity_follows_checked_wire_contract(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -18,7 +18,9 @@ After the reviewed PR stack is assembled into one exact candidate, its `final-im
 }
 ```
 
-The Dockerfile requires Coolify's `SOURCE_COMMIT` during the build and rejects a mismatch with Git HEAD. Its final Nginx image listens on port 80 and checks `/` and `/en/` from inside the container. Keep the existing domain and automatic deployment behavior. Do not add a separate build or start command.
+Every image build requires `SOURCE_COMMIT` as a full, lowercase 40-character Git SHA. The builder stamps that exact value into `build-info.json` and the OCI revision label. When the build context contains Git metadata, it compares the value with `HEAD` and rejects a dirty checkout. Coolify may provide a source archive without `.git`; in that case the builder cannot compare the archive with a Git object or inspect its cleanliness. It records `source_tree_clean: null` (unknown), never `true`, and relies on Coolify's injected commit to identify the archive. This provenance does not independently prove that the archive contents hash to that commit.
+
+The final Nginx image listens on port 80 and checks `/` and `/en/` from inside the container. Keep the existing domain and automatic deployment behavior. Do not add a separate build or start command.
 
 Before a first deployment, retain a tested image and its compatible application settings as a recovery path. At the time this file was written, the existing Slean container had never become healthy, so it cannot serve as a rollback image. The `final-image` workflow must pass on the SHA selected for release; a successful source build or HTTP preview does not prove the final image.
 

@@ -13,6 +13,8 @@ Open `http://127.0.0.1:8765/` for the French manual or `/en/` for English. The `
 
 The normal build is a development preview and displays no release tag. The displayed schema version comes from the newest versioned wire contract in `schema/`; the build rejects schema files whose ID and version fields disagree. For a candidate built from an existing annotated tag, check out that tag in a clean repository and run `SLEAN_SITE_TAG=<tag> bash site/build.sh`. The build rejects a lightweight tag, a tag that points elsewhere, or a dirty tree before compiling. Both title pages and the footer of every generated page then show the selected build tag; every page carries it in a metadata field, and `build-info.json` records the tag and full commit. This proves the local artifact's source identity. Publishing a tag, reviewing the final artifact, and deploying the site remain separate steps.
 
+The Docker image build requires a full lowercase 40-character `SOURCE_COMMIT`. It verifies the SHA against Git `HEAD` and records cleanliness when Git metadata is present. A source archive without `.git` uses the supplied SHA and records `source_tree_clean: null` because the archive's Git identity and cleanliness cannot be checked locally.
+
 For a local Nginx runtime check when the Lean-built artifact already exists, use BuildKit with the explicit `prebuilt-site-smoke` target. The helper checks the artifact's exact commit, schema, tag, clean-source flag, and page identities before building, then runs the existing image and browser smoke test:
 
 ```sh
