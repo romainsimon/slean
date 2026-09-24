@@ -243,7 +243,7 @@ L'API typée permet de construire le même type de dossier. Ces déclarations so
 #check Slean.DependencyGate
 ```
 
-`examples/Synthetic.lean` contient le cas typé complet. `bash tests/check.sh` le compile et compare son export `agent` avec la fixture JSON, octet par octet. Un statut de preuve importé depuis JSON n'accorde jamais `kernel_checked` ; ce statut est réservé à la déclaration locale fixée et contrôlée par le noyau Lean.
+`examples/Synthetic.lean` contient le cas typé complet. `bash tests/check.sh` le compile et compare ses octets à la projection `export-case agent` de la fixture JSON. Un statut de preuve importé depuis JSON n'accorde jamais `kernel_checked` ; ce statut est réservé à la déclaration locale fixée et contrôlée par le noyau Lean.
 
 # Limites et état du développement
 %%%

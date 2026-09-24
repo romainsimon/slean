@@ -227,7 +227,7 @@ The typed API can build the same kind of case. These declarations are checked as
 #check Slean.DependencyGate
 ```
 
-`examples/Synthetic.lean` contains the complete typed case. `bash tests/check.sh` compiles it and compares its `agent` export byte for byte with the JSON fixture. Imported JSON proof-status text never grants `kernel_checked`; that status is reserved for the pinned local declaration checked by the Lean kernel.
+`examples/Synthetic.lean` contains the complete typed case. `bash tests/check.sh` compiles it and compares its bytes with the JSON fixture's `export-case agent` projection. Imported JSON proof-status text never grants `kernel_checked`; that status is reserved for the pinned local declaration checked by the Lean kernel.
 
 # Limits and development status
 
