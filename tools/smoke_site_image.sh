@@ -9,36 +9,39 @@ expected_tag="${4:-}"
 [[ "$expected_schema" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Expected a schema version" >&2; exit 1; }
 
 container_name="slean-smoke-${RANDOM}-${RANDOM}"
+container_id=""
 artifact_dir="$(mktemp -d)"
 cleanup() {
-  docker stop "$container_name" >/dev/null 2>&1 || true
-  docker container rm "$container_name" >/dev/null 2>&1 || true
+  if [[ -n "$container_id" ]]; then
+    docker stop "$container_id" >/dev/null 2>&1 || true
+    docker container rm "$container_id" >/dev/null 2>&1 || true
+  fi
   rm -rf "$artifact_dir"
 }
 trap cleanup EXIT
 
-docker run -d --name "$container_name" -p 127.0.0.1::80 "$image_ref" >/dev/null
-port="$(docker port "$container_name" 80/tcp)"
+container_id="$(docker run -d --name "$container_name" -p 127.0.0.1::80 "$image_ref")"
+port="$(docker port "$container_id" 80/tcp)"
 port="${port##*:}"
 origin="http://127.0.0.1:${port}"
 
 health="starting"
 for _ in $(seq 1 30); do
-  health="$(docker inspect --format '{{.State.Health.Status}}' "$container_name")"
+  health="$(docker inspect --format '{{.State.Health.Status}}' "$container_id")"
   [[ "$health" == healthy ]] && break
   [[ "$health" == unhealthy ]] && break
   sleep 2
 done
 if [[ "$health" != healthy ]]; then
-  docker logs "$container_name" >&2
+  docker logs "$container_id" >&2
   echo "Final image did not become healthy: $health" >&2
   exit 1
 fi
 
-docker exec "$container_name" wget -q -O /dev/null http://127.0.0.1/
-docker exec "$container_name" wget -q -O /dev/null http://127.0.0.1/en/
-docker exec "$container_name" test ! -e /src
-docker exec "$container_name" test ! -e /root/.elan
+docker exec "$container_id" wget -q -O /dev/null http://127.0.0.1/
+docker exec "$container_id" wget -q -O /dev/null http://127.0.0.1/en/
+docker exec "$container_id" test ! -e /src
+docker exec "$container_id" test ! -e /root/.elan
 for route in / /en/ /portes-et-ou/ /en/and-or-gates/ /find/ /en/find/ /assets/brand/slean-dark.svg /build-info.json; do
   curl -fsS --max-time 10 -o /dev/null "$origin$route"
 done
@@ -46,7 +49,7 @@ done
 label_sha="$(docker image inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "$image_ref")"
 [[ "$label_sha" == "$expected_sha" ]] || { echo "Image revision label mismatch" >&2; exit 1; }
 
-docker cp "$container_name:/usr/share/nginx/html/." "$artifact_dir/"
+docker cp "$container_id:/usr/share/nginx/html/." "$artifact_dir/"
 EXPECTED_SHA="$expected_sha" EXPECTED_SCHEMA="$expected_schema" EXPECTED_TAG="$expected_tag" SLEAN_ARTIFACT_DIR="$artifact_dir" python3 - <<'PY'
 import html
 import json
