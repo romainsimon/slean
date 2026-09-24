@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "test:browser": "node security_browser.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

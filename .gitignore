@@ -1,9 +1,11 @@
 /.lake/
 /site/.lake/
 /site/_out/
+/site/node_modules/
 /blueprint/.lake/
 /blueprint/_out/
 /explorer/_out/
+/explorer/node_modules/
 *.olean
 *.ilean
 *.trace

@@ -24,6 +24,28 @@ adequacy were not reproduced or proved by Lean. The adapter wrote no private
 case or export to disk. A synthetic contract test verifies owner round-trip and
 that source records do not enter the agent export.
 
+A later Slean-only guard checks every converted owner source record against its
+parsed input object, source role, owner audience, canonical JSON and SHA-256.
+The loss report now names missing or changed source paths instead of assuming
+`wire_fields_lost: []`. It also lists source event envelope fields and nested
+budget/usage fields that remain outside the typed model. Synthetic regressions
+remove a nested manifest field while rehashing the altered record and omit an
+event record; both are reported as preservation failures. At code commit
+`094ad321f537d4891b2ed7e60bfea65935aec500`, the read-only CLI was rerun
+on the same 98-event development trace. It exited 0 and reported 297 converted
+events, valid artifact hashes, unchanged source files, Slean validation
+accepted, no lost wire fields or source-record integrity errors, and
+`source_preservation_verified: true`. All eight in-memory probes returned their
+expected diagnostics and `structural_gate_passed` was true. The aggregate report
+did not write the converted dossier or source values to disk or stdout. This
+run does not authenticate the source values. An unrecognized scientific
+decision in a completed source trace now fails conversion instead of silently
+becoming `defer`.
+The audit command also emits `structural_gate_passed` and exits nonzero when
+source shape, artifact hashes, preservation, Slean validation or the named
+mutation probes fail. A failed run still prints its aggregate JSON report.
+This is a structural evidence gate, not a claim of scientific value.
+
 The following probes changed copies held in memory. They were not faults
 observed in the original source and did not change its files.
 

@@ -127,6 +127,16 @@ structure Relation where
   kind : String
   deriving Repr, BEq, ToJson, FromJson
 
+/-- A recorded grouping of prior references. This describes an author's
+    dependency claim; V0.3 does not evaluate whether its members are true. -/
+structure DependencyGate where
+  identity : Identity
+  target_ref : String
+  member_refs : Array String
+  operator : String
+  kind : String
+  deriving Repr, BEq, ToJson, FromJson
+
 /-- Canonical JSON source record for the bounded development-trace adapter.
     Its contents are owner-only and are never an empirical or formal proof. -/
 structure SourceRecord where
@@ -136,7 +146,8 @@ structure SourceRecord where
   raw_json : String
   deriving ToJson, FromJson
 
-/-- Reserved dependency syntax. V0 does not evaluate general hyperdependencies. -/
+/-- Reserved expression syntax. V0.3 records gates but does not evaluate
+    general hyperdependencies. -/
 inductive DependencyExpr where
   | reference (objectId : String)
   | allOf (members : Array DependencyExpr)
@@ -152,6 +163,9 @@ structure Diagnostic where
 
 def diag (eventId objectId code message : String) : Diagnostic :=
   { event_id := eventId, object_id := objectId, code, message }
+
+private def validAudience (audience : String) : Bool :=
+  audience == "agent" || audience == "owner"
 
 structure Decimal where
   numerator : Int
@@ -236,6 +250,7 @@ structure State where
   decisions : Array PromotionDecision := #[]
   formal_claims : Array FormalClaimRef := #[]
   relations : Array Relation := #[]
+  dependency_gates : Array DependencyGate := #[]
   source_records : Array SourceRecord := #[]
   deriving Inhabited, ToJson
 
@@ -303,6 +318,8 @@ def identityError (state : State) (event : Event) (identity : Identity) : Option
     return some (diag event.event_id identity.id "identity" "ID, positive version, domain and provenance are required")
   if hasObject state identity.id || state.event_ids.contains identity.id then
     return some (diag event.event_id identity.id "duplicate_object" "object ID is already used")
+  if !validAudience identity.audience then
+    return some (diag event.event_id identity.id "audience" "object audience must be agent or owner")
   if identity.audience != event.audience then
     return some (diag event.event_id identity.id "audience" "event and object audience differ")
   return none
@@ -327,6 +344,8 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
   if event.version == 0 || event.domain.isEmpty || event.provenance.isEmpty ||
       event.actor.isEmpty || !(validTimestamp event.recorded_at) then
     throw (diag event.event_id "" "event_metadata" "version, domain, provenance, actor and canonical UTC recorded_at are required")
+  if !validAudience event.audience then
+    throw (diag event.event_id "" "audience" "event audience must be agent or owner")
   let state := { state with event_ids := state.event_ids.push event.event_id }
   match event.kind with
   | "protocol_frozen" =>
@@ -335,7 +354,7 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
       throw (diag event.event_id p.identity.id "protocol_revision" "frozen protocol ID cannot be reused; create a new ID and version")
     let state ← withIdentity state event p.identity
     unless p.claim_ref == state.claim_id && p.metric_id != "" && p.unit != "" && p.data_scope != "" &&
-        p.evaluator_ref != "" && p.stop_rule != "" && p.frozen_at == event.recorded_at do
+        p.evaluator_ref != "" && p.cost_unit != "" && p.stop_rule != "" && p.frozen_at == event.recorded_at do
       throw (diag event.event_id p.identity.id "protocol" "missing protocol field or frozen_at differs from event")
     if (p.direction != "external" && (parseDecimal p.threshold).toOption.isNone) ||
         (parseDecimal p.cost_cap).toOption.isNone ||
@@ -389,21 +408,26 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
     let run ← match findRun state c.run_ref with
       | some run => pure run
       | none => throw (diag event.event_id c.identity.id "missing_run" "cost references no run")
-    if (parseDecimal c.amount).toOption.isNone || c.unit.isEmpty || c.source.isEmpty || c.coverage.isEmpty then
-      throw (diag event.event_id c.identity.id "cost" "cost requires exact amount, unit, source and coverage")
+    if (parseDecimal c.amount).toOption.isNone || c.category.isEmpty || c.unit.isEmpty ||
+        c.source.isEmpty || c.coverage.isEmpty then
+      throw (diag event.event_id c.identity.id "cost" "cost requires category, exact amount, unit, source and coverage")
     if ((parseDecimal c.amount).toOption.get!).numerator < 0 then
       throw (diag event.event_id c.identity.id "cost" "cost cannot be negative")
     let protocol ← match findProtocol state run.protocol_ref with
       | some protocol => pure protocol
       | none => throw (diag event.event_id c.identity.id "missing_protocol" "run protocol is missing")
-    if c.unit == protocol.cost_unit && c.coverage == "complete" then
+    -- The cap belongs to the frozen protocol, not to an individual run.
+    -- A partial coverage amount is still known cost and a lower bound.
+    if c.unit == protocol.cost_unit then
       let mut total : Decimal := { numerator := 0, places := 0 }
       for prior in state.costs do
-        if prior.run_ref == c.run_ref && prior.unit == c.unit && prior.coverage == "complete" then
-          total := addDecimal total ((parseDecimal prior.amount).toOption.get!)
+        if prior.unit == c.unit then
+          if let some priorRun := findRun state prior.run_ref then
+            if priorRun.protocol_ref == protocol.identity.id then
+              total := addDecimal total ((parseDecimal prior.amount).toOption.get!)
       total := addDecimal total ((parseDecimal c.amount).toOption.get!)
       if compareDecimal total ((parseDecimal protocol.cost_cap).toOption.get!) == .gt then
-        throw (diag event.event_id c.identity.id "cost_cap_exceeded" "observed complete cost exceeds declared cap")
+        throw (diag event.event_id c.identity.id "cost_cap_exceeded" "recorded protocol cost exceeds declared cap")
     return { state with costs := state.costs.push c }
   | "assessment_recorded" =>
     let a : Assessment ← decodePayload event
@@ -469,12 +493,37 @@ def step (state : State) (event : Event) : Except Diagnostic State := do
     return { state with formal_claims := state.formal_claims.push { f with status := "declared" } }
   | "relation_recorded" =>
     let r : Relation ← decodePayload event
-    let state ← withIdentity state event r.identity
     unless hasObject state r.source_ref && hasObject state r.target_ref do
-      throw (diag event.event_id r.identity.id "missing_relation_ref" "relation endpoint is missing")
+      throw (diag event.event_id r.identity.id "missing_relation_ref" "relation endpoint must be a prior object")
     unless #["provenance", "support", "contradiction", "prerequisite", "formal_implication"].contains r.kind do
       throw (diag event.event_id r.identity.id "relation_kind" "invalid relation kind")
+    for ref in #[r.source_ref, r.target_ref] do
+      if let some recordedAt := findTime state ref then
+        if recordedAt > event.recorded_at then
+          throw (diag event.event_id r.identity.id "relation_time" "relation endpoint is dated after the relation")
+    let state ← withIdentity state event r.identity
     return { state with relations := state.relations.push r }
+  | "dependency_gate_recorded" =>
+    let g : DependencyGate ← decodePayload event
+    if g.member_refs.size < 2 then
+      throw (diag event.event_id g.identity.id "gate_members" "gate requires at least two distinct members")
+    unless #["all_of", "any_of"].contains g.operator do
+      throw (diag event.event_id g.identity.id "gate_operator" "gate operator must be all_of or any_of")
+    unless #["support", "prerequisite"].contains g.kind do
+      throw (diag event.event_id g.identity.id "gate_kind" "gate kind must be support or prerequisite")
+    let mut seen : Array String := #[]
+    for member in g.member_refs do
+      if member == g.target_ref || seen.contains member then
+        throw (diag event.event_id g.identity.id "gate_members" "gate members must be unique and differ from the target")
+      seen := seen.push member
+    unless hasObject state g.target_ref && g.member_refs.all (hasObject state) do
+      throw (diag event.event_id g.identity.id "missing_gate_ref" "gate target and members must be prior objects")
+    for ref in (#[g.target_ref] ++ g.member_refs) do
+      if let some recordedAt := findTime state ref then
+        if recordedAt > event.recorded_at then
+          throw (diag event.event_id g.identity.id "gate_time" "gate reference is dated after the gate")
+    let state ← withIdentity state event g.identity
+    return { state with dependency_gates := state.dependency_gates.push g }
   | "source_recorded" =>
     let record : SourceRecord ← decodePayload event
     if event.audience != "owner" || record.identity.audience != "owner" then
@@ -630,22 +679,27 @@ def validateSourceTrace (state : State) : Except Diagnostic Unit := do
 
 def replay (caseFile : CaseFile) (count : Nat := caseFile.events.size) : Except Diagnostic State := do
   if !(caseFile.schema_version == "0.1.0" && caseFile.semantics_version == "0.1.0") &&
-      !(caseFile.schema_version == "0.2.0" && caseFile.semantics_version == "0.2.0") then
+      !(caseFile.schema_version == "0.2.0" && caseFile.semantics_version == "0.2.0") &&
+      !(caseFile.schema_version == "0.3.0" && caseFile.semantics_version == "0.3.0") then
     throw (diag "" caseFile.case_id "version" "unsupported schema or semantics version; no implicit migration")
   if caseFile.case_id.isEmpty || caseFile.version == 0 || caseFile.domain.isEmpty || caseFile.provenance.isEmpty ||
-      (caseFile.audience != "agent" && caseFile.audience != "owner") ||
+      !validAudience caseFile.audience ||
       caseFile.question.identity.id.isEmpty || caseFile.claim.identity.id.isEmpty ||
       caseFile.question.identity.id == caseFile.claim.identity.id ||
       caseFile.question.identity.version == 0 || caseFile.claim.identity.version == 0 ||
       caseFile.question.identity.domain.isEmpty || caseFile.claim.identity.domain.isEmpty ||
       caseFile.question.identity.provenance.isEmpty || caseFile.claim.identity.provenance.isEmpty then
     throw (diag "" caseFile.case_id "case" "case, question, claim, version and provenance are required")
+  if !validAudience caseFile.question.identity.audience || !validAudience caseFile.claim.identity.audience then
+    throw (diag "" caseFile.case_id "audience" "question and claim audiences must be agent or owner")
   if count > caseFile.events.size then
     throw (diag "" caseFile.case_id "prefix" "snapshot prefix exceeds event count")
   let mut state : State := { object_ids := (#[caseFile.question.identity.id, caseFile.claim.identity.id]), claim_id := caseFile.claim.identity.id }
   for event in caseFile.events.extract 0 count do
     if caseFile.schema_version == "0.1.0" && event.kind == "source_recorded" then
       throw (diag event.event_id "" "version" "source records require schema 0.2.0")
+    if caseFile.schema_version != "0.3.0" && event.kind == "dependency_gate_recorded" then
+      throw (diag event.event_id "" "version" "dependency gates require schema 0.3.0")
     state ← step state event
   if count == caseFile.events.size && !state.source_records.isEmpty then
     validateSourceTrace state

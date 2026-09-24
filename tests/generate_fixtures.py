@@ -100,6 +100,7 @@ changed["events"][3]["payload"]["status"] = "technical_error"
 changed["events"][3]["payload"]["value"] = None
 changed["events"][5]["payload"]["verdict"] = "undetermined"
 changed["events"][6]["payload"]["result"] = "defer"
+changed["events"][6]["payload"]["reason"] = "Synthetic measurement failed with a technical error."
 save("technical-error.json", changed)
 
 changed = copy.deepcopy(case)
@@ -107,4 +108,55 @@ changed["events"][3]["payload"]["status"] = "unknown"
 changed["events"][3]["payload"]["value"] = None
 changed["events"][5]["payload"]["verdict"] = "undetermined"
 changed["events"][6]["payload"]["result"] = "defer"
+changed["events"][6]["payload"]["reason"] = "Synthetic measurement is unavailable."
 save("unknown.json", changed)
+
+# A separate V0.3 fixture records two dependency operators. They are author
+# statements about references, not a second assessment or proof of the claim.
+gated = copy.deepcopy(case)
+gated["schema_version"] = "0.3.0"
+gated["semantics_version"] = "0.3.0"
+gated["question"]["text"] = "Does either synthetic input exceed a fixed threshold?"
+gated["claim"]["text"] = "At least one synthetic input exceeds 0.001."
+gated["events"] = gated["events"][:8]
+gated["events"][0]["payload"]["data_scope"] = "synthetic inputs A and B"
+gated["events"][0]["payload"]["stop_rule"] = "up to two synthetic measurements"
+gated["events"] += [
+    event(9, "run_started", {"identity": ident("run-2"), "protocol_ref": "protocol-1",
+                              "input_ref": "synthetic-input-B", "seed": "8"}),
+    event(10, "artifact_registered", {"identity": ident("artifact-2"),
+                                       "digest": "sha256:" + "c" * 64,
+                                       "media_type": "application/json"}),
+    event(11, "observation_recorded", {"identity": ident("observation-2"),
+                                        "run_ref": "run-2", "metric_id": "synthetic_delta",
+                                        "unit": "ratio", "value": "0.003", "status": "measured",
+                                        "artifact_ref": "artifact-2",
+                                        "observed_at": "2026-01-01T00:11:00Z"}),
+    event(12, "dependency_gate_recorded", {"identity": ident("gate-all-1"),
+                                             "target_ref": "decision-1",
+                                             "member_refs": ["protocol-1", "assessment-1"],
+                                             "operator": "all_of", "kind": "prerequisite"}),
+    event(13, "dependency_gate_recorded", {"identity": ident("gate-any-1"),
+                                             "target_ref": "claim-1",
+                                             "member_refs": ["observation-1", "observation-2"],
+                                             "operator": "any_of", "kind": "support"}),
+]
+save("dependency-gates.json", gated)
+
+# Keep the same recorded gates while varying the first observation. A later
+# positive observation and an OR assertion do not rewrite the earlier decision.
+gated_unknown = copy.deepcopy(gated)
+gated_unknown["events"][3]["payload"].update(status="unknown", value=None)
+gated_unknown["events"][5]["payload"]["verdict"] = "undetermined"
+gated_unknown["events"][6]["payload"].update(
+    result="defer", reason="Synthetic measurement is unavailable."
+)
+save("dependency-gates-unknown.json", gated_unknown)
+
+gated_zero = copy.deepcopy(gated)
+gated_zero["events"][3]["payload"].update(status="measured", value="0")
+gated_zero["events"][5]["payload"]["verdict"] = "fail"
+gated_zero["events"][6]["payload"].update(
+    result="reject", reason="Synthetic measured zero does not exceed the threshold."
+)
+save("dependency-gates-zero.json", gated_zero)

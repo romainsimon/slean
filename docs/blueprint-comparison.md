@@ -22,4 +22,4 @@ Build a small local Explorer for the task Blueprint leaves awkward: choose a jou
 
 This decision is about a local prototype. It does not authorize site publication, a public repository/license decision, or integration with Mutome, GERMINAL, or autoresearch.
 
-The resulting [local Explorer](../explorer/README.md) implements the bounded task above. It starts with the agent projection, provides a prefix slider and event links, and displays the checked state at each prefix. The comparison remains scoped to this synthetic case and local UI; it does not establish that the Explorer improves a real research review without a user task study.
+The resulting [local Explorer](../explorer/README.md) implements the bounded task above. It starts with the agent projection, provides a prefix slider and event links, and displays the checked state at each prefix. Its 2D map repeats recorded relation edges from the same checked prefix as the relation list; unknown measurements remain distinct from measured zero. The comparison remains scoped to this synthetic case and local UI; it does not establish that the Explorer improves a real research review without a user task study.
