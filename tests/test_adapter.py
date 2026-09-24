@@ -9,10 +9,20 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.audit_autoresearch_trace import BIN, audit, digest, loss_report, make_case
+from tools.audit_autoresearch_trace import (BIN, SOURCE_RESULT_CHOICES, audit,
+                                           conflicting_source_decision, digest,
+                                           loss_report, make_case, validate_case)
 
 
 class AdapterTests(unittest.TestCase):
+    def test_conflict_probe_uses_a_valid_source_choice(self):
+        for current in SOURCE_RESULT_CHOICES:
+            other = conflicting_source_decision(current)
+            self.assertIn(other, SOURCE_RESULT_CHOICES)
+            self.assertNotEqual(other, current)
+        with self.assertRaisesRegex(ValueError, "unsupported source result decision"):
+            conflicting_source_decision("invented-choice")
+
     def test_read_only_loss_report_and_real_shape_mutations(self):
         protocol = {"protocol": "synthetic", "units": "dimensionless",
                     "selection_code_sha256": "synthetic-code", "model_odds_threshold": 0.95}
@@ -98,6 +108,35 @@ class AdapterTests(unittest.TestCase):
         self.assertTrue(result["losses"]["semantic_limits"])
 
         case = make_case(manifest, protocol, events)
+        def set_source_path(converted, role, path, value, kind=None):
+            for event in converted["events"]:
+                if event["kind"] != "source_recorded":
+                    continue
+                record = event["payload"]
+                if record["source_role"] != role:
+                    continue
+                raw = json.loads(record["raw_json"])
+                if kind and raw["type"] != kind:
+                    continue
+                target = raw
+                for key in path[:-1]:
+                    target = target[key]
+                target[path[-1]] = value
+                record["raw_json"] = json.dumps(raw, sort_keys=True, separators=(",", ":"))
+                record["canonical_sha256"] = digest(raw)
+
+        unsupported_choice = copy.deepcopy(case)
+        set_source_path(unsupported_choice, "manifest", ("result", "discrimination", "decision"),
+                        "invented-choice")
+        set_source_path(unsupported_choice, "event", ("payload", "decision"),
+                        "invented-choice", kind="discrimination_completed")
+        self.assertEqual(validate_case(unsupported_choice)[1], "source_decision")
+
+        unsupported_scientific = copy.deepcopy(case)
+        set_source_path(unsupported_scientific, "manifest", ("scientific_decision",),
+                        "unmapped-source-decision")
+        self.assertEqual(validate_case(unsupported_scientific)[1], "source_decision")
+
         unsupported = copy.deepcopy(manifest)
         unsupported["scientific_decision"] = "unmapped-source-decision"
         with self.assertRaisesRegex(ValueError, "unsupported source scientific_decision"):

@@ -18,6 +18,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BIN = ROOT / ".lake/build/bin/slean"
+SOURCE_RESULT_CHOICES = ("H0", "H1", "neither", "abstain")
+
+
+def conflicting_source_decision(current):
+    """Choose a different decision the source discriminator can actually emit."""
+    if current not in SOURCE_RESULT_CHOICES:
+        raise ValueError("unsupported source result decision")
+    return next(choice for choice in SOURCE_RESULT_CHOICES if choice != current)
 
 
 def read_json(path):
@@ -220,7 +228,9 @@ def mutation_probes(manifest, protocol, events):
         event["sequence"] = index
     results["second_freeze_event"] = validate_case(make_case(manifest, protocol, changed))[1] or "accepted"
     changed = copy.deepcopy(events)
-    next(e for e in changed if e["type"] == "discrimination_completed")["payload"]["decision"] = "changed-probe"
+    source_result = manifest["result"]["discrimination"]["decision"]
+    next(e for e in changed if e["type"] == "discrimination_completed")["payload"]["decision"] = (
+        conflicting_source_decision(source_result))
     results["completion_decision"] = validate_case(make_case(manifest, protocol, changed))[1] or "accepted"
     rebound_manifest = copy.deepcopy(manifest)
     rebound_bytes = "".join(json.dumps(e, sort_keys=True, allow_nan=False) + "\n"

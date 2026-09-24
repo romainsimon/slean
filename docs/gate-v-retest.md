@@ -56,8 +56,8 @@ observed in the original source and did not change its files.
 | Observation after assessment | `future_observation` |
 | Changed protocol file | `source_protocol_digest` |
 | Second freeze | `source_second_freeze` |
-| Completion decision conflicts with manifest result | `source_decision_provenance` |
-| Same conflict with refreshed event artifact hash metadata | `source_decision_provenance` |
+| A different valid source decision conflicts with manifest result | `source_decision_provenance` |
+| Same valid-choice conflict with refreshed event artifact hash metadata | `source_decision_provenance` |
 | Assessment omits one source observation | `source_projection` |
 
 ## What is new compared with the source flow
@@ -72,8 +72,21 @@ does not compare event payloads to the manifest. The source
 but does not read source event payloads. The latter conclusion is from code
 inspection, not from running a modified private replay. The Slean check binds
 the source completion event to the manifest result and source observation
-count, even with a refreshed hash entry. The changed completion is credible
-for the actual event shape; the in-memory probe rejected it on the real trace.
+count, even with a refreshed hash entry. The current in-memory probe selects a
+different choice from the source discriminator's `H0`, `H1`, `neither`, and
+`abstain` results. It no longer relies on an invented decision value. The
+valid-choice conflict is credible for the actual event shape and was rejected
+by Slean on the real trace. Slean also rejects an unsupported choice when the
+event and manifest agree on that value.
+
+A later read-only differential check executed the exact `verify_manifest` body
+from Autoresearch source commit `5c1ff43b73151b00bbf06b494c96f6774ee09cf2`
+in isolation on a minimal synthetic triplet. It accepted a self-consistently
+hashed event with one valid source decision while the manifest stored a
+different valid source decision. The Slean probe above used an in-memory copy
+of the source-produced 98-event trace, not this minimal triplet. No modified
+private trace was written to disk, and no defect was observed in the original
+unmodified trace.
 
 The original runtime already checks artifact integrity and recomputes its own
 scientific result. Slean's added control concerns agreement **between** its

@@ -646,6 +646,10 @@ def validateSourceTrace (state : State) : Except Diagnostic Unit := do
       let result ← match jsonAt manifestRaw ["result", "discrimination"] with
         | some value => pure value
         | none => throw (diag sourceId record.identity.id "source_result" "manifest result is missing")
+      let sourceChoice := stringAt payload ["decision"]
+      unless sourceChoice == some "H0" || sourceChoice == some "H1" ||
+          sourceChoice == some "neither" || sourceChoice == some "abstain" do
+        throw (diag sourceId record.identity.id "source_decision" "completion decision is outside the source choice set")
       for key in ["decision", "observations_used", "planning_cpu_seconds", "posterior_model_probabilities"] do
         if jsonAt payload [key] != jsonAt result [key] || (jsonAt payload [key]).isNone then
           throw (diag sourceId record.identity.id "source_decision_provenance" s!"completion {key} differs from manifest result")
@@ -669,11 +673,11 @@ def validateSourceTrace (state : State) : Except Diagnostic Unit := do
   let decision ← match state.decisions[0]? with
     | some value => pure value
     | none => throw (diag "" "" "source_projection" "typed decision is missing")
-  let expectedDecision := match stringAt manifestRaw ["scientific_decision"] with
-    | some "keep" => "override"
-    | some "discard" => "reject"
-    | some "inconclusive" => "defer"
-    | _ => "defer"
+  let expectedDecision ← match stringAt manifestRaw ["scientific_decision"] with
+    | some "keep" => pure "override"
+    | some "discard" => pure "reject"
+    | some "inconclusive" => pure "defer"
+    | _ => throw (diag "" manifest.identity.id "source_decision" "unsupported source scientific decision")
   if decision.result != expectedDecision || decision.assessment_ref != assessment.identity.id then
     throw (diag "" decision.identity.id "source_projection" "typed decision differs from source scientific decision")
 
