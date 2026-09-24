@@ -103,7 +103,7 @@ components:
 
 The Slean Verso manual is a quiet white reading surface in **Mode Read**. It helps an experiment owner follow a frozen protocol, an observation, a cost, and a decision through a documented case. Clear type, narrow measure, and numbered chapters carry the hierarchy. The visual system does not suggest that a local check proves an external empirical claim.
 
-Mutome's `docs/DESIGN_SPEC.md` supplies the restrained white, ink, muted text, and fine-line roles. Its `.article-body` rules in `app/assets/css/main.css` establish the Satoshi essay reading rhythm: 20px prose with generous leading on desktop, 18px on mobile. Slean adapts that rhythm to its own 18–20px manual, chapter rail, search, code examples, and proof boundaries. It does not reuse Mutome's content or assets.
+Mutome's `docs/DESIGN_SPEC.md` supplies the restrained white, ink, muted text, and fine-line roles. Its `.article-body` rules in `app/assets/css/main.css` establish the Satoshi essay reading rhythm: 20px prose with generous leading on desktop, 18px on mobile. Slean adapts that rhythm to its own 18–20px manual, chapter rail, search, code examples, and proof boundaries. Slean does not reuse Mutome's editorial content; the linked six-letter mark in the header is the only Mutome asset copied into the documentation.
 
 The local [Explorer design](explorer/DESIGN.md) remains separate. These rules describe the documentation site, not an inspection tool's interaction model.
 
