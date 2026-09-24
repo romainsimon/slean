@@ -17,6 +17,7 @@ chapters = [
     ("portes-et-ou", "and-or-gates"),
     ("suivre-la-provenance", "Follow-provenance"),
     ("format-et-api", "Format-and-API"),
+    ("exemples-lean", "lean-examples"),
     ("limites-et-etat-du-developpement", "Limits-and-development-status"),
 ]
 

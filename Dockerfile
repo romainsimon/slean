@@ -28,7 +28,7 @@ COPY . .
 ARG SOURCE_COMMIT
 RUN SOURCE_COMMIT="$SOURCE_COMMIT" python3 site/build_identity.py image-preflight \
     && SOURCE_COMMIT="$SOURCE_COMMIT" bash site/build.sh \
-    && SOURCE_COMMIT="$SOURCE_COMMIT" python3 -c 'import json, os; from pathlib import Path; p=Path("site/_out/html-multi"); d=json.loads((p/"build-info.json").read_text()); assert d["source_revision"] == os.environ["SOURCE_COMMIT"] and d["source_tree_clean"] in (True, None); assert len(list(p.rglob("*.html"))) == 16'
+    && SOURCE_COMMIT="$SOURCE_COMMIT" python3 -c 'import json, os; from pathlib import Path; p=Path("site/_out/html-multi"); d=json.loads((p/"build-info.json").read_text()); assert d["source_revision"] == os.environ["SOURCE_COMMIT"] and d["source_tree_clean"] in (True, None); assert len(list(p.rglob("*.html"))) == 18'
 
 FROM nginx:1.28.1-alpine AS runtime-base
 ARG SOURCE_COMMIT

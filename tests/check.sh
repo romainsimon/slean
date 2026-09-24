@@ -4,10 +4,21 @@ cd "$(dirname "$0")/.."
 check_dir="$(mktemp -d)"
 trap 'rm -rf "$check_dir"' EXIT
 lake build
+test "$(cat lean-toolchain)" = 'leanprover/lean4:v4.28.0'
+lake env lean --version | rg -F 'version 4.28.0' > /dev/null
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 lake env lean --run examples/Synthetic.lean > "$check_dir/lean-case.json"
 lake exe slean export-case examples/valid.json agent > "$check_dir/json-case.json"
 cmp "$check_dir/lean-case.json" "$check_dir/json-case.json"
+lake env lean --run examples/ExactThreshold.lean > "$check_dir/exact-threshold.txt"
+printf 'equal=fail; above=pass\n' | cmp - "$check_dir/exact-threshold.txt"
+lake env lean --run examples/ValidateExport.lean > "$check_dir/validate-export.txt"
+printf 'validated=10; agent_events=8\nexport=slean-export/0.1.0; lean=4.28.0\n' | cmp - "$check_dir/validate-export.txt"
+lake env lean --run examples/FormalBoundary.lean > "$check_dir/formal-boundary.txt"
+printf 'eligible=true; status=declared\n' | cmp - "$check_dir/formal-boundary.txt"
+lake exe slean export examples/valid.json agent > "$check_dir/agent-export.json"
+lake exe slean validate "$check_dir/agent-export.json" > "$check_dir/agent-validation.json"
+printf '{"case_id":"synthetic-decision-1","events":8,"ok":true}\n' | cmp - "$check_dir/agent-validation.json"
 if lake env lean tests/TypeError.lean > "$check_dir/type-error.log" 2>&1; then
   echo 'expected static type failure was accepted' >&2
   exit 1

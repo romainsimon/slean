@@ -20,7 +20,7 @@ Here, a *case* is a JSON file with the question, frozen protocol, observations, 
 - *What Slean checks:* the observation has the right metric and unit, follows the rule, and precedes the assessment; `0.002 > 0.001` and cost stays below the cap.
 - *What the case declares:* assessment `pass`, then decision `promote`. Slean checks that this chain is consistent. It does not make the author's decision.
 
-If the observation's unit changes, Slean reports `metric_unit` at `event-4`. If the measurement is missing, its value is `null` and the decision is `defer`: missing data is not zero. [The checked case](Start-with-a-checked-case/) shows the two useful commands; [read the decision](Read-the-decision/) explains the chain and its limits; [AND and OR gates](and-or-gates/) add the recorded links in schema 0.3.
+If the observation's unit changes, Slean reports `metric_unit` at `event-4`. If the measurement is missing, its value is `null` and the decision is `defer`: missing data is not zero. [The checked case](Start-with-a-checked-case/) shows the two useful commands; [read the decision](Read-the-decision/) explains the chain and its limits; [AND and OR gates](and-or-gates/) add the recorded links in schema 0.3. [Complete Lean examples](lean-examples/) show the typed API behind these jobs.
 
 Slean checks case shape, references, order, and local rules. It does not run the experiment, authenticate the sensor, or prove that a measurement is true.
 
@@ -230,6 +230,224 @@ The typed API can build the same kind of case. These declarations are checked as
 ```
 
 `examples/Synthetic.lean` contains the complete typed case. `bash tests/check.sh` compiles it and compares its bytes with the JSON fixture's `export-case agent` projection. Imported JSON proof-status text never grants `kernel_checked`; the CLI keeps even a matching local declaration at `declared` until the clean-build attester binds its receipt to exact artifacts.
+
+# Complete Lean examples
+%%%
+file := "lean-examples"
+tag := "lean-examples"
+%%%
+
+These are four complete Lean 4 files that call Slean's current typed API. Slean has no separate source-language parser: the CLI reads JSON cases or versioned export envelopes, while `lake env lean --run` runs these Lean files. Work from the repository root with the pinned Lean 4.28.0 toolchain, and run `lake build` once first. Every input and value here is synthetic.
+
+*1. Record and replay a decision dossier*
+
+Problem: record one frozen rule, run, artifact reference, measurement, cost, assessment, and decision, then inspect what existed when the decision was made. The typed source below produces the agent projection of the checked `examples/valid.json` fixture.
+
+*Complete source: `examples/Synthetic.lean`*
+
+```
+import Slean
+
+open Lean Slean
+
+private def ident (id : String) : Identity :=
+  { id, version := 1, domain := "synthetic-computation",
+    provenance := "synthetic://slean-v0", audience := "agent" }
+
+private def protocol : FrozenProtocol :=
+  { identity := ident "protocol-1", claim_ref := "claim-1",
+    metric_id := "synthetic_delta", unit := "ratio", direction := "gte",
+    threshold := "0.001", inclusive := false, data_scope := "synthetic input A",
+    evaluator_ref := "synthetic-evaluator-v1", cost_cap := "10.00",
+    cost_unit := "cpu_s", stop_rule := "one synthetic measurement",
+    frozen_at := "2026-01-01T00:01:00Z" }
+
+private def run : Run :=
+  { identity := ident "run-1", protocol_ref := "protocol-1",
+    input_ref := "synthetic-input-A", seed := "7" }
+
+private def artifact : ArtifactRef :=
+  { identity := ident "artifact-1", digest := "sha256:" ++ String.ofList (List.replicate 64 'a'),
+    media_type := "application/json" }
+
+private def observation : Observation :=
+  { identity := ident "observation-1", run_ref := "run-1",
+    metric_id := "synthetic_delta", unit := "ratio", value := some "0.002",
+    status := "measured", artifact_ref := "artifact-1",
+    observed_at := "2026-01-01T00:04:00Z" }
+
+private def cost : CostEntry :=
+  { identity := ident "cost-1", run_ref := "run-1", category := "machine_time",
+    amount := "2.50", unit := "cpu_s", source := "synthetic-meter", coverage := "complete" }
+
+private def assessment : Assessment :=
+  { identity := ident "assessment-1", protocol_ref := "protocol-1",
+    observation_refs := #["observation-1"], verdict := "pass", rule_used := "exact_v0" }
+
+private def decision : PromotionDecision :=
+  { identity := ident "decision-1", assessment_ref := "assessment-1",
+    result := "promote", reason := "Synthetic threshold passed." }
+
+private def relation : Relation :=
+  { identity := ident "relation-1", source_ref := "observation-1",
+    target_ref := "claim-1", kind := "support" }
+
+private def ev (sequence : Nat) (kind time : String) (payload : Json) : Event :=
+  { event_id := s!"event-{sequence}", version := 1,
+    domain := "synthetic-computation", provenance := "synthetic://slean-v0", sequence, kind,
+    actor := "synthetic-author", recorded_at := s!"2026-01-01T00:{time}:00Z",
+    audience := "agent", payload }
+
+def syntheticCase : CaseFile :=
+  { schema_version := "0.1.0", semantics_version := "0.1.0",
+    case_id := "synthetic-decision-1", version := 1,
+    domain := "synthetic-computation", provenance := "synthetic://slean-v0",
+    audience := "agent",
+    question := { identity := ident "question-1", text := "Does a synthetic candidate exceed a fixed threshold?" },
+    claim := { identity := ident "claim-1", text := "The synthetic metric exceeds 0.001 on the stated input." },
+    events := #[
+      ev 1 "protocol_frozen" "01" (toJson protocol),
+      ev 2 "run_started" "02" (toJson run),
+      ev 3 "artifact_registered" "03" (toJson artifact),
+      ev 4 "observation_recorded" "04" (toJson observation),
+      ev 5 "cost_recorded" "05" (toJson cost),
+      ev 6 "assessment_recorded" "06" (toJson assessment),
+      ev 7 "decision_recorded" "07" (toJson decision),
+      ev 8 "relation_recorded" "08" (toJson relation)] }
+
+#guard (replay syntheticCase).isOk
+#guard (compareDecimal (parseDecimal "0.010" |>.toOption.get!)
+  (parseDecimal "0.01" |>.toOption.get!)) == .eq
+#guard (assessExact protocol observation).toOption == some "pass"
+
+def main : IO Unit := IO.println (toJson (project syntheticCase "agent")).compress
+```
+
+Run and summarize the large JSON output:
+
+```
+lake env lean --run examples/Synthetic.lean |
+  python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["case_id"], len(d["events"]))'
+lake exe slean replay examples/valid.json 7 |
+  python3 -c 'import json,sys; s=json.load(sys.stdin); print(len(s["event_ids"]), s["assessments"][0]["verdict"], s["decisions"][0]["result"])'
+```
+
+Expected lines: `synthetic-decision-1 8` and `7 pass promote`. The typed program emits eight agent-visible events; the JSON fixture has ten total events, including two owner-only entries. Prefix seven contains the assessment and decision. `tests/check.sh` compares the typed output with the fixture's agent projection byte for byte. This checks the recorded chain, not whether the synthetic measurement happened or whether the artifact digest matches real bytes.
+
+*2. Compare exact values at a strict boundary*
+
+Problem: decide whether decimal strings equal to and just above a frozen threshold pass a strict rule, without floating-point rounding.
+
+*Complete source: `examples/ExactThreshold.lean`*
+
+```
+import Slean
+
+open Slean
+
+private def identity (id : String) : Identity :=
+  { id, version := 1, domain := "synthetic-computation",
+    provenance := "synthetic://worked-examples", audience := "agent" }
+
+private def protocol : FrozenProtocol :=
+  { identity := identity "protocol-exact", claim_ref := "claim-exact",
+    metric_id := "synthetic_delta", unit := "ratio", direction := "gte",
+    threshold := "0.010", inclusive := false, data_scope := "synthetic input",
+    evaluator_ref := "synthetic-evaluator", cost_cap := "1.00",
+    cost_unit := "cpu_s", stop_rule := "one synthetic reading",
+    frozen_at := "2026-01-01T00:00:00Z" }
+
+private def reading (id value : String) : Observation :=
+  { identity := identity id, run_ref := "run-exact", metric_id := "synthetic_delta",
+    unit := "ratio", value := some value, status := "measured",
+    artifact_ref := "artifact-exact", observed_at := "2026-01-01T00:01:00Z" }
+
+def main : IO Unit := do
+  match assessExact protocol (reading "equal" "0.0100"),
+        assessExact protocol (reading "above" "0.0101") with
+  | .ok equal, .ok above =>
+    IO.println s!"equal={equal}; above={above}"
+  | .error message, _ => throw (IO.userError message)
+  | _, .error message => throw (IO.userError message)
+```
+
+Run `lake env lean --run examples/ExactThreshold.lean`. Expected output: `equal=fail; above=pass`. `0.0100` equals `0.010` exactly, while `0.0101` is greater. `assessExact` compares one supplied observation with one protocol; this small program does not validate a journal, an artifact, or the observation's provenance. Use a `CaseFile` and `replay`, as in example 1, for the recorded evidence chain.
+
+*3. Validate, project, and prepare an export*
+
+Problem: validate the whole synthetic JSON dossier before preparing an agent-safe versioned export. The program reads the checked-in fixture from the repository root.
+
+*Complete source: `examples/ValidateExport.lean`*
+
+```
+import Slean
+
+open Lean Slean
+
+def main : IO Unit := do
+  let raw ← IO.FS.readFile "examples/valid.json"
+  let json ← match Json.parse raw with
+    | .ok value => pure value
+    | .error message => throw (IO.userError message)
+  let dossier ← match (fromJson? json : Except String CaseFile) with
+    | .ok value => pure value
+    | .error message => throw (IO.userError message)
+  let fullState ← match replay dossier with
+    | .ok state => pure state
+    | .error diagnostic => throw (IO.userError diagnostic.message)
+  let agentDossier := project dossier "agent"
+  let agentState ← match replay agentDossier with
+    | .ok state => pure state
+    | .error diagnostic => throw (IO.userError diagnostic.message)
+  let bundle := exportBundle agentDossier
+  IO.println s!"validated={fullState.event_ids.size}; agent_events={agentState.event_ids.size}"
+  IO.println s!"export={bundle.format}; lean={bundle.lean_version}"
+```
+
+Run `lake env lean --run examples/ValidateExport.lean`. Expected output:
+
+```
+validated=10; agent_events=8
+export=slean-export/0.1.0; lean=4.28.0
+```
+
+To write and revalidate the complete envelope, use the CLI on this synthetic fixture:
+
+```
+lake exe slean export examples/valid.json agent > /tmp/slean-agent-export.json
+lake exe slean validate /tmp/slean-agent-export.json
+```
+
+The second command reports `{"case_id":"synthetic-decision-1","events":8,"ok":true}`. The agent projection omits owner-only events before deriving the export, but a real export still needs a content review before sharing; validation does not decide whether free text is safe to disclose.
+
+*4. Keep empirical results separate from proof receipts*
+
+Problem: prevent a declared formal claim from being treated as kernel checked just because its input status says so. This program deliberately sets `status := "kernel_checked"` on a matching local theorem reference; `proofReceipt` still returns `declared`.
+
+*Complete source: `examples/FormalBoundary.lean`*
+
+```
+import Slean
+
+open Lean Slean
+
+private def formalIdentity : Identity :=
+  { id := "formal-claim-demo", version := 1, domain := "synthetic-computation",
+    provenance := "synthetic://worked-examples", audience := "agent" }
+
+private def formalClaim : FormalClaimRef :=
+  { identity := formalIdentity,
+    declaration := checkedDeclaration, statement := checkedStatement,
+    toolchain := checkedToolchain, status := "kernel_checked" }
+
+def main : IO Unit := do
+  let receipt := proofReceipt formalClaim
+  let status := (receipt.getObjValAs? String "status").toOption.getD "missing"
+  let eligible := (receipt.getObjValAs? Bool "attestation_eligible").toOption.getD false
+  IO.println s!"eligible={eligible}; status={status}"
+```
+
+Run `lake env lean --run examples/FormalBoundary.lean`. Expected output: `eligible=true; status=declared`. A matching declaration and toolchain make the claim eligible for *separate* clean-build attestation; this program does not issue that attestation. The theorem concerns a conditional link between recorded promotion evidence and prior records. Neither the local theorem nor an empirical `pass` proves that the measurement, evaluator, or scientific claim is true.
 
 # Limits and development status
 

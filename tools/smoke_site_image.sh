@@ -44,7 +44,7 @@ docker exec "$container_id" wget -q -O /dev/null http://127.0.0.1/
 docker exec "$container_id" wget -q -O /dev/null http://127.0.0.1/en/
 docker exec "$container_id" test ! -e /src
 docker exec "$container_id" test ! -e /root/.elan
-for route in / /en/ /portes-et-ou/ /en/and-or-gates/ /find/ /en/find/ /assets/brand/slean-dark.svg /build-info.json; do
+for route in / /en/ /portes-et-ou/ /en/and-or-gates/ /exemples-lean/ /en/lean-examples/ /find/ /en/find/ /assets/brand/slean-dark.svg /build-info.json; do
   curl -fsS --max-time 10 -o /dev/null "$origin$route"
 done
 
@@ -70,8 +70,8 @@ assert tree_clean is True or tree_clean is None
 assert info["schema_version"] == os.environ["EXPECTED_SCHEMA"]
 if os.environ["EXPECTED_TAG"]:
     assert info["source_tag"] == os.environ["EXPECTED_TAG"]
-assert len(pages) == 16
-assert sum("en" in page.relative_to(root).parts for page in pages) == 8
+assert len(pages) == 18
+assert sum("en" in page.relative_to(root).parts for page in pages) == 9
 for page in pages:
     markup = page.read_text()
     if os.environ["EXPECTED_TAG"]:
@@ -87,6 +87,6 @@ for page in pages:
     assert not any(old in markup for old in old_scripts), page
 assert not any(path.name in {".git", ".env"} for path in root.rglob("*"))
 cleanliness = "clean source checkout" if tree_clean is True else "source cleanliness unavailable"
-print(f"Final image: exact image and artifact SHAs, healthy, {cleanliness}, 16 pages, one Plausible loader per page")
+print(f"Final image: exact image and artifact SHAs, healthy, {cleanliness}, 18 pages, one Plausible loader per page")
 PY
 SLEAN_TEST_ORIGIN="$origin" npm --prefix site run test:browser
