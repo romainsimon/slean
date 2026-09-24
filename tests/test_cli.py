@@ -278,6 +278,21 @@ class CliTests(unittest.TestCase):
         hidden_case["claim"]["text"] = "secret claim"
         self.assertEqual(run_case(hidden_case, "export", "agent")[2], hidden_bytes)
 
+    def test_agent_export_redacts_opaque_run_input_reference(self):
+        case = fixture()
+        case["events"][1]["payload"]["input_ref"] = "private-artifact-1"
+        baseline_export = run_case(case, "export", "agent")[2]
+        baseline_timeline = run_case(case, "timeline", "agent")[2]
+        self.assertNotIn("private-artifact-1", baseline_export)
+        self.assertNotIn("private-artifact-1", baseline_timeline)
+        self.assertEqual(json.loads(baseline_export)["events"][1]["payload"]["input_ref"], "[redacted]")
+        self.assertEqual(run_case(case, "export", "owner")[1]["events"][1]["payload"]["input_ref"],
+                         "private-artifact-1")
+
+        case["events"][1]["payload"]["input_ref"] = "private://other-input"
+        self.assertEqual(run_case(case, "export", "agent")[2], baseline_export)
+        self.assertEqual(run_case(case, "timeline", "agent")[2], baseline_timeline)
+
     def test_formal_status_requires_local_pin(self):
         _, pin, _ = invoke("proof-statement")
         case = fixture()
