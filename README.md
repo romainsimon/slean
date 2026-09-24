@@ -1,6 +1,7 @@
 <h1 align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="site/assets/brand/slean-white.svg">
+    <source media="(prefers-color-scheme: light)" srcset="site/assets/brand/slean-dark.svg">
     <img src="site/assets/brand/slean-dark.svg" alt="Slean" width="148">
   </picture>
 </h1>
