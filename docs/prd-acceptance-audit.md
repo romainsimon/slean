@@ -6,6 +6,31 @@ This audit covers each explicit Slean-owned acceptance criterion in that file an
 
 ## Candidate stack checks — 2026-09-24
 
+### Reviewed integration code commit `347484d`
+
+The clean, pushed `codex/slean-prd-integration` code commit
+`347484d204a60293a39fbca5129d44e563c93522` combines the Slean-owned
+privacy, DOC-02 payload, and prebuilt-image candidates from draft PRs #23,
+#22, and #20. Its merge base is still `origin/main` at `72a916f`; the
+integration has not been merged. These checks apply to that exact code commit,
+not to the older PR #17 head or a public artifact.
+
+| Check | Observation at `347484d` | Limit |
+|---|---|---|
+| Fresh-clone independence | A `--no-local --single-branch` clone of the pushed branch at this SHA, with no copied `.lake` cache and `LEAN_PATH`/`LEAN_SRC_PATH` unset, passed `bash tests/check.sh` (13 Lean jobs, 32 Python tests, typed/JSON parity and expected type/proof checks). The checkout stayed clean and `lake-manifest.json` lists no packages. | The clone came from the local integration checkout at the same pushed SHA. This proves the pinned private source builds without a Mutome checkout; it does not prove public packaging or installation. |
+| Core and manual | `bash site/build.sh` exited 0: 13 Lean jobs, 32 Python tests, and 309 Verso jobs. It generated 16 FR/EN pages. `build-info.json` records the exact SHA, `source_tree_clean: true`, schema `0.3.0`, Lean `4.28.0`, and `source_tag: null`. | This is an untagged local source build. It does not satisfy DOC-01's public-tag and public-artifact condition or test the final image. |
+| Proof and export | `python3 tools/attest_proof.py examples/formal-claim.json` exited 0 on the clean commit. Its agent receipt is `kernel_checked`, with exact build ID `sha256:ac49d31601e72f480db5718a9dd0ba995157b28f15e091eaa863a40379993c54` and projected-export ID `sha256:895ca973facd8c87e3d29b85e043227dc6d65adb7c5865dd5369cb32f901ca4a`. | Lake, the exporter, and the attester are trusted code; this is no independent kernel recheck or empirical claim. |
+| Rendered manual | The generated FR/EN artifact passed `npm --prefix site run test:browser` with exit 0 for URL text, search, highlights, keyboard behavior, and cross-references. | Browser evidence is local; the public route and release revision remain unverified. |
+| V trace and Explorer | The read-only 98-event source trace audit at this code commit returned 297 converted events, zero lost wire fields, `structural_gate_passed: true`, and eight expected mutation diagnostics without changing source files. The current Explorer rendered the 13→12→13 prefix task at 1440, 390, and 320 CSS px with matching 2→1→2 gates and 7→4→7 map edges, keyboard controls, reduced-motion behavior, no page errors, and no horizontal overflow. | The trace is one source-produced synthetic development run. The cross-file decision discrepancy was injected in memory; the original trace was clean. No reviewer time saving or general DSL value was measured. |
+
+The SL-09 decision remains **reduce to a bounded documentation and inspection
+prototype**. Slean corrected its observed 47-of-48 assessment-reference loss
+on the source-produced trace. The valid-choice mutation and a minimal synthetic
+check against the historical source verifier support only a cross-file
+consistency control; neither found a defect in the unmodified trace. The
+optional 3D task study remains `prepared_not_run` pending representative
+dossiers and target reviewers. The 2D/table Explorer remains the product view.
+
 ### Verified follow-up at the proof gate and cost-cap candidate
 
 At the clean starting revision `00a9d3d4807305758691e5f78380fe266cf95265`, the first `lake build` exited 1 when the host ran out of disk space. After space returned, its retry exited 0 with 13 jobs. `bash tests/check.sh` exited 0 with 23 Python tests and the Lean fixture, type-error, and bad-proof checks. `bash site/build.sh` exited 0 with 309 Verso jobs, 16 localized HTML pages, and `build-info.json` naming that exact clean revision, schema 0.3.0, Lean 4.28.0, and no tag. The clean-build proof attester exited 0 and emitted one `kernel_checked` receipt bound to that revision and its agent export.
@@ -48,7 +73,7 @@ The final sentence of `ROADMAP.md` on `main` still says no remote `main` commit 
 
 | PRD criterion | State and evidence | Boundary or remaining work |
 |---|---|---|
-| SL-01 | **Candidate; local criterion met at exact PR #17 SHA a4bcf5d.** A fresh clone with no copied build cache or Mutome checkout passed the pinned Lean 4.28.0 lake build (13 jobs), bash tests/check.sh (26 Python tests and Lean parity/failure checks), and CLI paths. The checkout stayed clean; lake-manifest.json has no external package. | This proves reproducibility of the combined private candidate, not a public install or release tag. |
+| SL-01 | **Candidate; local criterion met at integrated code SHA 347484d.** A fresh no-local, single-branch clone with no copied build cache or Mutome checkout and with Lean path overrides unset passed the pinned Lean 4.28.0 build (13 jobs), `bash tests/check.sh` (32 Python tests, typed/JSON parity and expected type/proof checks), and CLI paths. The checkout stayed clean; `lake-manifest.json` has no external package. | The clone was sourced from the local integration checkout at the same pushed SHA. This proves private candidate independence, not a public install or release tag. |
 | SL-02 | **Candidate; local checks met at a4bcf5d.** [`examples/Synthetic.lean`](../examples/Synthetic.lean) describes the synthetic question, claim, frozen protocol, run, observation, cost, assessment and decision. [`tests/check.sh`](../tests/check.sh) compares its agent JSON bytes with the versioned JSON fixture. | The example is synthetic; its empirical result is not a scientific finding. |
 | SL-03 | **Candidate; local checks met at a4bcf5d.** [`test_valid_and_four_preregistered_errors`](../tests/test_cli.py) checks the four named JSON failures with event IDs and deterministic codes. The same suite checks unknown, technical error, and a motivated `override` that stays separate from `pass`. | Import validation does not authenticate an external evaluator. |
 | SL-04 | **Candidate; local checks met at a4bcf5d.** The replay tests compare deterministic snapshots, later mutation against an earlier prefix, duplicate IDs, out-of-order sequences and later observations. [`promotionEvidence_has_frozen_observation`](../Slean/Core.lean) proves a narrow property of the executable promotion gate without `sorry`. | The theorem does not establish empirical truth, clock authenticity or artifact content. |
@@ -72,7 +97,7 @@ production performance.
 
 | Gate | Current evidence | Required next evidence |
 |---|---|---|
-| Lean distribution | The private a4bcf5d candidate has a pinned Lean 4.28.0 toolchain, dependency-free Lake manifest, documented CLI and a successful fresh no-cache clone check at its exact SHA. | Review the stacked PRs. Public licence, repository visibility and release tag remain Romain's decisions. |
+| Lean distribution | The private integration code commit `347484d` has a pinned Lean 4.28.0 toolchain, dependency-free Lake manifest, documented CLI and a successful fresh no-cache clone check at its exact SHA. | Review the stacked PRs. Public licence, repository visibility and release tag remain Romain's decisions. |
 | Manual artifact | The exact a4bcf5d local tagged rehearsal passed the 16-page FR/EN source build and browser checks. PR #12 contains the Dockerfile, health probe and image smoke script. Across draft PRs #16–19, GitHub's final-image job was rejected before runner assignment or any steps because of account billing/spending limits. | Final-image build, smoke and health proof require a working runner or Docker daemon. The local source artifact is not a tested final image or public DOC-01 artifact. |
 | Public release | The manual is an untagged development preview; no public tag, released package, approved licence, site deployment, running revision, or monitor result is established here. | After publication authority, verify a public annotated tag, its exact artifact, the running revision, public reader path, health probe, and recovery image before reporting release. |
 
@@ -103,4 +128,4 @@ R0 scope review is treated as permission for this local audit and the existing p
 2. **VIS-01/02 integration.** The local acceptance checks above are covered by open PRs, not by `main`. Merge review must preserve the validated projection, exact-prefix selection, accessible list, and explicit ET/OU semantics. The reserved Lean `DependencyExpr` is not a general evaluation engine; grouped support is not a scientific verdict. Representative task comprehension and long-term TypeScript maintenance remain possible follow-up questions, not retroactive VIS-01/02 blockers.
 3. **SL-009 3D.** [PR #19](https://github.com/romainsimon/slean/pull/19) at 86996c8 checks matched conditions on the current candidate but its manifest remains prepared_not_run. Run the [predeclared protocol](https://github.com/romainsimon/slean/blob/86996c84714cbaa76bf156016be23d8ead678ea8/docs/3d-task-study-protocol.md) only with authorized representative dossiers and target reviewers. Record negative results too; keep 2D/table as the product unless the predefined benefit threshold is met.
 
-The exact a4bcf5d candidate has fresh-clone, versioned-export, proof-receipt, frozen-cost, V trace, local-tag manual and Explorer evidence. The PRs remain open; the final-image job is blocked before runner start by GitHub billing, and no image-level or production proof exists. DOC-01 still needs release authority and a public artifact, while the SL-009 3D decision needs representative dossiers and target reviewers. GERMINAL adapters and scientific campaigns have other owners. This audit does not convert those gates into implementation permission.
+The integrated code commit `347484d` has fresh-clone, versioned-export, proof-receipt, frozen-cost, V trace, untagged manual and Explorer evidence. The older `a4bcf5d` candidate has a separate local-tag rehearsal. The PRs remain open; the final-image job was blocked before runner start by GitHub billing in the recorded runs, and no image-level or production proof exists. DOC-01 still needs release authority and a public artifact, while the SL-009 3D decision needs representative dossiers and target reviewers. GERMINAL adapters and scientific campaigns have other owners. This audit does not convert those gates into implementation permission.
