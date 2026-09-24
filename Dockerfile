@@ -32,12 +32,19 @@ RUN test -n "$SOURCE_COMMIT" \
     && bash site/build.sh \
     && SOURCE_COMMIT="$SOURCE_COMMIT" python3 -c 'import json, os; from pathlib import Path; p=Path("site/_out/html-multi"); d=json.loads((p/"build-info.json").read_text()); assert d["source_revision"] == os.environ["SOURCE_COMMIT"] and d["source_tree_clean"] is True; assert len(list(p.rglob("*.html"))) == 16'
 
-FROM nginx:1.28.1-alpine AS runtime
+FROM nginx:1.28.1-alpine AS runtime-base
 ARG SOURCE_COMMIT
 LABEL org.opencontainers.image.revision="$SOURCE_COMMIT"
-RUN rm -f /usr/share/nginx/html/*
-COPY --from=builder /src/site/_out/html-multi/ /usr/share/nginx/html/
+RUN test -n "$SOURCE_COMMIT" && rm -f /usr/share/nginx/html/*
 EXPOSE 80
 HEALTHCHECK --interval=20s --timeout=5s --start-period=10s --retries=3 \
   CMD wget -q -O /dev/null http://127.0.0.1/ \
       && wget -q -O /dev/null http://127.0.0.1/en/ || exit 1
+
+# BuildKit-only local diagnostic: --build-context prebuilt-site=PATH.
+FROM runtime-base AS prebuilt-site-smoke
+COPY --from=prebuilt-site / /usr/share/nginx/html/
+
+# Keep production last: an ordinary docker build still runs builder and site/build.sh.
+FROM runtime-base AS runtime
+COPY --from=builder /src/site/_out/html-multi/ /usr/share/nginx/html/

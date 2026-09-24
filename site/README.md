@@ -13,6 +13,16 @@ Open `http://127.0.0.1:8765/` for the French manual or `/en/` for English. The `
 
 The normal build is a development preview and displays no release tag. The displayed schema version comes from the newest versioned wire contract in `schema/`; the build rejects schema files whose ID and version fields disagree. For a candidate built from an existing annotated tag, check out that tag in a clean repository and run `SLEAN_SITE_TAG=<tag> bash site/build.sh`. The build rejects a lightweight tag, a tag that points elsewhere, or a dirty tree before compiling. Both title pages and the footer of every generated page then show the selected build tag; every page carries it in a metadata field, and `build-info.json` records the tag and full commit. This proves the local artifact's source identity. Publishing a tag, reviewing the final artifact, and deploying the site remain separate steps.
 
+For a local Nginx runtime check when the Lean-built artifact already exists, use BuildKit with the explicit `prebuilt-site-smoke` target. The helper checks the artifact's exact commit, schema, tag, clean-source flag, and page identities before building, then runs the existing image and browser smoke test:
+
+```sh
+bash tools/smoke_prebuilt_site_image.sh \
+  site/_out/html-multi <full-commit-sha> 0.3.0 <local-annotated-tag> slean-site:prebuilt-smoke
+```
+
+The target receives `site/_out/html-multi` through the named `prebuilt-site` build context. It inherits the same Nginx runtime base, revision label, port, and health check as production, but does not execute the pinned Lean builder or `site/build.sh`. The default final `runtime` target and CI's ordinary `docker build` still execute that builder. A successful prebuilt smoke checks runtime packaging only; it cannot substitute for the normal final-image build or authorize publication or deployment.
+Add `--check-only` before the artifact directory to validate the artifact without Docker.
+
 The site uses the supplied Slean vector wordmark in the header and on both title pages. The charcoal and white variants are kept in `assets/brand/`; the white variant is available for future dark surfaces. The mobile header and favicon use a small S mark derived from the same vector geometry. The PNG exports are omitted because the SVGs stay sharp at any size. The build copies these assets into both language outputs.
 
 The header links a compact stack of all six Mutome letters before Slean to `https://mutome.com/`. It reproduces the closed state of Mutome's `MutomeUnfold` wordmark using six crops of the self-hosted `mutome-texture.webp` asset from Mutome's `public/brand/`; the same full stack appears at narrow sizes. The accessible link is named Mutome, and the build copies the texture into both language outputs without a runtime request to the other site.
