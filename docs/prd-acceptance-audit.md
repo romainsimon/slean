@@ -1,10 +1,26 @@
-# Slean PRD acceptance audit — updated 2026-09-24
+# Slean PRD acceptance audit — 2026-09-24
 
 **Source of truth for this checklist:** CEO [`tasks/prd-slean-mutome-program.md`](https://github.com/romainsimon/ceo/blob/457660b00916c1073be9ff405a4616b7664a4819/tasks/prd-slean-mutome-program.md), review version **1.1, 2026-09-23**, from commit `457660b00916c1073be9ff405a4616b7664a4819`; file SHA-256 `65e3896ce7639c4360aff0bc272eacc2c5b5135f9877e5e18791f708b9d0db01`. Romain's request to implement the full Slean PRD authorizes local implementation and this audit. [CEO PR #17](https://github.com/romainsimon/ceo/pull/17) remains open, so this is a review-version program baseline, not a merged CEO policy or authorization to publish. The separate `GERMINAL_PRD.md` v0.3 draft in Downloads is not the source of these criteria.
 
-This audit covers each explicit Slean-owned acceptance criterion in that file and distinguishes evidence on `main` at `72a916f` from candidates in open pull requests. It does not grant a public licence, merge, release tag, repository visibility change, site deployment, or scientific result.
+This audit covers each explicit Slean-owned acceptance criterion in that file. The dated candidate checks below preserve the evidence and limits recorded during review. The current source and release state is recorded here first. The audit grants no public licence, release tag, repository visibility change, site deployment, or scientific result.
 
-## Candidate stack checks — 2026-09-24
+## Current source and release state — 2026-09-24 15:53 UTC
+
+[Slean PR #24](https://github.com/romainsimon/slean/pull/24) merged the consolidated implementation into `main` as `9e41796709c6bbf35cf3928e0ae28297514774f6`. The merge commit has the same source tree as the locally tested PR head `adecfcf641871e620d48eea8b1cf17e8a2f836db`, but a different revision SHA. The older candidate and stacked-PR labels below describe historical checks; they do not describe the current merge status.
+
+| Area | Evidence and current limit |
+|---|---|
+| V0, core, proof, export, manual, 2D Explorer | The Slean-owned SL-01–08, DOC-02 and VIS-01/02 implementation is merged. The criterion-level checks below were run on named candidate revisions. At clean head `adecfcf`, a no-local clone built the final `linux/arm64` and emulated `linux/amd64` Dockerfile images. Each build passed 13 Lean jobs, 32 Python tests, 309 Verso jobs and 16 FR/EN pages. Each final image passed `tools/smoke_site_image.sh` with a healthy internal probe, exact image/artifact SHA and schema `0.3.0`, required routes/assets, guarded analytics loader and served FR/EN browser flow. This is local image evidence at the PR head, not a test of a production image stamped with merge SHA `9e41796`. |
+| Gate V / SL-09 | A real Slean adapter loss of 47 of 48 assessment references on one source-produced synthetic development trace was fixed. The read-only full-trace comparator found an injected valid-choice decision discrepancy accepted by two pinned source verifiers and rejected by Slean while retaining parsed fields. The unmodified trace had no observed source defect. Broader scientific value, representative reviewer time and a general DSL benefit remain unmeasured; the justified result is a bounded documentation and inspection prototype. |
+| DOC-01 and publication | No public annotated tag, release or checked public tagged artifact was found. The local annotated-tag rehearsal below remains historical evidence. DOC-01 is partial until a public artifact and its displayed revision are checked. |
+| Optional 3D study | The matched 2D/3D study remains `prepared_not_run`. It needs three authorized representative dossiers, six target reviewers and recorded task outcomes before a 3D product decision. The 2D/table Explorer remains the product view. |
+| Production | The [merge SHA's final-image Actions job](https://github.com/romainsimon/slean/actions/runs/36022119442) failed before any job steps because of the account billing/spending limit; Romain waived Actions as a merge gate. A read-only probe at 15:53 UTC returned HTTP 503 for `/`, `/en/` and `/build-info.json`. The running revision, internal health, independent monitor and compatible recovery image have not been verified. Neither the merge nor the local images establish a healthy public release. |
+
+The local arm64 image ID is `sha256:443bef43ea000891e5f7dcd586ff7bcd454f5471dea5c31f4739b2440b09299c`; the locally emulated amd64 image ID is `sha256:44344809c519eb4f0b244549ea01186bdd70f3edd7d1edd5467465f0e19935fb`. Neither is claimed as the image built or deployed by Coolify. GERMINAL adapters and scientific campaigns have separate owners.
+
+## Historical candidate stack checks — 2026-09-24
+
+The following candidate states, open-PR descriptions and `main` references were recorded before PR #24 merged. They remain as evidence history; use the current-state section above for the merged source and release status.
 
 ### Reviewed integration code commit `347484d`
 
@@ -105,7 +121,7 @@ The [manual payload baseline](manual-payload-baseline.md) measures the clean
 It records page and local-resource bytes without claiming browser load time or
 production performance.
 
-## Packaging and release readiness
+## Historical packaging and release readiness
 
 | Gate | Current evidence | Required next evidence |
 |---|---|---|
@@ -119,7 +135,7 @@ A detached local worktree combined dependency-gate PR #4 at `9547395` (including
 
 `bash site/build.sh` passed the 13-job Lean build, 20 Python tests, and 309-job Verso build. All 16 generated pages (eight FR, eight EN) had exactly one production-host-guarded loader for the current `slean.org` site-specific script, with no legacy `script.js` loader. `build-info.json` showed schema `0.3.0`, derived from the versioned wire contract. Both 0.3 gate chapters and the reader-first title pages were present; `examples/dependency-gates.json` validated with 13 events and the documented output. This checks compatibility in a local source build; it is not the tagged artifact, a public route, an analytics pageview, or deployment.
 
-## Slean-owned roadmap issues and gates
+## Historical Slean-owned roadmap issues and gates
 
 | Issue / gate | Current result | Closure still needed |
 |---|---|---|
@@ -134,10 +150,10 @@ A detached local worktree combined dependency-gate PR #4 at `9547395` (including
 
 R0 scope review is treated as permission for this local audit and the existing prototypes. It does not settle licence, public visibility, deployment, integrations or new spend. I1 (GERMINAL/Mutome adapters) and B1 (scientific campaign) are owned outside Slean and remain separate.
 
-## Remaining gates and scope boundaries
+## Current remaining gates and scope boundaries
 
-1. **DOC-01 at a public tag.** The [combined-candidate local annotated-tag rehearsal](local-tag-build.md#combined-slean-candidate-at-pr-17) proves that exact a4bcf5d built from a clean checkout selected by a temporary local tag, compiled the documented examples and displayed that tag on all 16 pages. The temporary tag was deleted, no tag was pushed, and no release exists. After publication authority, check the exact public tag, compiled examples, build-info.json, displayed identity and public artifact together. Until then DOC-01 remains partial.
-2. **VIS-01/02 integration.** The local acceptance checks above are covered by open PRs, not by `main`. Merge review must preserve the validated projection, exact-prefix selection, accessible list, and explicit ET/OU semantics. The reserved Lean `DependencyExpr` is not a general evaluation engine; grouped support is not a scientific verdict. Representative task comprehension and long-term TypeScript maintenance remain possible follow-up questions, not retroactive VIS-01/02 blockers.
-3. **SL-009 3D.** [PR #19](https://github.com/romainsimon/slean/pull/19) at 86996c8 checks matched conditions on the current candidate but its manifest remains prepared_not_run. Run the [predeclared protocol](https://github.com/romainsimon/slean/blob/86996c84714cbaa76bf156016be23d8ead678ea8/docs/3d-task-study-protocol.md) only with authorized representative dossiers and target reviewers. Record negative results too; keep 2D/table as the product unless the predefined benefit threshold is met.
+1. **DOC-01 at a public tag.** The [local annotated-tag rehearsal](local-tag-build.md#combined-slean-candidate-at-pr-17) proved that exact historical candidate `a4bcf5d` compiled the documented examples and displayed its temporary tag on all 16 pages. The tag was deleted locally; no public tag or release was found. After publication authority, check the exact public tag, compiled examples, `build-info.json`, displayed identity and public artifact together. Until then DOC-01 remains partial.
+2. **Production reader path.** PR #24 merged the locally checked source tree. The public routes currently return 503, and no running revision, internal health, independent monitor or compatible recovery image is verified. Verify those against the final deployed artifact before calling the release healthy. GitHub Actions was waived as a merge gate only. The reserved Lean `DependencyExpr` is not a general evaluation engine; grouped support is not a scientific verdict.
+3. **SL-009 3D.** [Study PR #19](https://github.com/romainsimon/slean/pull/19) at `86996c8` checked matched conditions in the historical candidate. The integrated study remains `prepared_not_run`. Run the [predeclared protocol](https://github.com/romainsimon/slean/blob/86996c84714cbaa76bf156016be23d8ead678ea8/docs/3d-task-study-protocol.md) only with authorized representative dossiers and target reviewers. Record negative results too; keep 2D/table as the product unless the predefined benefit threshold is met.
 
-The integrated code commit `347484d` has fresh-clone, versioned-export, proof-receipt, frozen-cost, V trace, untagged manual and Explorer evidence. The older `a4bcf5d` candidate has a separate local-tag rehearsal. The PRs remain open; the final-image job was blocked before runner start by GitHub billing in the recorded runs, and no image-level or production proof exists. DOC-01 still needs release authority and a public artifact, while the SL-009 3D decision needs representative dossiers and target reviewers. GERMINAL adapters and scientific campaigns have other owners. This audit does not convert those gates into implementation permission.
+The merged implementation has local core, proof, export, documentation, Gate V and Explorer evidence, including final-image tests at the PR head. This audit does not convert a source merge or local image into public release proof. DOC-01, production verification and the optional 3D study have the named external gates above. GERMINAL adapters and scientific campaigns have other owners.
