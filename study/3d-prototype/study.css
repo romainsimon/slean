@@ -1,0 +1,10 @@
+.study-banner {
+  margin: 0;
+  padding: .48rem clamp(1rem, 3.1vw, 3rem);
+  border-bottom: 1px solid var(--line);
+  background: var(--side);
+  color: var(--deep);
+  font-size: .78rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
