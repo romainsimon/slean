@@ -62,13 +62,33 @@ Its documented features do not include this experimental event-to-result
 validator. A custom Blueprint extension could implement one; no same-case
 Blueprint prototype has yet measured that extension's cost.
 
+## Value evidence boundary
+
+The source was one existing development run, not an established representative
+sample of campaigns or reviewer tasks. Every rejected discrepancy in this
+retest was injected into an in-memory copy; none was found in the unmodified
+trace. The comparison with the source verifier used a synthetic manifest and
+completion event, plus source-code inspection. It demonstrates a plausible
+cross-file gap on the real event shape, not an observed source failure or time
+saved for a researcher.
+
+The PRD asks for a new useful control on a development trace and excludes a
+fixture-only defect. It does not set a numeric time-saving threshold or require
+an observed production incident. This retest supports a candidate structural
+control because the mutation uses the development trace's event shape and the
+existing verifier comparison is source-backed. Its usefulness on a
+representative workload remains unmeasured. An empty wire-fields-lost list
+means every parsed source JSON field is retained in owner-only records; it does
+not mean model comparison, posterior calculation or audit adequacy is typed or
+recomputed by Slean.
+
 ## Decision and limits
 
-**V result: continue to a bounded documentation prototype.** This establishes
-one useful structural check beyond the existing source verifier on the actual
-trace shape, without discarding source fields. It does not establish improved
-scientific accuracy, a safe publication, or value for a general DSL. The
-canonical SHA fields are computed by the trusted Python adapter; Lean checks
+**V result: continue to a bounded documentation prototype.** This records a
+limited implementation decision after the earlier reduce result. The injected
+cross-file discrepancy is detectable, but the retest does not establish
+scientific accuracy, a safe publication, measured reviewer value, or value for
+a general DSL. The canonical SHA fields are computed by the trusted Python adapter; Lean checks
 their links but does not recompute SHA-256. Source artifact bytes stay in the
 source repository. Some fields remain present only in owner source records and
 are not typed decision rules. Typed times use UTC seconds, while owner records
