@@ -46,6 +46,8 @@ def canonical_json(value):
 def make_case(manifest, protocol, source_events):
     """Retain each source JSON object in an owner-only in-memory dossier."""
     attempt = str(manifest["attempt_id"])
+    decision_map = {"keep": "override", "discard": "reject", "inconclusive": "defer"}
+    source_decision = manifest.get("scientific_decision")
     frozen = next(e for e in source_events if e["type"] == "protocol_frozen")
     observations = [e for e in source_events if e["type"] == "observation_recorded"]
     if not observations:
@@ -123,6 +125,8 @@ def make_case(manifest, protocol, source_events):
                  "kind": "provenance"}, source_id, at)
             observation_ids.append(observation_id)
         elif source["type"] == "discrimination_completed":
+            if not isinstance(source_decision, str) or source_decision not in decision_map:
+                raise ValueError("unsupported source scientific_decision")
             usage = manifest.get("usage") or {}
             cpu = usage.get("cpu_seconds")
             if cpu is not None:
@@ -132,8 +136,7 @@ def make_case(manifest, protocol, source_events):
             emit("assessment_recorded", {"identity": ident("assessment:" + source_id, source_id),
                  "protocol_ref": "protocol:" + frozen_id, "observation_refs": observation_ids,
                  "verdict": "external_unverified", "rule_used": "external"}, source_id, at)
-            source_decision = manifest.get("scientific_decision")
-            result = {"keep": "override", "discard": "reject", "inconclusive": "defer"}.get(source_decision, "defer")
+            result = decision_map[source_decision]
             emit("decision_recorded", {"identity": ident("decision:" + source_id, source_id),
                  "assessment_ref": "assessment:" + source_id, "result": result,
                  "reason": "External multi-observation decision; no Slean V0 pass is claimed."}, source_id, at)
@@ -235,8 +238,96 @@ def mutation_probes(manifest, protocol, events):
     return results
 
 
-def loss_report(manifest, protocol, events):
-    mapped_manifest = {"attempt_id", "question", "hypothesis", "budgets", "usage", "scientific_decision"}
+def missing_or_changed_paths(original, retained, path):
+    """Name source fields that are absent or changed in an owner source record."""
+    if isinstance(original, dict) and isinstance(retained, dict):
+        paths = []
+        for key in sorted(original):
+            child = path + "/" + str(key).replace("~", "~0").replace("/", "~1")
+            if key not in retained:
+                paths.append(child)
+            else:
+                paths.extend(missing_or_changed_paths(original[key], retained[key], child))
+        return paths
+    if isinstance(original, list) and isinstance(retained, list):
+        paths = []
+        for index, value in enumerate(original):
+            child = f"{path}/{index}"
+            if index >= len(retained):
+                paths.append(child)
+            else:
+                paths.extend(missing_or_changed_paths(value, retained[index], child))
+        return paths
+    return [] if canonical_json(original) == canonical_json(retained) else [path]
+
+
+def source_record_fidelity(manifest, protocol, events, converted):
+    """Check the actual owner records, rather than assuming the adapter kept them."""
+    attempt = str(manifest["attempt_id"])
+    expected = [("manifest", "source-manifest:" + attempt, "manifest", manifest),
+                ("protocol", "source-protocol:" + attempt, "protocol", protocol)]
+    expected.extend((f"events/{index}", "source-event:" + str(event["event_id"]),
+                     "event", event) for index, event in enumerate(events))
+    records = {}
+    duplicates = set()
+    errors = []
+    for index, event in enumerate(converted["events"]):
+        if event["kind"] != "source_recorded":
+            continue
+        payload = event.get("payload")
+        identity = payload.get("identity") if isinstance(payload, dict) else None
+        record_id = identity.get("id") if isinstance(identity, dict) else None
+        if not isinstance(record_id, str):
+            errors.append(f"source_record/{index}:missing_identity")
+            continue
+        if record_id in records:
+            duplicates.add(record_id)
+        else:
+            records[record_id] = (event, payload)
+
+    missing = []
+    expected_ids = {record_id for _, record_id, _, _ in expected}
+    if set(records) - expected_ids:
+        errors.append("source_record:unexpected_record")
+    for label, record_id, role, original in expected:
+        if record_id in duplicates:
+            errors.append(f"{label}:duplicate_record")
+        if record_id not in records:
+            missing.append(label)
+            errors.append(f"{label}:missing_record")
+            continue
+        event, payload = records[record_id]
+        if (event.get("audience") != "owner" or
+                payload["identity"].get("audience") != "owner"):
+            errors.append(f"{label}:not_owner_only")
+        if payload.get("source_role") != role:
+            errors.append(f"{label}:wrong_role")
+        raw = payload.get("raw_json")
+        if not isinstance(raw, str):
+            missing.append(label)
+            errors.append(f"{label}:invalid_raw_json")
+            continue
+        try:
+            retained = json.loads(raw)
+            canonical = canonical_json(retained)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            missing.append(label)
+            errors.append(f"{label}:invalid_raw_json")
+            continue
+        missing.extend(missing_or_changed_paths(original, retained, label))
+        if canonical != canonical_json(original):
+            errors.append(f"{label}:content_mismatch")
+        if raw != canonical:
+            errors.append(f"{label}:noncanonical_raw_json")
+        if payload.get("canonical_sha256") != digest(original):
+            errors.append(f"{label}:digest_mismatch")
+    return sorted(set(missing)), sorted(set(errors))
+
+
+def loss_report(manifest, protocol, events, converted):
+    wire_fields_lost, source_record_integrity_errors = source_record_fidelity(
+        manifest, protocol, events, converted)
+    mapped_manifest = {"attempt_id", "question", "hypothesis", "scientific_decision"}
     mapped_protocol = {"selection_code_sha256"}
     mapped_event = {
         "protocol_frozen": {"definition_sha256"},
@@ -247,13 +338,27 @@ def loss_report(manifest, protocol, events):
     unmapped = {kind: sorted(set().union(*(set(e["payload"]) for e in events
                                             if e["type"] == kind)) - mapped_event.get(kind, set()))
                 for kind in sorted({e["type"] for e in events})}
+    manifest_not_typed = []
+    has_completion = any(event["type"] == "discrimination_completed" for event in events)
+    for key, value in manifest.items():
+        if key in mapped_manifest:
+            continue
+        if key in {"budgets", "usage"} and isinstance(value, dict):
+            mapped_children = {"cpu_seconds"} if key == "budgets" or has_completion else set()
+            manifest_not_typed.extend(f"{key}/{child}" for child in value
+                                      if child not in mapped_children)
+        else:
+            manifest_not_typed.append(key)
     return {
-        "wire_fields_lost": [],
-        "manifest_fields_not_typed": sorted(set(manifest) - mapped_manifest),
+        "wire_fields_lost": wire_fields_lost,
+        "source_record_integrity_errors": source_record_integrity_errors,
+        "manifest_fields_not_typed": sorted(manifest_not_typed),
         "protocol_fields_not_typed": sorted(set(protocol) - mapped_protocol),
+        "event_fields_not_typed": sorted(set().union(*(set(event) for event in events)) -
+                                         {"event_id", "type", "observed_at", "payload"}),
         "event_payload_fields_not_typed": unmapped,
         "semantic_limits": [
-            "Every source JSON object remains in owner-only records; typed observations and assessment cover all source observations.",
+            "Owner source-record fidelity is checked against every parsed source JSON object; typed observations and assessment cover all source observations.",
             "Model comparison, posterior calculation and audit adequacy remain external and unverified by Slean.",
             "Typed timestamps use UTC seconds; owner-only source records retain original precision.",
             "External artifact bytes remain in the source repository and are checked by path, size and hash; they are not embedded in the case.",
@@ -270,13 +375,16 @@ def audit(path):
     converted = make_case(manifest, protocol, events)
     code, error = validate_case(converted)
     after = {name: hashlib.sha256(file.read_bytes()).digest() for name, file in files.items()}
+    losses = loss_report(manifest, protocol, events, converted)
     return {**source_shape(manifest, protocol, events),
             "source_artifact_hashes_valid": source_artifacts_valid(path, manifest),
             "converted_event_count": len(converted["events"]),
             "slean_validation": "accepted" if code == 0 else f"rejected:{error}",
             "source_files_unchanged": before == after,
+            "source_preservation_verified": not losses["wire_fields_lost"] and
+                not losses["source_record_integrity_errors"],
             "mutation_probes_on_memory_copy": mutation_probes(manifest, protocol, events),
-            "losses": loss_report(manifest, protocol, events)}
+            "losses": losses}
 
 
 def main():

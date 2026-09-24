@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.audit_autoresearch_trace import BIN, audit, make_case
+from tools.audit_autoresearch_trace import BIN, audit, digest, loss_report, make_case
 
 
 class AdapterTests(unittest.TestCase):
@@ -47,7 +47,8 @@ class AdapterTests(unittest.TestCase):
         append("discrimination_completed", completion, 6)
         manifest = {"attempt_id": "synthetic-source", "question": "Synthetic question?",
                     "hypothesis": "Synthetic claim.", "scientific_decision": "inconclusive",
-                    "budgets": {"cpu_seconds": 10}, "usage": {"cpu_seconds": 1},
+                    "budgets": {"cpu_seconds": 10, "model_calls": 2},
+                    "usage": {"cpu_seconds": 1, "model_calls": 1},
                     "provenance": {"definition_sha256": definition}, "artifacts": [],
                     "result": {"discrimination": completion}}
         with tempfile.TemporaryDirectory() as directory:
@@ -68,9 +69,19 @@ class AdapterTests(unittest.TestCase):
             "completion_decision_rehashed": "source_decision_provenance",
             "omitted_assessment_observation": "source_projection"})
         self.assertEqual(result["losses"]["wire_fields_lost"], [])
+        self.assertEqual(result["losses"]["source_record_integrity_errors"], [])
+        self.assertTrue(result["source_preservation_verified"])
+        self.assertIn("budgets/model_calls", result["losses"]["manifest_fields_not_typed"])
+        self.assertIn("usage/model_calls", result["losses"]["manifest_fields_not_typed"])
+        self.assertNotIn("budgets/cpu_seconds", result["losses"]["manifest_fields_not_typed"])
+        self.assertIn("sequence", result["losses"]["event_fields_not_typed"])
         self.assertTrue(result["losses"]["semantic_limits"])
 
         case = make_case(manifest, protocol, events)
+        unsupported = copy.deepcopy(manifest)
+        unsupported["scientific_decision"] = "unmapped-source-decision"
+        with self.assertRaisesRegex(ValueError, "unsupported source scientific_decision"):
+            make_case(unsupported, protocol, events)
         source_records = [e["payload"] for e in case["events"] if e["kind"] == "source_recorded"]
         self.assertEqual([json.loads(r["raw_json"]) for r in source_records],
                          [manifest, protocol, *events])
@@ -78,6 +89,29 @@ class AdapterTests(unittest.TestCase):
         assessment = next(e["payload"] for e in case["events"] if e["kind"] == "assessment_recorded")
         self.assertEqual(len(assessment["observation_refs"]), 2)
         self.assertEqual(assessment["verdict"], "external_unverified")
+
+        tampered = copy.deepcopy(case)
+        source_manifest = next(e["payload"] for e in tampered["events"]
+                               if e["kind"] == "source_recorded" and
+                               e["payload"]["source_role"] == "manifest")
+        truncated = copy.deepcopy(manifest)
+        del truncated["budgets"]["cpu_seconds"]
+        source_manifest["raw_json"] = json.dumps(truncated, sort_keys=True, separators=(",", ":"))
+        source_manifest["canonical_sha256"] = digest(truncated)
+        losses = loss_report(manifest, protocol, events, tampered)
+        self.assertIn("manifest/budgets/cpu_seconds", losses["wire_fields_lost"])
+        self.assertIn("manifest:content_mismatch", losses["source_record_integrity_errors"])
+        self.assertIn("manifest:digest_mismatch", losses["source_record_integrity_errors"])
+
+        missing_record = copy.deepcopy(case)
+        missing_record["events"] = [e for e in missing_record["events"]
+                                    if not (e["kind"] == "source_recorded" and
+                                            e["payload"]["identity"]["id"] ==
+                                            "source-event:source-3")]
+        losses = loss_report(manifest, protocol, events, missing_record)
+        self.assertIn("events/2", losses["wire_fields_lost"])
+        self.assertIn("events/2:missing_record", losses["source_record_integrity_errors"])
+
         owner = subprocess.run([str(BIN), "export", "-", "owner"], input=json.dumps(case),
                                text=True, capture_output=True, check=True)
         self.assertEqual(json.loads(owner.stdout)["case"], case)

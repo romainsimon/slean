@@ -24,6 +24,17 @@ adequacy were not reproduced or proved by Lean. The adapter wrote no private
 case or export to disk. A synthetic contract test verifies owner round-trip and
 that source records do not enter the agent export.
 
+A later Slean-only guard checks every converted owner source record against its
+parsed input object, source role, owner audience, canonical JSON and SHA-256.
+The loss report now names missing or changed source paths instead of assuming
+`wire_fields_lost: []`. It also lists source event envelope fields and nested
+budget/usage fields that remain outside the typed model. Synthetic regressions
+remove a nested manifest field while rehashing the altered record and omit an
+event record; both are reported as preservation failures. This follow-up did
+not rerun the private trace or authenticate its source values. An unrecognized
+scientific decision in a completed source trace now fails conversion instead
+of silently becoming `defer`.
+
 The following probes changed copies held in memory. They were not faults
 observed in the original source and did not change its files.
 
