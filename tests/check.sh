@@ -6,7 +6,7 @@ trap 'rm -rf "$check_dir"' EXIT
 lake build
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 lake env lean --run examples/Synthetic.lean > "$check_dir/lean-case.json"
-lake exe slean export examples/valid.json agent > "$check_dir/json-case.json"
+lake exe slean export-case examples/valid.json agent > "$check_dir/json-case.json"
 cmp "$check_dir/lean-case.json" "$check_dir/json-case.json"
 if lake env lean tests/TypeError.lean > "$check_dir/type-error.log" 2>&1; then
   echo 'expected static type failure was accepted' >&2

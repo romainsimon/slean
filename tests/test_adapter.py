@@ -80,10 +80,10 @@ class AdapterTests(unittest.TestCase):
         self.assertEqual(assessment["verdict"], "external_unverified")
         owner = subprocess.run([str(BIN), "export", "-", "owner"], input=json.dumps(case),
                                text=True, capture_output=True, check=True)
-        self.assertEqual(json.loads(owner.stdout), case)
+        self.assertEqual(json.loads(owner.stdout)["case"], case)
         agent = subprocess.run([str(BIN), "export", "-", "agent"], input=json.dumps(case),
                                text=True, capture_output=True, check=True)
-        self.assertEqual(json.loads(agent.stdout)["events"], [])
+        self.assertEqual(json.loads(agent.stdout)["case"]["events"], [])
         self.assertNotIn("synthetic-prediction", agent.stdout)
         changed = copy.deepcopy(case)
         hidden = next(e for e in changed["events"] if e["kind"] == "source_recorded")

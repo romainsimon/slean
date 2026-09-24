@@ -3,6 +3,20 @@ import Slean.Core
 namespace Slean
 open Lean
 
+/-- The case schema remains unchanged. The export envelope records the toolchain
+    that produced a projection and has its own wire version. -/
+def exportFormat : String := "slean-export/0.1.0"
+def exportLeanVersion : String := "4.28.0"
+
+structure ExportBundle where
+  format : String
+  lean_version : String
+  «case» : CaseFile
+  deriving ToJson, FromJson
+
+def exportBundle (caseFile : CaseFile) : ExportBundle :=
+  { format := exportFormat, lean_version := exportLeanVersion, «case» := caseFile }
+
 private def field (j : Json) (name : String) : String :=
   (j.getObjValAs? String name).toOption.getD ""
 

@@ -229,8 +229,21 @@ class CliTests(unittest.TestCase):
         case = fixture()
         code, exported, bytes_one = run_case(case, "export", "owner")
         self.assertEqual(code, 0)
-        self.assertEqual(exported, case)
+        self.assertEqual(exported["format"], "slean-export/0.1.0")
+        self.assertEqual(exported["lean_version"], "4.28.0")
+        self.assertEqual(exported["case"], case)
         self.assertEqual(run_case(exported, "export", "owner")[2], bytes_one)
+        self.assertEqual(run_case(exported, "validate")[0], 0)
+        self.assertEqual(run_case(case, "export-case", "owner")[1], case)
+        incompatible = copy.deepcopy(exported)
+        incompatible["lean_version"] = "4.27.0"
+        self.assertEqual(run_case(incompatible)[1]["error"]["code"], "json")
+        incompatible = copy.deepcopy(exported)
+        incompatible["format"] = "slean-export/9.0.0"
+        self.assertEqual(run_case(incompatible)[1]["error"]["code"], "json")
+        incompatible = copy.deepcopy(exported)
+        incompatible["unreviewed_field"] = "opaque"
+        self.assertEqual(run_case(incompatible, "export", "agent")[1]["error"]["code"], "json")
         case["schema_version"] = "0.2.0"
         code, result, _ = run_case(case)
         self.assertEqual((code, result["error"]["code"]), (1, "version"))
@@ -249,7 +262,7 @@ class CliTests(unittest.TestCase):
         self.assertNotIn("private-artifact", baseline_export)
         self.assertNotIn("private-observation", baseline_view)
         self.assertNotIn("secret_note", baseline_export)
-        self.assertEqual(len(json.loads(baseline_export)["events"]), 8)
+        self.assertEqual(len(json.loads(baseline_export)["case"]["events"]), 8)
         inserted = copy.deepcopy(fixture())
         inserted["events"].insert(4, {
             "event_id": "hidden-extra", "sequence": 5, "kind": "artifact_registered",
@@ -285,8 +298,8 @@ class CliTests(unittest.TestCase):
         baseline_timeline = run_case(case, "timeline", "agent")[2]
         self.assertNotIn("private-artifact-1", baseline_export)
         self.assertNotIn("private-artifact-1", baseline_timeline)
-        self.assertEqual(json.loads(baseline_export)["events"][1]["payload"]["input_ref"], "[redacted]")
-        self.assertEqual(run_case(case, "export", "owner")[1]["events"][1]["payload"]["input_ref"],
+        self.assertEqual(json.loads(baseline_export)["case"]["events"][1]["payload"]["input_ref"], "[redacted]")
+        self.assertEqual(run_case(case, "export", "owner")[1]["case"]["events"][1]["payload"]["input_ref"],
                          "private-artifact-1")
 
         case["events"][1]["payload"]["input_ref"] = "private://other-input"
@@ -308,6 +321,8 @@ class CliTests(unittest.TestCase):
         code, receipt, _ = run_case(case, "proof")
         self.assertEqual(code, 0)
         self.assertEqual(receipt[0]["status"], "kernel_checked")
+        self.assertEqual(receipt[0]["dependencies"], pin["dependencies"])
+        self.assertIn("Slean.promotionEvidence", receipt[0]["dependencies"])
         contrary = copy.deepcopy(case)
         contrary["events"][3]["payload"]["value"] = "0.000"
         contrary["events"][5]["payload"]["verdict"] = "fail"
@@ -317,13 +332,15 @@ class CliTests(unittest.TestCase):
         self.assertEqual(contrary_receipt[0]["status"], "kernel_checked")
         self.assertEqual(contrary_receipt[0]["elaborated_statement"], receipt[0]["elaborated_statement"])
         exported = run_case(case, "export", "agent")[1]
-        self.assertEqual(exported["events"][-1]["payload"]["status"], "declared")
+        self.assertEqual(exported["case"]["events"][-1]["payload"]["status"], "declared")
+        self.assertEqual(run_case(exported, "proof")[1][0]["status"], "kernel_checked")
         for key, value in (
             ("declaration", "Test.sorry"), ("declaration", "Test.unauthorizedAxiom"),
             ("statement", "substituted statement"), ("toolchain", "other toolchain")):
             bad = copy.deepcopy(case)
             bad["events"][-1]["payload"][key] = value
             self.assertEqual(run_case(bad, "proof")[1][0]["status"], "declared")
+            self.assertEqual(run_case(bad, "proof")[1][0]["dependencies"], [])
         forged = copy.deepcopy(case)
         forged["events"][-1]["payload"]["statement"] = "forged"
         forged["events"][-1]["payload"]["status"] = "kernel_checked"

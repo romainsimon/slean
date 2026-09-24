@@ -7,8 +7,18 @@ def readCase (path : String) : IO (Except String (CaseFile × Bool)) := do
     let raw ← if path == "-" then (← IO.getStdin).readToEnd else IO.FS.readFile path
     return do
       let json ← Json.parse raw
-      let caseFile : CaseFile ← fromJson? json
-      pure (caseFile, toJson caseFile == json)
+      if (json.getObjVal? "format").isOk then
+        let bundle : ExportBundle ← fromJson? json
+        if bundle.format != exportFormat then
+          throw "unsupported export format; no implicit migration"
+        if bundle.lean_version != exportLeanVersion then
+          throw "export Lean version differs from this toolchain"
+        if toJson bundle != json then
+          throw "export envelope has unsupported or noncanonical fields"
+        pure (bundle.«case», true)
+      else
+        let caseFile : CaseFile ← fromJson? json
+        pure (caseFile, toJson caseFile == json)
   catch error => return .error error.toString
 
 def reportError (error : Diagnostic) : IO UInt32 := do
@@ -39,7 +49,8 @@ def execute (args : List String) : IO UInt32 := do
   if args == ["proof-statement"] then
     IO.println (Json.mkObj [("declaration", toJson checkedDeclaration),
       ("elaborated_statement", toJson checkedStatement),
-      ("toolchain", toJson checkedToolchain)]).compress
+      ("toolchain", toJson checkedToolchain),
+      ("dependencies", toJson checkedDependencies)]).compress
     return 0
   match args with
   | command :: path :: rest =>
@@ -47,7 +58,7 @@ def execute (args : List String) : IO UInt32 := do
     let (caseFile, canonicalInput) ← match caseResult with
       | .ok pair => pure pair
       | .error message => return ← reportError (diag "" "" "json" message)
-    let agentProjection := (command == "export" || command == "view") && rest.head? == some "agent"
+    let agentProjection := (command == "export" || command == "export-case" || command == "view") && rest.head? == some "agent"
     if !canonicalInput && !agentProjection then
       return ← reportError (diag "" caseFile.case_id "unexpected_field" "case has unsupported or noncanonical fields")
     if command == "validate" then
@@ -66,7 +77,7 @@ def execute (args : List String) : IO UInt32 := do
         IO.println (toJson state).compress
         return 0
       | .error error => return ← reportError error
-    if command == "export" || command == "view" then
+    if command == "export" || command == "export-case" || command == "view" then
       let audience := rest.head?.getD "owner"
       if audience != "owner" && audience != "agent" then
         return ← reportError (diag "" "" "audience" "expected owner or agent")
@@ -74,7 +85,9 @@ def execute (args : List String) : IO UInt32 := do
       match replay projected with
       | .error error => return ← reportError error
       | .ok state =>
-        IO.println (if command == "export" then (toJson projected).compress else (view projected state).compress)
+        IO.println (if command == "export" then (toJson (exportBundle projected)).compress
+          else if command == "export-case" then (toJson projected).compress
+          else (view projected state).compress)
         return 0
     if command == "timeline" then
       let audience := rest.head?.getD "agent"
@@ -101,6 +114,6 @@ def execute (args : List String) : IO UInt32 := do
         IO.println (toJson (state.formal_claims.map proofReceipt)).compress
         return 0
     return ← reportError (diag "" "" "usage" "unknown command")
-  | _ => return ← reportError (diag "" "" "usage" "slean validate|replay|export|view|timeline|proof <case.json> [count|owner|agent], or proof-statement")
+  | _ => return ← reportError (diag "" "" "usage" "slean validate|replay|export|export-case|view|timeline|proof <case.json> [count|owner|agent], or proof-statement")
 
 def main (args : List String) : IO UInt32 := execute args

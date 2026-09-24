@@ -8,9 +8,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SCHEMAS = {version: json.loads((ROOT / f"schema/v{version}.schema.json").read_text())
            for version in ("0.1.0", "0.2.0", "0.3.0")}
+EXPORT_SCHEMA = json.loads((ROOT / "schema/export-v0.1.0.schema.json").read_text())
 
 
 def matches(schema, value, root):
+    if "$defs" in schema:
+        root = schema
     if "$ref" in schema:
         return matches(root["$defs"][schema["$ref"].rsplit("/", 1)[1]], value, root)
     if "oneOf" in schema:
@@ -46,6 +49,16 @@ def matches(schema, value, root):
 
 
 class SchemaTests(unittest.TestCase):
+    def test_export_envelope_keeps_case_version(self):
+        case = json.loads((ROOT / "examples/dependency-gates.json").read_text())
+        export = {"format": "slean-export/0.1.0", "lean_version": "4.28.0", "case": case}
+        self.assertTrue(matches(EXPORT_SCHEMA, export, EXPORT_SCHEMA))
+        export["lean_version"] = "4.27.0"
+        self.assertFalse(matches(EXPORT_SCHEMA, export, EXPORT_SCHEMA))
+        export["lean_version"] = "4.28.0"
+        export["case"]["semantics_version"] = "0.2.0"
+        self.assertFalse(matches(EXPORT_SCHEMA, export, EXPORT_SCHEMA))
+
     def test_checked_in_fixtures_share_wire_shape(self):
         for path in sorted((ROOT / "examples").glob("*.json")):
             with self.subTest(path=path.name):

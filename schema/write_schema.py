@@ -133,3 +133,24 @@ schema_v03 = {
     "$defs": defs_v03,
 }
 (HERE / "v0.3.0.schema.json").write_text(json.dumps(schema_v03, indent=2, sort_keys=True) + "\n")
+
+# Export is a separate versioned envelope. Its case field retains the exact
+# existing case schema; no 0.1–0.3 input is silently upgraded.
+export_v01 = {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:slean:export:0.1.0",
+    "title": "Slean export envelope V0.1.0",
+    "description": "Lean version describes the exporter, not an independent proof or source attestation.",
+    **obj({
+        "format": {"const": "slean-export/0.1.0"},
+        "lean_version": {"const": "4.28.0"},
+        "case": {"oneOf": [{"$ref": f"#/$defs/case_v{version.replace('.', '_')}"}
+                           for version in ("0.1.0", "0.2.0", "0.3.0")]},
+    }),
+    "$defs": {
+        "case_v0_1_0": schema,
+        "case_v0_2_0": schema_v02,
+        "case_v0_3_0": schema_v03,
+    },
+}
+(HERE / "export-v0.1.0.schema.json").write_text(json.dumps(export_v01, indent=2, sort_keys=True) + "\n")

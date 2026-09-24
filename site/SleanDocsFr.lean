@@ -219,9 +219,9 @@ tag := "format-et-api"
 - `validate <dossier.json>` : le dossier respecte-t-il les règles prises en charge ? La sortie contient `ok: true` ou une erreur avec `code`, `event_id` et `object_id` ; une erreur donne un code de sortie non nul.
 - `replay <dossier.json> <N>` : quel était l'état après les `N` premiers événements ?
 - `view <dossier.json> agent|owner` : quelles observations, décisions et relations sont visibles pour cette audience ?
-- `export <dossier.json> agent|owner` : produire le dossier JSON canonique pour cette audience. Révisez le contenu avant partage.
+- `export <dossier.json> agent|owner` : produire une enveloppe versionnée avec le dossier canonique et la version de Lean. Révisez le contenu avant partage. Utilisez `export-case` seulement si un consommateur attend l'ancien dossier brut.
 - `timeline <dossier.json> agent|owner` : obtenir les états vérifiés de tous les préfixes visibles, utilisés par l'Explorer local.
-- `proof <dossier.json>` et `proof-statement` : examiner les statuts formels locaux et l'unique énoncé de théorème fixé par le projet.
+- `proof <dossier.json>` et `proof-statement` : examiner les statuts formels locaux, les dépendances du projet et l'unique énoncé de théorème fixé par le projet. Sur un commit propre, `python3 tools/attest_proof.py chemin/vers/dossier-formel.json` relie le reçu aux empreintes du build exact. Lake, le CLI et ce script Python restent dans la chaîne de confiance ; il ne s'agit pas d'une revérification indépendante.
 
 Les commandes qui lisent un dossier acceptent aussi `-` comme chemin d'entrée standard. Par exemple, depuis la racine du dépôt :
 
