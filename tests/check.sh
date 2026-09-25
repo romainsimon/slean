@@ -19,6 +19,19 @@ printf 'eligible=true; status=declared\n' | cmp - "$check_dir/formal-boundary.tx
 lake exe slean export examples/valid.json agent > "$check_dir/agent-export.json"
 lake exe slean validate "$check_dir/agent-export.json" > "$check_dir/agent-validation.json"
 printf '{"case_id":"synthetic-decision-1","events":8,"ok":true}\n' | cmp - "$check_dir/agent-validation.json"
+lake exe slean validate examples/uci-bike-sharing/case.json > "$check_dir/uci-validation.json"
+printf '{"case_id":"uci-bike-hourly-2011-2012-mae-v1","events":8,"ok":true}\n' | cmp - "$check_dir/uci-validation.json"
+lake exe slean replay examples/uci-bike-sharing/case.json 8 > "$check_dir/uci-replay.json"
+python3 - "$check_dir/uci-replay.json" <<'PY'
+import json
+import sys
+
+replay = json.load(open(sys.argv[1], encoding="utf-8"))
+assert replay["observations"][0]["value"] == "50.094698"
+assert replay["costs"][0]["amount"] == "0.122995000"
+assert replay["assessments"][0]["verdict"] == "pass"
+assert replay["decisions"][0]["result"] == "promote"
+PY
 if lake env lean tests/TypeError.lean > "$check_dir/type-error.log" 2>&1; then
   echo 'expected static type failure was accepted' >&2
   exit 1

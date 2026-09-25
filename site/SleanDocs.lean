@@ -20,7 +20,7 @@ Here, a *case* is a JSON file with the question, frozen protocol, observations, 
 - *What Slean checks:* the observation has the right metric and unit, follows the rule, and precedes the assessment; `0.002 > 0.001` and cost stays below the cap.
 - *What the case declares:* assessment `pass`, then decision `promote`. Slean checks that this chain is consistent. It does not make the author's decision.
 
-If the observation's unit changes, Slean reports `metric_unit` at `event-4`. If the measurement is missing, its value is `null` and the decision is `defer`: missing data is not zero. [The checked case](Start-with-a-checked-case/) shows the two useful commands; [read the decision](Read-the-decision/) explains the chain and its limits; [AND and OR gates](and-or-gates/) add the recorded links in schema 0.3. [Complete Lean examples](lean-examples/) show the typed API behind these jobs.
+If the observation's unit changes, Slean reports `metric_unit` at `event-4`. If the measurement is missing, its value is `null` and the decision is `defer`: missing data is not zero. [The checked case](Start-with-a-checked-case/) shows the two useful commands; [read the decision](Read-the-decision/) explains the chain and its limits; [AND and OR gates](and-or-gates/) add the recorded links in schema 0.3. [Executable examples](lean-examples/) show the typed API and a retrospective public-data case.
 
 Slean checks case shape, references, order, and local rules. It does not run the experiment, authenticate the sensor, or prove that a measurement is true.
 
@@ -231,13 +231,13 @@ The typed API can build the same kind of case. These declarations are checked as
 
 `examples/Synthetic.lean` contains the complete typed case. `bash tests/check.sh` compiles it and compares its bytes with the JSON fixture's `export-case agent` projection. Imported JSON proof-status text never grants `kernel_checked`; the CLI keeps even a matching local declaration at `declared` until the clean-build attester binds its receipt to exact artifacts.
 
-# Complete Lean examples
+# Executable examples
 %%%
 file := "lean-examples"
 tag := "lean-examples"
 %%%
 
-These are four complete Lean 4 files that call Slean's current typed API. Slean has no separate source-language parser: the CLI reads JSON cases or versioned export envelopes, while `lake env lean --run` runs these Lean files. Work from the repository root with the pinned Lean 4.28.0 toolchain, and run `lake build` once first. Every input and value here is synthetic.
+The first four examples are complete Lean 4 files that call Slean's current typed API. Slean has no separate source-language parser: the CLI reads JSON cases or versioned export envelopes, while `lake env lean --run` runs these Lean files. Work from the repository root with the pinned Lean 4.28.0 toolchain, and run `lake build` once first. Their inputs and values are synthetic. The fifth example uses a real public dataset with a separately authored teaching protocol.
 
 *1. Record and replay a decision dossier*
 
@@ -449,10 +449,34 @@ def main : IO Unit := do
 
 Run `lake env lean --run examples/FormalBoundary.lean`. Expected output: `eligible=true; status=declared`. A matching declaration and toolchain make the claim eligible for *separate* clean-build attestation; this program does not issue that attestation. The theorem concerns a conditional link between recorded promotion evidence and prior records. Neither the local theorem nor an empirical `pass` proves that the measurement, evaluator, or scientific claim is true.
 
+*5. Revisit a demand decision with public hourly data*
+
+Problem: compare two simple predictors of hourly bike rentals on a later year, then inspect exactly what Slean records. This is an *illustrative retrospective protocol authored for Slean*, not a protocol from UCI or Capital Bikeshare. It was [frozen in commit `7c5bb24`](https://github.com/romainsimon/slean/commit/7c5bb24f8f07e73db76b8bf37ec12d7ccec2a283) at `2026-09-25T07:10:52Z`, before the one recorded evaluation began at `2026-09-25T07:14:43Z`.
+
+Source: Hadi Fanaee-T, [Bike Sharing](https://archive.ics.uci.edu/dataset/275/bike%2Bsharing%2Bdataset), UCI Machine Learning Repository (2013), [DOI 10.24432/C5W894](https://doi.org/10.24432/C5W894), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The unmodified official ZIP is 279,992 bytes, SHA-256 `b70182d0d0508e9abbb79306ce5c0cec34869000f8220175ac83d11dbe845401`; its `hour.csv` member is SHA-256 `e03de4ee4ef4dc376ac6e04bf829673c6269e8eba5c60fa121640fa2f829504f`. The repository stores the small derived record, not the CSV. UCI's page says 17,389 instances; the pinned `hour.csv` has 17,379 data rows. The script checks that exact count and both hashes.
+
+The frozen rule fits a global mean on 2011's 8,645 recorded hours as the baseline, and a mean for each hour of day on the same rows as the candidate. It evaluates both once on 2012's 8,734 held-out hours. The metric is baseline MAE minus candidate MAE in bikes per recorded hour, rounded to six decimal places with half-even rounding; the illustrative promotion threshold is `>= 5.000000` bikes/hour. The local CPU cap is `5.000000000 cpu_s`, excluding the download.
+
+The recorded run measured baseline MAE `168.251927`, candidate MAE `118.157229`, and improvement `50.094698` bikes/hour, using `0.122995000 cpu_s`. Slean accepted the eight-event case and replayed `pass` followed by an *illustrative* `promote`. The result record at `examples/uci-bike-sharing/result.json` has SHA-256 `dc45fa164d3125d58e6769b9480c577aaa4d68e9ea55a10886eb7aaf8caf540a`; its full calculation and source reference are in `tools/evaluate_uci_bike_sharing.py` and the frozen `examples/uci-bike-sharing/protocol.json`.
+
+To repeat the calculation, download only the official archive and use the pinned script. The numerical MAEs should agree; execution time and the output hash will change on a new run.
+
+```
+curl -LfsS 'https://archive.ics.uci.edu/static/public/275/bike%2Bsharing%2Bdataset.zip' -o /tmp/slean-uci-bike-sharing.zip
+shasum -a 256 /tmp/slean-uci-bike-sharing.zip
+python3 tools/evaluate_uci_bike_sharing.py --archive /tmp/slean-uci-bike-sharing.zip --output-dir /tmp/slean-uci-repeat
+lake exe slean validate /tmp/slean-uci-repeat/case.json
+lake exe slean replay /tmp/slean-uci-repeat/case.json 8
+```
+
+The checked-in case at `examples/uci-bike-sharing/case.json` can also be validated offline: `lake exe slean validate examples/uci-bike-sharing/case.json` returns `{"case_id":"uci-bike-hourly-2011-2012-mae-v1","events":8,"ok":true}`. Its prefix `5` holds the measured MAE improvement; prefix `8` adds the cost, assessment, and scoped decision.
+
+UCI's `dteday` and `hr` are historical local hour labels from 2011–2012; the source gives no time zone, so the evaluator does not convert them to UTC. Slean's 2026 event times describe the *retrospective evaluation*, not the original rentals. Slean checks the dossier's references, recorded order, exact threshold and stated CPU cap. It does not independently hash the UCI bytes, recompute MAE, certify the measurements, or recommend operating a bike fleet with this predictor. The pinned Python evaluator and source archive remain in the trust boundary.
+
 # Limits and development status
 
 *Slean checks here:* the versioned case shape, IDs and references, causal journal order, local exact decimal comparison, stated cost cap, promotion rule, AND/OR gate references, and audience projection. It can report a precise error or preserve an undetermined result.
 
 *Slean does not check here:* that the measurement happened, that artifact bytes are authentic, that an external clock or evaluator is reliable, that an AND/OR gate proves its target, that a human decision is wise, or that the scientific claim is true. The local Lean theorem concerns a conditional property of the mechanism, not those empirical facts. No independent proof checker is configured.
 
-This site is a local pre-publication prototype. Its examples are synthetic. Public licensing, repository visibility, domain deployment, and integrations remain separate decisions. The build runs tests and compiles examples before generating the manual. `build-info.json` identifies the source commit, tree cleanliness when Git metadata is available, schema, Lean, and selected tag; without Git metadata, `source_tree_clean` is `null` because cleanliness is unknown. A build without a tag remains a development preview.
+This site is a local pre-publication prototype. Its original Lean cases are synthetic; the Bike Sharing case is a measured retrospective teaching comparison on licensed public data. Public licensing of Slean, repository visibility, domain deployment, and integrations remain separate decisions. The build runs tests and compiles examples before generating the manual. `build-info.json` identifies the source commit, tree cleanliness when Git metadata is available, schema, Lean, and selected tag; without Git metadata, `source_tree_clean` is `null` because cleanliness is unknown. A build without a tag remains a development preview.

@@ -20,7 +20,7 @@ Ici, un *dossier* est un fichier JSON contenant la question, le protocole figé,
 - *Ce que Slean vérifie :* l'observation a la bonne métrique et la bonne unité, arrive après la règle et avant l'évaluation ; `0.002 > 0.001` et le coût reste sous le plafond.
 - *Ce que le dossier annonce :* l'évaluation `pass`, puis la décision `promote`. Slean vérifie que cette chaîne est cohérente. Il ne prend pas la décision à la place de l'auteur.
 
-Si l'unité de l'observation change, Slean signale `metric_unit` à `event-4`. Si la mesure manque, sa valeur est `null` et la décision est `defer` : une mesure absente n'est pas un zéro. Le [cas vérifié](commencer-par-un-cas-verifie/) montre les deux commandes utiles ; [lire la décision](lire-la-decision/) explique la chaîne et ses limites ; [les portes ET et OU](portes-et-ou/) ajoutent les liens consignés dans le schéma 0.3. Les [exemples Lean complets](exemples-lean/) montrent l'API typée utilisée pour ces tâches.
+Si l'unité de l'observation change, Slean signale `metric_unit` à `event-4`. Si la mesure manque, sa valeur est `null` et la décision est `defer` : une mesure absente n'est pas un zéro. Le [cas vérifié](commencer-par-un-cas-verifie/) montre les deux commandes utiles ; [lire la décision](lire-la-decision/) explique la chaîne et ses limites ; [les portes ET et OU](portes-et-ou/) ajoutent les liens consignés dans le schéma 0.3. Les [exemples exécutables](exemples-lean/) montrent l'API typée et un cas rétrospectif sur des données publiques.
 
 Slean vérifie le format, les références, l'ordre et les règles locales du dossier. Il ne réalise pas l'expérience, n'authentifie pas le capteur et ne prouve pas que la mesure est vraie.
 
@@ -247,13 +247,13 @@ L'API typée permet de construire le même type de dossier. Ces déclarations so
 
 `examples/Synthetic.lean` contient le cas typé complet. `bash tests/check.sh` le compile et compare ses octets à la projection `export-case agent` de la fixture JSON. Un statut de preuve importé depuis JSON n'accorde jamais `kernel_checked` ; le CLI conserve aussi une déclaration locale concordante à `declared` jusqu'à ce que l'attestation sur un build propre relie son reçu aux artefacts exacts.
 
-# Exemples Lean complets
+# Exemples exécutables
 %%%
 file := "exemples-lean"
 tag := "exemples-lean"
 %%%
 
-Voici quatre fichiers Lean 4 complets qui appellent l'API typée actuelle de Slean. Slean n'a pas de parseur de langage source distinct : le CLI lit des dossiers JSON ou des enveloppes d'export versionnées, tandis que `lake env lean --run` exécute ces fichiers Lean. Placez-vous à la racine du dépôt, utilisez Lean 4.28.0 fixé par `lean-toolchain`, puis lancez `lake build` une fois. Toutes les valeurs sont synthétiques.
+Les quatre premiers exemples sont des fichiers Lean 4 complets qui appellent l'API typée actuelle de Slean. Slean n'a pas de parseur de langage source distinct : le CLI lit des dossiers JSON ou des enveloppes d'export versionnées, tandis que `lake env lean --run` exécute ces fichiers Lean. Placez-vous à la racine du dépôt, utilisez Lean 4.28.0 fixé par `lean-toolchain`, puis lancez `lake build` une fois. Leurs entrées et leurs valeurs sont synthétiques. Le cinquième exemple utilise un jeu de données public réel et un protocole pédagogique rédigé séparément.
 
 *1. Consigner et rejouer un dossier de décision*
 
@@ -465,6 +465,30 @@ def main : IO Unit := do
 
 Exécutez `lake env lean --run examples/FormalBoundary.lean`. Résultat attendu : `eligible=true; status=declared`. Une déclaration et une version de Lean concordantes rendent l'affirmation admissible à une *attestation séparée* sur un build propre ; ce programme ne produit pas cette attestation. Le théorème est conditionnel et relie la décision de promotion consignée à des enregistrements antérieurs. Ni ce théorème local ni un `pass` empirique ne prouvent que la mesure, l'évaluateur ou l'affirmation scientifique sont vrais.
 
+*5. Revoir une décision de demande avec des données horaires publiques*
+
+Problème : comparer deux prédicteurs simples du nombre de locations par heure sur une année ultérieure, puis inspecter ce que Slean consigne. Il s'agit d'un *protocole rétrospectif pédagogique rédigé pour Slean*, pas d'un protocole de l'UCI ni de Capital Bikeshare. Il a été [figé au commit `7c5bb24`](https://github.com/romainsimon/slean/commit/7c5bb24f8f07e73db76b8bf37ec12d7ccec2a283) le `2026-09-25T07:10:52Z`, avant le début de l'unique évaluation consignée à `2026-09-25T07:14:43Z`.
+
+Source : Hadi Fanaee-T, [Bike Sharing](https://archive.ics.uci.edu/dataset/275/bike%2Bsharing%2Bdataset), UCI Machine Learning Repository (2013), [DOI 10.24432/C5W894](https://doi.org/10.24432/C5W894), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). L'archive ZIP officielle non modifiée contient 279 992 octets, SHA-256 `b70182d0d0508e9abbb79306ce5c0cec34869000f8220175ac83d11dbe845401` ; son membre `hour.csv` a pour SHA-256 `e03de4ee4ef4dc376ac6e04bf829673c6269e8eba5c60fa121640fa2f829504f`. Le dépôt conserve le petit résultat dérivé, pas le CSV. La page UCI annonce 17 389 instances ; le fichier `hour.csv` épinglé contient 17 379 lignes de données. Le script vérifie ce compte et les deux empreintes.
+
+La règle figée entraîne une moyenne globale sur les 8 645 heures consignées en 2011 comme référence, puis une moyenne par heure de la journée sur ces mêmes lignes comme candidat. Elle évalue les deux une seule fois sur les 8 734 heures tenues à l'écart en 2012. La mesure est le MAE de référence moins le MAE du candidat, en vélos par heure consignée, arrondie à six décimales au pair le plus proche ; le seuil illustratif de promotion est `>= 5.000000` vélos/heure. Le plafond CPU local est `5.000000000 cpu_s`, téléchargement exclu.
+
+L'exécution consignée mesure un MAE de référence de `168.251927`, un MAE candidat de `118.157229` et une amélioration de `50.094698` vélos/heure, avec `0.122995000 cpu_s`. Slean accepte le dossier de huit événements et rejoue `pass` puis `promote` *dans ce seul cadre illustratif*. Le résultat `examples/uci-bike-sharing/result.json` a pour SHA-256 `dc45fa164d3125d58e6769b9480c577aaa4d68e9ea55a10886eb7aaf8caf540a` ; son calcul complet et la référence source figurent dans `tools/evaluate_uci_bike_sharing.py` et le protocole figé `examples/uci-bike-sharing/protocol.json`.
+
+Pour refaire le calcul, téléchargez uniquement l'archive officielle et utilisez le script épinglé. Les MAE numériques doivent être identiques ; le temps d'exécution et l'empreinte de sortie changeront lors d'une nouvelle exécution.
+
+```
+curl -LfsS 'https://archive.ics.uci.edu/static/public/275/bike%2Bsharing%2Bdataset.zip' -o /tmp/slean-uci-bike-sharing.zip
+shasum -a 256 /tmp/slean-uci-bike-sharing.zip
+python3 tools/evaluate_uci_bike_sharing.py --archive /tmp/slean-uci-bike-sharing.zip --output-dir /tmp/slean-uci-repeat
+lake exe slean validate /tmp/slean-uci-repeat/case.json
+lake exe slean replay /tmp/slean-uci-repeat/case.json 8
+```
+
+Le dossier versionné `examples/uci-bike-sharing/case.json` se valide aussi sans réseau : `lake exe slean validate examples/uci-bike-sharing/case.json` renvoie `{"case_id":"uci-bike-hourly-2011-2012-mae-v1","events":8,"ok":true}`. Son préfixe `5` contient l'amélioration de MAE mesurée ; le préfixe `8` ajoute le coût, l'évaluation et la décision bornée.
+
+Les champs UCI `dteday` et `hr` désignent les heures locales historiques de 2011–2012 ; la source n'indique pas de fuseau horaire, donc l'évaluateur ne les convertit pas en UTC. Les dates des événements Slean en 2026 décrivent *l'évaluation rétrospective*, pas les locations d'origine. Slean vérifie les références, l'ordre consigné, le seuil décimal exact et le plafond CPU déclaré. Il ne calcule pas indépendamment les empreintes UCI ni le MAE, ne certifie pas les mesures et ne recommande pas d'exploiter une flotte de vélos avec ce prédicteur. L'évaluateur Python épinglé et l'archive source restent dans la chaîne de confiance.
+
 # Limites et état du développement
 %%%
 file := "limites-et-etat-du-developpement"
@@ -475,4 +499,4 @@ tag := "limites-et-etat-du-developpement"
 
 *Slean ne vérifie pas ici :* que la mesure a été réellement prise, que les octets d'un artefact sont authentiques, que l'horloge externe ou l'évaluateur est fiable, qu'une porte ET/OU démontre sa cible, que la décision humaine est judicieuse, ou que l'affirmation scientifique est vraie. Le théorème Lean local porte sur une propriété conditionnelle du mécanisme, pas sur ces faits empiriques. Aucune vérification indépendante de preuve n'est configurée.
 
-Ce site est un prototype local antérieur à la publication. Les exemples sont synthétiques. La licence publique, la visibilité du dépôt, le domaine et les intégrations restent des décisions distinctes. La construction exécute les tests et compile les exemples avant de générer le manuel. `build-info.json` indique le commit source, la propreté de l'arbre lorsque les métadonnées Git sont disponibles, le schéma, Lean et le tag sélectionné ; sans ces métadonnées, `source_tree_clean` vaut `null` car la propreté est inconnue. Un build sans tag reste une prévisualisation de développement.
+Ce site est un prototype local antérieur à la publication. Ses cas Lean d'origine sont synthétiques ; le cas Bike Sharing est une comparaison pédagogique rétrospective mesurée sur des données publiques sous licence. La licence publique de Slean, la visibilité du dépôt, le domaine et les intégrations restent des décisions distinctes. La construction exécute les tests et compile les exemples avant de générer le manuel. `build-info.json` indique le commit source, la propreté de l'arbre lorsque les métadonnées Git sont disponibles, le schéma, Lean et le tag sélectionné ; sans ces métadonnées, `source_tree_clean` vaut `null` car la propreté est inconnue. Un build sans tag reste une prévisualisation de développement.
