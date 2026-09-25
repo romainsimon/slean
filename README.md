@@ -7,7 +7,7 @@
 </h1>
 
 <p align="center">
-  A Lean 4 and JSON tool for validating and replaying research dossiers.
+  Make every research decision traceable.
 </p>
 
 <p align="center">
@@ -16,7 +16,7 @@
 
 > **Status:** Early, local V0 research prototype. The repository is private; no public license or contribution guide is available.
 
-Slean represents a research case as a versioned journal of its frozen protocol, runs, observations, costs, assessments, and decisions. It exists to make the records behind a decision inspectable and replayable. Slean checks how the journal hangs together; it does not determine whether an empirical conclusion is true.
+A structured decision record brings together observations, assumptions, rules, and conclusions. Slean checks that the record is consistent—including references, event order, units, and exact thresholds—and replays it so readers can see which recorded inputs led to each conclusion. It checks traceability and consistency; it does not establish whether measurements or external scientific claims are true.
 
 ## What it checks
 
