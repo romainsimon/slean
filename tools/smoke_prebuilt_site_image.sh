@@ -61,8 +61,8 @@ if info != expected:
     raise SystemExit(f"Artifact identity mismatch: {info!r}")
 
 pages = sorted(root.rglob("*.html"))
-if len(pages) != 16 or sum("en" in page.relative_to(root).parts for page in pages) != 8:
-    raise SystemExit("Expected 16 localized HTML pages, eight in English")
+if len(pages) != 18 or sum("en" in page.relative_to(root).parts for page in pages) != 9:
+    raise SystemExit("Expected 18 localized HTML pages, nine in English")
 safe_tag = html.escape(expected_tag, quote=True)
 for page in pages:
     markup = page.read_text(encoding="utf-8")
@@ -73,7 +73,7 @@ for page in pages:
             or expected_tag not in html.unescape(footer.group(1))
             or expected_artifact_sha[:12] not in footer.group(1)):
         raise SystemExit(f"Artifact page identity mismatch: {page}")
-print(f"Prebuilt artifact: source SHA {expected_artifact_sha}, schema {expected['schema_version']}, tag {expected_tag}, 16 pages")
+print(f"Prebuilt artifact: source SHA {expected_artifact_sha}, schema {expected['schema_version']}, tag {expected_tag}, 18 pages")
 PY
 
 if "$check_only"; then

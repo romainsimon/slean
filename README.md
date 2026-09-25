@@ -38,6 +38,8 @@ lake exe slean validate examples/valid.json
 
 These values are synthetic. A local `pass` means the encoded rule passed for its cited record; it is not evidence that a real-world claim is true.
 
+The equivalent [typed Lean example](examples/Synthetic.lean) is synthetic too. The [UCI Bike Sharing example](examples/uci-bike-sharing/) is a separate retrospective teaching comparison on CC BY 4.0 public data. Its protocol was authored for Slean and frozen before the recorded evaluation. Slean validates the recorded case but does not independently hash the source or recompute the reported MAE. The [Verso manual](site/README.md) walks through the example and its limits.
+
 ## Quickstart
 
 Install Lean using the [official setup guide](https://lean-lang.org/install/). The [`lean-toolchain`](lean-toolchain) file pins Lean 4.28.0, which `elan` selects for this project.

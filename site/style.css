@@ -376,6 +376,7 @@ main li code {
   border-radius: 3px;
   padding: 0.06em 0.22em;
   font-size: 0.9em;
+  overflow-wrap: anywhere;
 }
 
 @media (min-width: 701px) and (max-width: 900px) {

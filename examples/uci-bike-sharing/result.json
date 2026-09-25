@@ -1,0 +1,84 @@
+{
+  "decision": {
+    "direction": "gte",
+    "result": "promote",
+    "scope": "illustrative retrospective teaching decision only",
+    "threshold": "5.000000",
+    "verdict": "pass"
+  },
+  "evaluation": {
+    "completed_at_utc": "2026-09-25T07:14:43.459272Z",
+    "completed_at_utc_second": "2026-09-25T07:14:43Z",
+    "cpu_cap_seconds": "5.000000000",
+    "cpu_coverage": "open pinned local ZIP member, parse CSV, fit both 2011 means, predict and score 2012; exclude network fetch and result serialization",
+    "cpu_process_time_ns": 122995000,
+    "cpu_seconds": "0.122995000",
+    "network_fetch_included": false,
+    "started_at_utc": "2026-09-25T07:14:43.331112Z",
+    "started_at_utc_second": "2026-09-25T07:14:43Z"
+  },
+  "format": "slean-uci-bike-retrospective/0.1.0",
+  "historical_source_hours": {
+    "all": {
+      "first_local_hour": "2011-01-01T00:00",
+      "last_local_hour": "2012-12-31T23:00",
+      "rows": 17379
+    },
+    "fields": [
+      "dteday",
+      "hr"
+    ],
+    "held_out_2012": {
+      "first_local_hour": "2012-01-01T00:00",
+      "last_local_hour": "2012-12-31T23:00",
+      "rows": 8734
+    },
+    "timezone": "not specified by UCI; no UTC conversion",
+    "train_2011": {
+      "first_local_hour": "2011-01-01T00:00",
+      "last_local_hour": "2011-12-31T23:00",
+      "rows": 8645
+    }
+  },
+  "limits": "One historical dataset and one fixed holdout; no model tuning, deployment, causal inference or external scientific validation.",
+  "measurements": {
+    "baseline_mae": {
+      "decimal_6_half_even": "168.251927",
+      "denominator": 7550543,
+      "numerator": 1270393408
+    },
+    "candidate_mae": {
+      "decimal_6_half_even": "118.157229",
+      "denominator": 6891227081738816960,
+      "numerator": 814248296114813457303
+    },
+    "mae_improvement": {
+      "decimal_6_half_even": "50.094698",
+      "denominator": 3710660736320901440,
+      "numerator": 185884428304469351323
+    },
+    "unit": "bikes/hour"
+  },
+  "model": {
+    "baseline": "arithmetic mean of cnt over all 2011 hourly rows",
+    "candidate": "arithmetic mean of cnt among 2011 rows with the same hr; use the 2011 global mean only if that hour is absent",
+    "candidate_unseen_train_hours": []
+  },
+  "protocol": {
+    "evaluator_sha256": "efac8a144c5c91df0d99cb69b40778ca8e4ad60aaeebb223f23df8690cc06053",
+    "frozen_at_utc": "2026-09-25T07:10:52Z",
+    "frozen_git_commit": "7c5bb24f8f07e73db76b8bf37ec12d7ccec2a283",
+    "id": "uci-bike-hourly-2011-2012-mae-v1",
+    "sha256": "b519249c349de8ef840ec8c0b4a4eb5b7469158ca09e5cb0c969c5c42388dda0"
+  },
+  "source": {
+    "archive_sha256": "b70182d0d0508e9abbb79306ce5c0cec34869000f8220175ac83d11dbe845401",
+    "archive_url": "https://archive.ics.uci.edu/static/public/275/bike%2Bsharing%2Bdataset.zip",
+    "attribution": "Fanaee-T, H. (2013). Bike Sharing [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5W894",
+    "dataset_url": "https://archive.ics.uci.edu/dataset/275/bike%2Bsharing%2Bdataset",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "member": "hour.csv",
+    "member_sha256": "e03de4ee4ef4dc376ac6e04bf829673c6269e8eba5c60fa121640fa2f829504f"
+  }
+}

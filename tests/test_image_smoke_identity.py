@@ -31,7 +31,7 @@ def site_artifact(root: Path, source_sha: str, source_tree_clean: bool | None = 
         '<link href="' + SCRIPT_URL + '"></body></html>'
     )
     for locale in (Path(), Path("en")):
-        for index in range(8):
+        for index in range(9):
             page = root / locale / ("index.html" if index == 0 else f"chapter-{index}/index.html")
             page.parent.mkdir(parents=True, exist_ok=True)
             page.write_text(markup)

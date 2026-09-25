@@ -20,7 +20,7 @@ Ici, un *dossier* est un fichier JSON contenant la question, le protocole figé,
 - *Ce que Slean vérifie :* l'observation a la bonne métrique et la bonne unité, arrive après la règle et avant l'évaluation ; `0.002 > 0.001` et le coût reste sous le plafond.
 - *Ce que le dossier annonce :* l'évaluation `pass`, puis la décision `promote`. Slean vérifie que cette chaîne est cohérente. Il ne prend pas la décision à la place de l'auteur.
 
-Si l'unité de l'observation change, Slean signale `metric_unit` à `event-4`. Si la mesure manque, sa valeur est `null` et la décision est `defer` : une mesure absente n'est pas un zéro. Le [cas vérifié](commencer-par-un-cas-verifie/) montre les deux commandes utiles ; [lire la décision](lire-la-decision/) explique la chaîne et ses limites ; [les portes ET et OU](portes-et-ou/) ajoutent les liens consignés dans le schéma 0.3.
+Si l'unité de l'observation change, Slean signale `metric_unit` à `event-4`. Si la mesure manque, sa valeur est `null` et la décision est `defer` : une mesure absente n'est pas un zéro. Le [cas vérifié](commencer-par-un-cas-verifie/) montre les deux commandes utiles ; [lire la décision](lire-la-decision/) explique la chaîne et ses limites ; [les portes ET et OU](portes-et-ou/) ajoutent les liens consignés dans le schéma 0.3. Les [exemples exécutables](exemples-lean/) montrent l'API typée et un cas rétrospectif sur des données publiques.
 
 Slean vérifie le format, les références, l'ordre et les règles locales du dossier. Il ne réalise pas l'expérience, n'authentifie pas le capteur et ne prouve pas que la mesure est vraie.
 
@@ -247,6 +247,248 @@ L'API typée permet de construire le même type de dossier. Ces déclarations so
 
 `examples/Synthetic.lean` contient le cas typé complet. `bash tests/check.sh` le compile et compare ses octets à la projection `export-case agent` de la fixture JSON. Un statut de preuve importé depuis JSON n'accorde jamais `kernel_checked` ; le CLI conserve aussi une déclaration locale concordante à `declared` jusqu'à ce que l'attestation sur un build propre relie son reçu aux artefacts exacts.
 
+# Exemples exécutables
+%%%
+file := "exemples-lean"
+tag := "exemples-lean"
+%%%
+
+Les quatre premiers exemples sont des fichiers Lean 4 complets qui appellent l'API typée actuelle de Slean. Slean n'a pas de parseur de langage source distinct : le CLI lit des dossiers JSON ou des enveloppes d'export versionnées, tandis que `lake env lean --run` exécute ces fichiers Lean. Placez-vous à la racine du dépôt, utilisez Lean 4.28.0 fixé par `lean-toolchain`, puis lancez `lake build` une fois. Leurs entrées et leurs valeurs sont synthétiques. Le cinquième exemple utilise un jeu de données public réel et un protocole pédagogique rédigé séparément.
+
+*1. Consigner et rejouer un dossier de décision*
+
+Problème : consigner une règle figée, un essai, une référence d'artefact, une mesure, un coût, une évaluation et une décision, puis examiner ce qui existait au moment de la décision. La source typée ci-dessous produit la projection `agent` de la fixture vérifiée `examples/valid.json`.
+
+*Source complète : `examples/Synthetic.lean`*
+
+```
+import Slean
+
+open Lean Slean
+
+private def ident (id : String) : Identity :=
+  { id, version := 1, domain := "synthetic-computation",
+    provenance := "synthetic://slean-v0", audience := "agent" }
+
+private def protocol : FrozenProtocol :=
+  { identity := ident "protocol-1", claim_ref := "claim-1",
+    metric_id := "synthetic_delta", unit := "ratio", direction := "gte",
+    threshold := "0.001", inclusive := false, data_scope := "synthetic input A",
+    evaluator_ref := "synthetic-evaluator-v1", cost_cap := "10.00",
+    cost_unit := "cpu_s", stop_rule := "one synthetic measurement",
+    frozen_at := "2026-01-01T00:01:00Z" }
+
+private def run : Run :=
+  { identity := ident "run-1", protocol_ref := "protocol-1",
+    input_ref := "synthetic-input-A", seed := "7" }
+
+private def artifact : ArtifactRef :=
+  { identity := ident "artifact-1", digest := "sha256:" ++ String.ofList (List.replicate 64 'a'),
+    media_type := "application/json" }
+
+private def observation : Observation :=
+  { identity := ident "observation-1", run_ref := "run-1",
+    metric_id := "synthetic_delta", unit := "ratio", value := some "0.002",
+    status := "measured", artifact_ref := "artifact-1",
+    observed_at := "2026-01-01T00:04:00Z" }
+
+private def cost : CostEntry :=
+  { identity := ident "cost-1", run_ref := "run-1", category := "machine_time",
+    amount := "2.50", unit := "cpu_s", source := "synthetic-meter", coverage := "complete" }
+
+private def assessment : Assessment :=
+  { identity := ident "assessment-1", protocol_ref := "protocol-1",
+    observation_refs := #["observation-1"], verdict := "pass", rule_used := "exact_v0" }
+
+private def decision : PromotionDecision :=
+  { identity := ident "decision-1", assessment_ref := "assessment-1",
+    result := "promote", reason := "Synthetic threshold passed." }
+
+private def relation : Relation :=
+  { identity := ident "relation-1", source_ref := "observation-1",
+    target_ref := "claim-1", kind := "support" }
+
+private def ev (sequence : Nat) (kind time : String) (payload : Json) : Event :=
+  { event_id := s!"event-{sequence}", version := 1,
+    domain := "synthetic-computation", provenance := "synthetic://slean-v0", sequence, kind,
+    actor := "synthetic-author", recorded_at := s!"2026-01-01T00:{time}:00Z",
+    audience := "agent", payload }
+
+def syntheticCase : CaseFile :=
+  { schema_version := "0.1.0", semantics_version := "0.1.0",
+    case_id := "synthetic-decision-1", version := 1,
+    domain := "synthetic-computation", provenance := "synthetic://slean-v0",
+    audience := "agent",
+    question := { identity := ident "question-1", text := "Does a synthetic candidate exceed a fixed threshold?" },
+    claim := { identity := ident "claim-1", text := "The synthetic metric exceeds 0.001 on the stated input." },
+    events := #[
+      ev 1 "protocol_frozen" "01" (toJson protocol),
+      ev 2 "run_started" "02" (toJson run),
+      ev 3 "artifact_registered" "03" (toJson artifact),
+      ev 4 "observation_recorded" "04" (toJson observation),
+      ev 5 "cost_recorded" "05" (toJson cost),
+      ev 6 "assessment_recorded" "06" (toJson assessment),
+      ev 7 "decision_recorded" "07" (toJson decision),
+      ev 8 "relation_recorded" "08" (toJson relation)] }
+
+#guard (replay syntheticCase).isOk
+#guard (compareDecimal (parseDecimal "0.010" |>.toOption.get!)
+  (parseDecimal "0.01" |>.toOption.get!)) == .eq
+#guard (assessExact protocol observation).toOption == some "pass"
+
+def main : IO Unit := IO.println (toJson (project syntheticCase "agent")).compress
+```
+
+Exécutez ces commandes pour résumer le grand résultat JSON :
+
+```
+lake env lean --run examples/Synthetic.lean |
+  python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["case_id"], len(d["events"]))'
+lake exe slean replay examples/valid.json 7 |
+  python3 -c 'import json,sys; s=json.load(sys.stdin); print(len(s["event_ids"]), s["assessments"][0]["verdict"], s["decisions"][0]["result"])'
+```
+
+Résultats attendus : `synthetic-decision-1 8` et `7 pass promote`. Le programme typé émet huit événements visibles par l'agent ; la fixture JSON compte dix événements au total, dont deux réservés au propriétaire. Le préfixe sept contient l'évaluation et la décision. `tests/check.sh` compare octet par octet la sortie typée et la projection `agent` de la fixture. Ce contrôle porte sur la chaîne consignée ; il ne confirme ni la réalité de la mesure synthétique ni la correspondance entre l'empreinte et les octets de l'artefact.
+
+*2. Comparer des décimaux à un seuil strict*
+
+Problème : décider si une chaîne décimale égale au seuil figé, puis une valeur juste au-dessus, satisfont une règle stricte, sans arrondi en virgule flottante.
+
+*Source complète : `examples/ExactThreshold.lean`*
+
+```
+import Slean
+
+open Slean
+
+private def identity (id : String) : Identity :=
+  { id, version := 1, domain := "synthetic-computation",
+    provenance := "synthetic://worked-examples", audience := "agent" }
+
+private def protocol : FrozenProtocol :=
+  { identity := identity "protocol-exact", claim_ref := "claim-exact",
+    metric_id := "synthetic_delta", unit := "ratio", direction := "gte",
+    threshold := "0.010", inclusive := false, data_scope := "synthetic input",
+    evaluator_ref := "synthetic-evaluator", cost_cap := "1.00",
+    cost_unit := "cpu_s", stop_rule := "one synthetic reading",
+    frozen_at := "2026-01-01T00:00:00Z" }
+
+private def reading (id value : String) : Observation :=
+  { identity := identity id, run_ref := "run-exact", metric_id := "synthetic_delta",
+    unit := "ratio", value := some value, status := "measured",
+    artifact_ref := "artifact-exact", observed_at := "2026-01-01T00:01:00Z" }
+
+def main : IO Unit := do
+  match assessExact protocol (reading "equal" "0.0100"),
+        assessExact protocol (reading "above" "0.0101") with
+  | .ok equal, .ok above =>
+    IO.println s!"equal={equal}; above={above}"
+  | .error message, _ => throw (IO.userError message)
+  | _, .error message => throw (IO.userError message)
+```
+
+Exécutez `lake env lean --run examples/ExactThreshold.lean`. Résultat attendu : `equal=fail; above=pass`. `0.0100` est exactement égal à `0.010`, tandis que `0.0101` est supérieur. `assessExact` compare une observation fournie à un protocole ; ce petit programme ne valide ni un journal, ni un artefact, ni la provenance de la mesure. Utilisez un `CaseFile` et `replay`, comme dans l'exemple 1, pour vérifier la chaîne de références consignée.
+
+*3. Valider, projeter et préparer un export*
+
+Problème : valider tout le dossier JSON synthétique avant de préparer un export versionné destiné à un agent. Le programme lit la fixture du dépôt depuis sa racine.
+
+*Source complète : `examples/ValidateExport.lean`*
+
+```
+import Slean
+
+open Lean Slean
+
+def main : IO Unit := do
+  let raw ← IO.FS.readFile "examples/valid.json"
+  let json ← match Json.parse raw with
+    | .ok value => pure value
+    | .error message => throw (IO.userError message)
+  let dossier ← match (fromJson? json : Except String CaseFile) with
+    | .ok value => pure value
+    | .error message => throw (IO.userError message)
+  let fullState ← match replay dossier with
+    | .ok state => pure state
+    | .error diagnostic => throw (IO.userError diagnostic.message)
+  let agentDossier := project dossier "agent"
+  let agentState ← match replay agentDossier with
+    | .ok state => pure state
+    | .error diagnostic => throw (IO.userError diagnostic.message)
+  let bundle := exportBundle agentDossier
+  IO.println s!"validated={fullState.event_ids.size}; agent_events={agentState.event_ids.size}"
+  IO.println s!"export={bundle.format}; lean={bundle.lean_version}"
+```
+
+Exécutez `lake env lean --run examples/ValidateExport.lean`. Résultat attendu :
+
+```
+validated=10; agent_events=8
+export=slean-export/0.1.0; lean=4.28.0
+```
+
+Pour écrire puis revalider l'enveloppe complète de cette fixture synthétique, utilisez le CLI :
+
+```
+lake exe slean export examples/valid.json agent > /tmp/slean-agent-export.json
+lake exe slean validate /tmp/slean-agent-export.json
+```
+
+La seconde commande renvoie `{"case_id":"synthetic-decision-1","events":8,"ok":true}`. La projection `agent` omet les événements réservés au propriétaire avant de produire l'export, mais un vrai export doit encore être relu avant partage : la validation ne décide pas si tout texte libre peut être divulgué.
+
+*4. Séparer les résultats empiriques des reçus de preuve*
+
+Problème : éviter qu'une affirmation formelle déclarée soit considérée comme vérifiée par le noyau simplement parce que son statut d'entrée le dit. Ce programme fixe volontairement `status := "kernel_checked"` sur une référence concordant avec le théorème local ; `proofReceipt` renvoie quand même `declared`.
+
+*Source complète : `examples/FormalBoundary.lean`*
+
+```
+import Slean
+
+open Lean Slean
+
+private def formalIdentity : Identity :=
+  { id := "formal-claim-demo", version := 1, domain := "synthetic-computation",
+    provenance := "synthetic://worked-examples", audience := "agent" }
+
+private def formalClaim : FormalClaimRef :=
+  { identity := formalIdentity,
+    declaration := checkedDeclaration, statement := checkedStatement,
+    toolchain := checkedToolchain, status := "kernel_checked" }
+
+def main : IO Unit := do
+  let receipt := proofReceipt formalClaim
+  let status := (receipt.getObjValAs? String "status").toOption.getD "missing"
+  let eligible := (receipt.getObjValAs? Bool "attestation_eligible").toOption.getD false
+  IO.println s!"eligible={eligible}; status={status}"
+```
+
+Exécutez `lake env lean --run examples/FormalBoundary.lean`. Résultat attendu : `eligible=true; status=declared`. Une déclaration et une version de Lean concordantes rendent l'affirmation admissible à une *attestation séparée* sur un build propre ; ce programme ne produit pas cette attestation. Le théorème est conditionnel et relie la décision de promotion consignée à des enregistrements antérieurs. Ni ce théorème local ni un `pass` empirique ne prouvent que la mesure, l'évaluateur ou l'affirmation scientifique sont vrais.
+
+*5. Revoir une décision de demande avec des données horaires publiques*
+
+Problème : comparer deux prédicteurs simples du nombre de locations par heure sur une année ultérieure, puis inspecter ce que Slean consigne. Il s'agit d'un *protocole rétrospectif pédagogique rédigé pour Slean*, pas d'un protocole de l'UCI ni de Capital Bikeshare. Il a été [figé au commit `7c5bb24`](https://github.com/romainsimon/slean/commit/7c5bb24f8f07e73db76b8bf37ec12d7ccec2a283) le `2026-09-25T07:10:52Z`, avant le début de l'unique évaluation consignée à `2026-09-25T07:14:43Z`.
+
+Source : Hadi Fanaee-T, [Bike Sharing](https://archive.ics.uci.edu/dataset/275/bike%2Bsharing%2Bdataset), UCI Machine Learning Repository (2013), [DOI 10.24432/C5W894](https://doi.org/10.24432/C5W894), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). L'archive ZIP officielle non modifiée contient 279 992 octets, SHA-256 `b70182d0d0508e9abbb79306ce5c0cec34869000f8220175ac83d11dbe845401` ; son membre `hour.csv` a pour SHA-256 `e03de4ee4ef4dc376ac6e04bf829673c6269e8eba5c60fa121640fa2f829504f`. Le dépôt conserve le petit résultat dérivé, pas le CSV. La page UCI annonce 17 389 instances ; le fichier `hour.csv` épinglé contient 17 379 lignes de données. Le script vérifie ce compte et les deux empreintes.
+
+La règle figée entraîne une moyenne globale sur les 8 645 heures consignées en 2011 comme référence, puis une moyenne par heure de la journée sur ces mêmes lignes comme candidat. Elle évalue les deux une seule fois sur les 8 734 heures tenues à l'écart en 2012. La mesure est le MAE de référence moins le MAE du candidat, en vélos par heure consignée, arrondie à six décimales au pair le plus proche ; le seuil illustratif de promotion est `>= 5.000000` vélos/heure. Le plafond CPU local est `5.000000000 cpu_s`, téléchargement exclu.
+
+L'exécution consignée mesure un MAE de référence de `168.251927`, un MAE candidat de `118.157229` et une amélioration de `50.094698` vélos/heure, avec `0.122995000 cpu_s`. Slean accepte le dossier de huit événements et rejoue `pass` puis `promote` *dans ce seul cadre illustratif*. Le résultat `examples/uci-bike-sharing/result.json` a pour SHA-256 `dc45fa164d3125d58e6769b9480c577aaa4d68e9ea55a10886eb7aaf8caf540a` ; son calcul complet et la référence source figurent dans `tools/evaluate_uci_bike_sharing.py` et le protocole figé `examples/uci-bike-sharing/protocol.json`.
+
+Pour refaire le calcul, téléchargez uniquement l'archive officielle et utilisez le script épinglé. Les MAE numériques doivent être identiques ; le temps d'exécution et l'empreinte de sortie changeront lors d'une nouvelle exécution.
+
+```
+curl -LfsS 'https://archive.ics.uci.edu/static/public/275/bike%2Bsharing%2Bdataset.zip' -o /tmp/slean-uci-bike-sharing.zip
+shasum -a 256 /tmp/slean-uci-bike-sharing.zip
+python3 tools/evaluate_uci_bike_sharing.py --archive /tmp/slean-uci-bike-sharing.zip --output-dir /tmp/slean-uci-repeat
+lake exe slean validate /tmp/slean-uci-repeat/case.json
+lake exe slean replay /tmp/slean-uci-repeat/case.json 8
+```
+
+Le dossier versionné `examples/uci-bike-sharing/case.json` se valide aussi sans réseau : `lake exe slean validate examples/uci-bike-sharing/case.json` renvoie `{"case_id":"uci-bike-hourly-2011-2012-mae-v1","events":8,"ok":true}`. Son préfixe `5` contient l'amélioration de MAE mesurée ; le préfixe `8` ajoute le coût, l'évaluation et la décision bornée.
+
+Les champs UCI `dteday` et `hr` désignent les heures locales historiques de 2011–2012 ; la source n'indique pas de fuseau horaire, donc l'évaluateur ne les convertit pas en UTC. Les dates des événements Slean en 2026 décrivent *l'évaluation rétrospective*, pas les locations d'origine. Slean vérifie les références, l'ordre consigné, le seuil décimal exact et le plafond CPU déclaré. Il ne calcule pas indépendamment les empreintes UCI ni le MAE, ne certifie pas les mesures et ne recommande pas d'exploiter une flotte de vélos avec ce prédicteur. L'évaluateur Python épinglé et l'archive source restent dans la chaîne de confiance.
+
 # Limites et état du développement
 %%%
 file := "limites-et-etat-du-developpement"
@@ -257,4 +499,4 @@ tag := "limites-et-etat-du-developpement"
 
 *Slean ne vérifie pas ici :* que la mesure a été réellement prise, que les octets d'un artefact sont authentiques, que l'horloge externe ou l'évaluateur est fiable, qu'une porte ET/OU démontre sa cible, que la décision humaine est judicieuse, ou que l'affirmation scientifique est vraie. Le théorème Lean local porte sur une propriété conditionnelle du mécanisme, pas sur ces faits empiriques. Aucune vérification indépendante de preuve n'est configurée.
 
-Ce site est un prototype local antérieur à la publication. Les exemples sont synthétiques. La licence publique, la visibilité du dépôt, le domaine et les intégrations restent des décisions distinctes. La construction exécute les tests et compile les exemples avant de générer le manuel. `build-info.json` indique le commit source, la propreté de l'arbre lorsque les métadonnées Git sont disponibles, le schéma, Lean et le tag sélectionné ; sans ces métadonnées, `source_tree_clean` vaut `null` car la propreté est inconnue. Un build sans tag reste une prévisualisation de développement.
+Ce site est un prototype local antérieur à la publication. Ses cas Lean d'origine sont synthétiques ; le cas Bike Sharing est une comparaison pédagogique rétrospective mesurée sur des données publiques sous licence. La licence publique de Slean, la visibilité du dépôt, le domaine et les intégrations restent des décisions distinctes. La construction exécute les tests et compile les exemples avant de générer le manuel. `build-info.json` indique le commit source, la propreté de l'arbre lorsque les métadonnées Git sont disponibles, le schéma, Lean et le tag sélectionné ; sans ces métadonnées, `source_tree_clean` vaut `null` car la propreté est inconnue. Un build sans tag reste une prévisualisation de développement.

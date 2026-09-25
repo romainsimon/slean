@@ -5,8 +5,8 @@ from pathlib import Path
 
 site = Path(__file__).parent / "_out" / "html-multi"
 pages = sorted(site.rglob("*.html"))
-if len(pages) != 16 or sum("en" in page.relative_to(site).parts for page in pages) != 8:
-    raise SystemExit(f"Expected 8 French and 8 English HTML pages; found {len(pages)}")
+if len(pages) != 18 or sum("en" in page.relative_to(site).parts for page in pages) != 9:
+    raise SystemExit(f"Expected 9 French and 9 English HTML pages; found {len(pages)}")
 
 marker = "data-slean-analytics"
 script_url = "https://stats.yukicapital.com/js/pa-70RUKb_J9zQLn67oUHf2d.js"
