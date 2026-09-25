@@ -65,7 +65,8 @@ script = "https://stats.yukicapital.com/js/pa-70RUKb_J9zQLn67oUHf2d.js"
 old_scripts = ("https://stats.yukicapital.com/js/script.js", "https://plausible.io/js/")
 info = json.loads((root / "build-info.json").read_text())
 assert info["source_revision"] == os.environ["EXPECTED_ARTIFACT_SHA"]
-assert info["source_tree_clean"] is True
+tree_clean = info["source_tree_clean"]
+assert tree_clean is True or tree_clean is None
 assert info["schema_version"] == os.environ["EXPECTED_SCHEMA"]
 if os.environ["EXPECTED_TAG"]:
     assert info["source_tag"] == os.environ["EXPECTED_TAG"]
@@ -85,6 +86,7 @@ for page in pages:
     assert markup.count(script) == 2, page
     assert not any(old in markup for old in old_scripts), page
 assert not any(path.name in {".git", ".env"} for path in root.rglob("*"))
-print("Final image: exact image and artifact SHAs, healthy, 16 pages, one Plausible loader per page")
+cleanliness = "clean source checkout" if tree_clean is True else "source cleanliness unavailable"
+print(f"Final image: exact image and artifact SHAs, healthy, {cleanliness}, 16 pages, one Plausible loader per page")
 PY
 SLEAN_TEST_ORIGIN="$origin" npm --prefix site run test:browser

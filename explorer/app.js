@@ -350,7 +350,10 @@ function initialize() {
     const slider = byId("prefix-slider");
     slider.max = String(events.length);
     byId("journal-count").textContent = `${events.length} events`;
-    byId("build-revision").textContent = `Base ${data.build.base_revision.slice(0, 8)}${data.build.source_tree_clean ? "" : " · source tree changed"}`;
+    const sourceStatus = data.build.source_tree_clean === null
+        ? " · source cleanliness unknown"
+        : data.build.source_tree_clean ? "" : " · source tree changed";
+    byId("build-revision").textContent = `Base ${data.build.base_revision.slice(0, 8)}${sourceStatus}`;
     const journal = byId("journal-list");
     const mobileSelect = byId("mobile-event-select");
     mobileSelect.append(new Option("Before the first event", "0"));

@@ -1,8 +1,8 @@
 # Slean Coolify deployment candidate
 
-This describes the intended configuration for the existing `slean.org` application (`iegozztocwpvv1xzodzynpec`). It has not been applied. The source remains `romainsimon/slean`, branch `main`, base directory `/`, and domain `https://slean.org`.
+This describes the required configuration for the existing `slean.org` application (`iegozztocwpvv1xzodzynpec`). The source is `romainsimon/slean`, branch `main`, base directory `/`, and domain `https://slean.org`.
 
-After the reviewed PR stack is assembled into one exact candidate, its `final-image` workflow passes, and a recovery image is retained, change only these application fields before merging to `main`:
+After the reviewed PR stack is assembled into one exact candidate, the final image is tested, and a recovery image is retained, check these application fields before merging to `main`:
 
 ```json
 {
@@ -18,9 +18,11 @@ After the reviewed PR stack is assembled into one exact candidate, its `final-im
 }
 ```
 
-The Dockerfile requires Coolify's `SOURCE_COMMIT` during the build and rejects a mismatch with Git HEAD. Its final Nginx image listens on port 80 and checks `/` and `/en/` from inside the container. Keep the existing domain and automatic deployment behavior. Do not add a separate build or start command.
+Every image build requires `SOURCE_COMMIT` as a full, lowercase 40-character Git SHA. The builder stamps that exact value into `build-info.json` and the OCI revision label. When the build context contains Git metadata, it compares the value with `HEAD` and rejects a dirty checkout. Coolify may provide a source archive without `.git`; in that case the builder cannot compare the archive with a Git object or inspect its cleanliness. It records `source_tree_clean: null` (unknown), never `true`, and relies on Coolify's injected commit to identify the archive. This provenance does not independently prove that the archive contents hash to that commit.
 
-Before a first deployment, retain a tested image and its compatible application settings as a recovery path. At the time this file was written, the existing Slean container had never become healthy, so it cannot serve as a rollback image. The `final-image` workflow must pass on the SHA selected for release; a successful source build or HTTP preview does not prove the final image.
+The final Nginx image listens on port 80 and checks `/` and `/en/` from inside the container. Keep the existing domain and automatic deployment behavior. Do not add a separate build or start command.
+
+Before a first deployment, retain a tested image and its compatible application settings as a recovery path. At the time this file was written, the existing Slean container had never become healthy, so it cannot serve as a rollback image. Test the final image for the exact release SHA in CI when the workflow is available, or locally when GitHub Actions is unavailable. A successful source build or HTTP preview does not prove the final image.
 
 Run the read-only portfolio audit and the exact candidate check before changing the live application:
 

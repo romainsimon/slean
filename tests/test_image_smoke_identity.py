@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import subprocess
 import tempfile
 import unittest
@@ -14,10 +15,10 @@ TAG = "local-site-test"
 SCRIPT_URL = "https://stats.yukicapital.com/js/pa-70RUKb_J9zQLn67oUHf2d.js"
 
 
-def site_artifact(root: Path, source_sha: str) -> None:
+def site_artifact(root: Path, source_sha: str, source_tree_clean: bool | None = True) -> None:
     (root / "build-info.json").write_text(json.dumps({
         "source_revision": source_sha,
-        "source_tree_clean": True,
+        "source_tree_clean": source_tree_clean,
         "source_tag": TAG,
         "schema_version": "0.3.0",
         "lean_version": "4.28.0",
@@ -74,9 +75,12 @@ elif args[0] == "cp":
 class ImageSmokeIdentityTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.image_sha = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
-        ).strip()
+        cls.image_sha = os.environ.get("SOURCE_COMMIT")
+        if cls.image_sha is None:
+            cls.image_sha = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+            ).strip()
+        assert re.fullmatch(r"[0-9a-f]{40}", cls.image_sha)
         assert cls.image_sha != ARTIFACT_SHA
 
     def helper(self, artifact: Path, image_sha: str, artifact_sha: str,
@@ -112,7 +116,7 @@ class ImageSmokeIdentityTests(unittest.TestCase):
             self.assertEqual(self.helper(artifact, self.image_sha, ARTIFACT_SHA).returncode, 0)
             wrong_head = self.helper(artifact, ARTIFACT_SHA, self.image_sha)
             self.assertNotEqual(wrong_head.returncode, 0)
-            self.assertIn("Image source SHA must match current HEAD", wrong_head.stderr)
+            self.assertIn("Image source SHA must match", wrong_head.stderr)
             for artifact_sha, schema, tag in (
                 (self.image_sha, "0.3.0", TAG),
                 (ARTIFACT_SHA, "0.2.0", TAG),
@@ -136,9 +140,25 @@ class ImageSmokeIdentityTests(unittest.TestCase):
                               label_sha=self.image_sha)
             self.assertEqual(good.returncode, 0, good.stderr)
             self.assertIn("exact image and artifact SHAs", good.stdout)
+            self.assertIn("clean source checkout", good.stdout)
             self.assertIn("stop mock-container-id", log.read_text())
             self.assertIn("container rm mock-container-id", log.read_text())
 
+            site_artifact(artifact, ARTIFACT_SHA, source_tree_clean=None)
+            unknown_cleanliness = self.smoke(
+                artifact, bin_dir, log, self.image_sha, ARTIFACT_SHA,
+                label_sha=self.image_sha,
+            )
+            self.assertEqual(unknown_cleanliness.returncode, 0, unknown_cleanliness.stderr)
+            self.assertIn("source cleanliness unavailable", unknown_cleanliness.stdout)
+
+            site_artifact(artifact, ARTIFACT_SHA, source_tree_clean=False)
+            dirty_source = self.smoke(artifact, bin_dir, log, self.image_sha, ARTIFACT_SHA,
+                                      label_sha=self.image_sha)
+            self.assertNotEqual(dirty_source.returncode, 0)
+            self.assertIn("AssertionError", dirty_source.stderr)
+
+            site_artifact(artifact, ARTIFACT_SHA)
             wrong_label = self.smoke(artifact, bin_dir, log, self.image_sha, ARTIFACT_SHA,
                                      label_sha=ARTIFACT_SHA)
             self.assertNotEqual(wrong_label.returncode, 0)
