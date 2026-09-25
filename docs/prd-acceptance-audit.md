@@ -12,6 +12,42 @@ At clean combined head `c741162`, `bash tests/check.sh` passed 36 Python tests a
 
 **Unmodified public-record trial.** OpenML's public [run 523926](https://www.openml.org/r/523926) was read through its [JSON API](https://www.openml.org/api/v1/json/run/523926), with 15,818 source bytes pinned to SHA-256 `d905312659db078e0e8afd4fc4b352d6cac33efa3e76621b8139be58fc6890c1`. The source identifies task 59, flow 2629, and a reported overall `predictive_accuracy` of `0.966667`; it contains 187 evaluation entries. The record was not edited. Given those raw bytes, both `slean validate` and `slean replay <file> 0` returned `json` because `schema_version` is absent. The current `audit_autoresearch_trace.py` adapter could not read the file: it expects a directory with `manifest.json`, `protocol.json`, and `events.jsonl` in its specific frozen-prediction shape. The OpenML record has no such event journal or freeze timestamps. Therefore no Slean replay of this unmodified real run occurred, no discrepancy was observed in it, and neither the earlier synthetic trace nor an invented wrapper is real-life validation. A source-faithful OpenML adapter and a reviewer task would be separate evidence before widening the SL-09 value claim.
 
+### OpenML source and mapping check
+
+The four official JSON responses were fetched read-only on 2026-09-25. The hashes pin the **received bytes**, not an immutable OpenML version; a future fetch must compare them before using this result. No OpenML response or derived case was committed.
+
+| Resource | API source | Bytes | SHA-256 |
+|---|---|---:|---|
+| Run 523926 | [run JSON](https://www.openml.org/api/v1/json/run/523926) | 15,818 | `d905312659db078e0e8afd4fc4b352d6cac33efa3e76621b8139be58fc6890c1` |
+| Flow 2629 | [flow JSON](https://www.openml.org/api/v1/json/flow/2629) | 1,405 | `28ad31ccd5f4e65eb083966597e3af6a4bca57510b11066d4e1003ba832b14d4` |
+| Task 59 | [task JSON](https://www.openml.org/api/v1/json/task/59) | 1,068 | `aef270eb7b713d7f729c5f756b43e0b947df1b0d0765aa9e38844bd2d3ce5cda` |
+| Dataset 61 | [dataset JSON](https://www.openml.org/api/v1/json/data/61) | 1,910 | `7e408fec68984cfcf25f360ca267e706bc5ef27284a17351f78429660c14acd0` |
+
+The IDs agree across responses: the run names flow 2629 and task 59; the run and task name dataset 61. The task specifies one repeat of ten-fold cross-validation, and the run contains ten fold-specific `predictive_accuracy` entries plus the reported overall `0.966667`. It links a predictions ARFF (`file_id` 1797278), which this audit did not fetch or re-score. The flow's `upload_date` is a **flow** date, not a timestamp for the run or its observations. The run response has no run start/end or observation time, no frozen protocol, no metric unit, no threshold, no cost cap, no stop rule, and no scientific or promotion decision. Its parameter `random_state` is `None`, not a recorded seed.
+
+The [current Slean schema](../Slean/Core.lean) requires a frozen protocol before a run and a timestamped observation linked to that run and an artifact. The protocol requires a unit, cost cap, stop rule and freeze time; an exact Slean rule also requires a threshold. Even an `external` assessment requires the protocol and at least one observation. The owner-only `source_recorded` route is bound to one Autoresearch manifest, protocol and ordered source-event journal, not arbitrary OpenML JSON. The published OpenML accuracy and source IDs could be **cited** in a separate review dossier, but they cannot form a faithful Slean experiment replay without authoring missing source facts. No OpenML-to-Slean case was emitted, so no preservation or typed-field coverage claim follows.
+
+The exact native-input check at combined source head `c741162` was:
+
+```sh
+mkdir -p /tmp/slean-openml-audit
+curl -LfsS --max-time 25 https://www.openml.org/api/v1/json/run/523926 -o /tmp/slean-openml-audit/run-523926.json
+shasum -a 256 /tmp/slean-openml-audit/run-523926.json
+.lake/build/bin/slean validate /tmp/slean-openml-audit/run-523926.json
+.lake/build/bin/slean replay /tmp/slean-openml-audit/run-523926.json 0
+python3 tools/audit_autoresearch_trace.py /tmp/slean-openml-audit/run-523926.json
+```
+
+The hash matched the table. Both Slean commands exited 1 with this same output:
+
+```json
+{"error":{"code":"json","event_id":"","message":"Slean.CaseFile.schema_version: String expected","object_id":""},"ok":false}
+```
+
+The adapter exited 2 with `audit_autoresearch_trace.py: error: unsupported or unreadable source trace: NotADirectoryError`. These are format refusals before Slean's event replay. There was no injected mutation.
+
+OpenML's [terms](https://docs.openml.org/intro/terms/) allow access and research use subject to the content's licences; its [current terms page](https://beta.openml.org/terms) also asks users to respect resource-specific licences. The run and flow JSON responses have no licence field; dataset 61 reports `licence: Public` without naming a specific redistribution grant. We therefore cite and hash the responses without placing third-party bytes in the repository. The absent experiment chronology and required protocol fields are the decisive compatibility blocker even for a private, read-only import.
+
 A read-only probe of `https://slean.org/`, `/en/`, and `/build-info.json` returned HTTP 503 on 2026-09-25. The running revision, compatible recovery image, and independent monitor remain unverified. The historical section below is retained as dated evidence.
 
 ## Current source and release state — 2026-09-24 15:53 UTC
