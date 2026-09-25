@@ -1,0 +1,61 @@
+{
+  "protocol_id": "uci-bike-hourly-2011-2012-mae-v1",
+  "status": "illustrative_retrospective_teaching_protocol",
+  "frozen_at_utc": "2026-09-25T07:10:52Z",
+  "authorship": "Slean example; not a UCI or Capital Bikeshare protocol",
+  "question": "Does the 2011 hour-of-day mean lower 2012 hourly demand MAE by at least 5 bikes/hour versus the 2011 global mean?",
+  "source": {
+    "dataset_url": "https://archive.ics.uci.edu/dataset/275/bike%2Bsharing%2Bdataset",
+    "archive_url": "https://archive.ics.uci.edu/static/public/275/bike%2Bsharing%2Bdataset.zip",
+    "archive_sha256": "b70182d0d0508e9abbb79306ce5c0cec34869000f8220175ac83d11dbe845401",
+    "member": "hour.csv",
+    "member_sha256": "e03de4ee4ef4dc376ac6e04bf829673c6269e8eba5c60fa121640fa2f829504f",
+    "expected_hour_rows": 17379,
+    "doi": "10.24432/C5W894",
+    "attribution": "Fanaee-T, H. (2013). Bike Sharing [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5W894",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "historical_time": {
+    "date_column": "dteday",
+    "hour_column": "hr",
+    "timezone": "not specified by source; retain date and hour labels without UTC conversion"
+  },
+  "split": {
+    "train_year": 2011,
+    "test_year": 2012,
+    "order": "strict chronological holdout; never fit on 2012 rows"
+  },
+  "target": {
+    "column": "cnt",
+    "meaning": "total rental bikes in each recorded hour",
+    "unit": "bikes/hour"
+  },
+  "baseline": {
+    "prediction": "arithmetic mean of cnt over all 2011 hourly rows"
+  },
+  "candidate": {
+    "prediction": "arithmetic mean of cnt among 2011 rows with the same hr; use the 2011 global mean only if that hour is absent"
+  },
+  "metric": {
+    "id": "mae_improvement",
+    "definition": "MAE(global mean on 2012) minus MAE(hour-of-day mean on 2012)",
+    "arithmetic": "exact rational arithmetic from integer counts; round each displayed MAE and the final improvement to 6 decimal places with ROUND_HALF_EVEN",
+    "unit": "bikes/hour"
+  },
+  "promotion_rule": {
+    "direction": "gte",
+    "inclusive": true,
+    "threshold": "5.000000",
+    "unit": "bikes/hour",
+    "meaning": "illustrative example promotion only"
+  },
+  "cpu_budget": {
+    "cap": "5.000000000",
+    "unit": "cpu_s",
+    "clock": "Python time.process_time_ns",
+    "coverage": "open pinned local ZIP member, parse CSV, fit both 2011 means, predict and score 2012; exclude network fetch and result serialization"
+  },
+  "stop_rule": "Exactly one evaluation on the 2012 holdout, no tuning and no retry chosen by outcome.",
+  "limits": "Retrospective teaching comparison on one public dataset; no operational, causal or scientific validity claim beyond the computed sample."
+}
