@@ -94,6 +94,24 @@ The design consequences are bounded:
 - Preserve attempt outcomes without promoting them to scientific evidence. An agent's `STATEMENT_WRONG` diagnosis or an exhausted budget differs from a checked negation, and both differ from empirical disagreement under a test's assumptions.
 - Keep proof-search strategy outside the standard. The first Slean demonstration must still connect models to observations and revision across consumers. The paper does not establish that this needs a separate Slean contract; Gate U remains decisive.
 
+## Exploration, retrieval and delayed usefulness, 28 September 2026
+
+The follow-up product clarification is exploration without a preselected final theorem: retain diverse research directions, allow questions and definitions to evolve, and preserve results whose utility becomes visible only in later work. This is product intent, not evidence that a particular evolutionary algorithm outperforms a simpler agent with memory.
+
+Three primary-source checks constrain the design:
+
+| Source | Verified scope of the source | Consequence |
+|---|---|---|
+| [Hipster](https://arxiv.org/abs/1405.3426) | The paper describes an exploratory mode generating lemmas from datatypes/functions in Isabelle/HOL, as well as a mode finding lemmas needed by a supplied proof goal. | Generating questions without a final target is an existing technique. It supports the direction but does not demonstrate broad autonomous scientific discovery. |
+| [TheoremGraph](https://arxiv.org/abs/2606.25363), [TheoremSearch](https://www.theoremsearch.com/) | The paper reports a formal/informal statement graph, including 388,105 Lean declaration nodes across 25 projects, and candidate cross-corpus matches. The site documents REST and MCP retrieval. | Reuse existing retrieval before building a global theorem corpus. Preserve whether a link came from a checked term, a paper extractor or a semantic match; a match is not a proof of equivalence. |
+| [LeanSearch v2](https://arxiv.org/abs/2605.13137) | The paper describes retrieval of premise groups for a theorem through sketch/retrieve/reflect cycles, with standard and reasoning modes. | Finding reusable formal components is an existing research/tooling area. Evaluate an adapter when retrieval becomes necessary; no hosted search is required by the first offline contract. |
+
+This pass checked paper abstracts and the public retrieval documentation, not every benchmark or scientific case study mentioned in the background conversation. No search endpoint was exercised and no new dependency installed. These sources add comparison evidence, not a third mandatory M0 exporter or an implementation claim.
+
+Slean must permit a question without a fixed target, a new definition within a native model interface, an unresolved alternative, and a subsequent question motivated by an observation. It must not require a proof, an immediate use, or a high planner score for an object to remain representable. Newness relative to an archive, newness relative to literature, correctness and downstream usefulness remain separate assessments.
+
+Keep the initial calibration and Physlib examples as engineering checks. A later GERMINAL experiment should separately compare a single persistent agent, an evolutionary population sharing an archive, and independent explorations under matched total budgets. Freeze archives before revealing held-out downstream questions, record all attempts and costs, and check results independently. Such a study can test delayed usefulness and exploration policies; it cannot attribute gains to the Slean format without the separate direct-tool comparison. No Mutome or GERMINAL implementation is authorized by this documentation update.
+
 ## What makes this potentially useful to Mutome
 
 A research agent needs to find a result, inspect its conditions, attempt a valid application, and make the resulting work reusable by later investigations. Slean supplies that exchange and validation boundary. Mutome owns search strategy, execution, resource allocation and decisions. A successful reuse produces a dependency that can be queried; it does not itself establish scientific importance or causal benefit.
