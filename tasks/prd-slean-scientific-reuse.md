@@ -46,6 +46,10 @@ The [research comparison](../docs/research/slean-standard-landscape-2026-09-27.m
 
 The strongest alternative is Lean/Physlib plus an existing viewer and RO-Crate with a small integration script. It has a lower maintenance burden. Slean must beat that baseline on a real reuse task, not on a format comparison designed to favor Slean.
 
+The [direct Physlib comparison](../docs/research/slean-standard-landscape-2026-09-27.md#direct-physlib-comparison-28-september-2026) is a required design constraint. Physlib already aims to connect theory, simulations and experimental data and to support AI-driven progress. It has scientific content, dependency navigation and contribution infrastructure. Slean's proposed advantage is an easier, portable investigation across tools with explicit data/model bindings and revisions; this has not been demonstrated. "Open foundation", "AI-ready", a graph and reuse of a theorem are not sufficient differentiators.
+
+Reuse Physlib definitions and results as the physics library. Prefer an upstream contribution or adapter for physics-specific gaps. Add a separate Slean contract only for shared scientific operations whose benefit survives comparison with Physlib plus ordinary experimental tools and reusable helpers. Do not create a competing physics corpus to make Slean appear independent.
+
 The current `CaseFile` journal remains useful for auditing a decision. It does not become the root of every scientific package. A theorem does not need a cost cap or promotion decision. A calibration method does not need to encode an entire campaign to be reusable.
 
 ## 3. First complete scientific path
@@ -211,7 +215,7 @@ All tasks below are **not started** at this decision commit. Existing V0 work is
 ### M0: reuse the ecosystem and freeze the comparison
 
 - [ ] **SR-T01: pin and build the formal sample.** Build the selected Physlib module in its own Lake package. Record exact toolchain/lock, theorem name/type and transitive axioms. Select a reviewed theorem or expose an unsupported dependency; do not silently swap the task for an internal invariant. Covers SR-01, SR-03, SR-08.
-- [ ] **SR-T02: make the direct-tool baseline.** Express the two reuse paths, including the section 3C prediction/test/revision cycle, using Lean/Physlib and Python with RO-Crate, without a Slean wrapper. Inventory the mapping code and manual decisions. Freeze the identical inputs, negative cases, tasks and effort accounting for both paths. Inspect at most two Atlas/Blueprint integration candidates, then select reuse, a bounded port or a small native extractor with a written reason.
+- [ ] **SR-T02: make the direct-tool baseline.** Express the two reuse paths, including the section 3C prediction/test/revision cycle, using Lean/Physlib and Python with RO-Crate, without a Slean wrapper. Classify each proposed feature against current Physlib as available, planned, an adapter need or a shared-contract candidate. Inventory the mapping code and manual decisions. Freeze identical inputs, negative cases, tasks and effort accounting for both paths. Inspect at most two Atlas/Blueprint integration candidates, then select reuse, a bounded port or a small native extractor with a written reason.
 - [ ] **SR-T03: specify the first contract and fixtures.** Turn section 4 into `spec/` documents, typed authoring signatures and positive/negative fixtures, including an unresolved hypothesis, a planned test, a failed prediction and a revision. Demonstrate which shared scientific meanings require new terms. No universal science ontology or unexplained opaque blobs for the example's core conditions.
 
 ### M1: formal components can actually be reused
