@@ -1,34 +1,48 @@
-# Slean: reusable scientific components
+# Slean: an open foundation for cumulative science in the age of AI
 
-Version: direction 2.0, 27 September 2026. Status: selected engineering direction and implementation plan; the new contract is not implemented or released. Owner: Slean maintainer. The user delegated the product and architecture decision after identifying the gap between V0 and the original Science + Lean ambition.
+Version: direction 2.1, updated 28 September 2026. Status: selected mission, engineering direction and implementation plan; the new contract is not implemented or released. Owner: Slean maintainer. The user delegated the product and architecture decision, then clarified that Slean must aim to become a new foundation for advancing science in the age of AI. Reuse is the first engineering test of that mission, not its full scope.
 
 This PRD supersedes the **forward implementation direction** of the dossier-first PRD. It preserves V0's code, evidence and limitations. It does not declare the earlier full-program goal complete. Release, repository publication, deployment, outside-project changes, external outreach and new spending retain their existing boundaries.
 
 ## 1. Product decision
 
-**Slean is an open library and interoperability contract for building on scientific results.** It lets a person or agent find a component, inspect its assumptions and justification, apply it in a new investigation, check the resulting obligations, and share the result in the same form.
+**Slean's mission is to become an open foundation on which humans and AI systems can build scientific knowledge together.** Scientific work should become explicit enough to inspect, reason about, test, challenge, revise and extend across tools and generations of agents.
 
-The user-facing promise is: **use an existing scientific result without losing what it assumes, what supports it, or where it applies.** The graph is a view of those relationships. The standard is useful without the graph, a website, an LLM, a Slean account, or Mutome.
+The target scientific cycle is **question → hypothesis/model → prediction → experiment → observation → assessment/revision → further research**. Formal deduction and computational reproduction can support several steps. Alternative explanations, negative results, unresolved obligations and contextual disagreement remain visible. The cycle can branch or revisit an earlier step; it is not a mandatory linear workflow.
 
-The analogy with Lean is reuse through explicit interfaces and checked composition. Science also needs observations, measurement uncertainty and applicability assessments that cannot be proved from definitions alone. Slean connects these to formal models while keeping their different meanings. A library of JSON descriptions without an actual theorem or method application fails this product definition.
+The first deliverable is an open scientific library and contract that makes a small instance of this cycle work. Its first useful operation is applying an existing result or method without losing what it assumes, what supports it, or where it applies. The graph is a view of those relationships. Slean remains usable without the graph, a website, an LLM, a Slean account, or Mutome.
 
-The primary initial user is a developer of computational research tools who needs to reuse models, methods and results across investigations. Lean authors and computational researchers are the first contributors. Mutome is the first intended agent consumer, not the owner of a private extension that everyone else must use.
+The analogy with Lean is explicit meaning, checked composition and a growing shared library. Science also needs observations, uncertainty and applicability assessments that cannot be proved from definitions alone. Slean connects these to formal models while keeping their different meanings. It must support an unproved hypothesis as an inspectable research object, without promoting it to an established result. A library of JSON descriptions without an actual scientific application fails this product definition.
+
+The intended users are researchers and AI systems working on cumulative investigations. The initial adoption route is through developers of computational research tools and authors of Lean/Python components. Mutome is the first intended research system using the foundation; the same operations and artifacts must be available to other systems.
 
 An adopted standard is an eventual outcome. The initial deliverable is an open specification candidate, a working reference library, two interoperating producers and consumers, and a demonstrated reuse task. A brand, JSON schema or large implementation does not establish adoption.
+
+### What the foundation consists of
+
+| Part | Responsibility | Initial form |
+|---|---|---|
+| Scientific language | Express a model or claim, its assumptions, predicted observables, methods and evidence with explicit meanings. | Lean definitions plus a small typed research profile accessible from Python. Formal expressions stay in Lean; a separate compiler is unnecessary. |
+| Checking and interaction contract | Expose obligations, distinguish kinds of justification, bind tests to exact predictions, and report the effects of new evidence on recorded uses. | Lean checks, numerical adapters and the same library/CLI operations for humans and agents. |
+| Cumulative scientific library | Preserve versioned contributions that can be composed, reproduced, disputed and extended across investigations. | Portable modules and a curated example corpus first; independent domain libraries can grow around the contract. |
+
+The AI-specific design requirement is continuity: a new agent, model or tool can resume an investigation from its explicit artifacts, including unresolved hypotheses and failed tests, without reconstructing the reasoning from a private conversation. AI systems propose candidates; their fluency or identity gives those candidates no extra evidential status.
+
+Slean standardizes the meaning of recorded scientific work and its supported operations. Planners choose investigations; existing tools perform numerical calculations, proof search or physical experiments. The small common foundation must permit different planners, laboratories and scientific methods rather than imposing one research strategy.
 
 ### Five scope decisions
 
 | Question | Decision |
 |---|---|
-| What problem do we solve? | Scientific work is often reusable only after someone reconstructs its assumptions, inputs, environment and evidence. Preserve these at the point of reuse. |
-| What are the central actions? | Inspect a component, apply it with explicit bindings, and verify/share the resulting application. |
-| Where do we stop? | Slean describes and checks reuse. Existing systems perform proof search, numerical simulation, experiment execution and campaign planning. |
-| What proves success? | Two separately authored investigations exchange and actually use a component; invalid uses are detected; another consumer understands the same artifact without private Slean code. |
+| What problem do we solve? | Make scientific reasoning and evidence explicit enough that successive humans and AI systems can build on, test and revise the work. |
+| What are the central actions? | Express a claim/model, derive a prediction, attach a specified test and observation, inspect or revise the assessment, and reuse the resulting work. |
+| Where do we stop? | Slean owns shared scientific semantics and checking interfaces. Existing systems perform proof search, numerical simulation, physical experiments and campaign planning. |
+| What proves initial success? | Two investigations exchange and actually use a component; a recorded prediction is tested and revised; invalid uses are detected; another consumer understands the same artifacts. |
 | What are our constraints? | Start locally, reuse Lean and domain libraries, preserve existing data, no new paid services, no external-repository mutations or public deployment in this work. |
 
 ## 2. Why this direction
 
-The [research comparison](../docs/research/slean-standard-landscape-2026-09-27.md) covers Lean/Physlib/SciLean, Atlas/Blueprint/Lean4web, RO-Crate/PROV/nanopublications/ORKG, OpenMath/OMDoc, CWL and domain model standards. Many parts already exist. Slean will combine selected parts around a narrow operation: **checked application of a reusable component across formal and computational work**.
+The [research comparison](../docs/research/slean-standard-landscape-2026-09-27.md) covers Lean/Physlib/SciLean, Atlas/Blueprint/Lean4web, RO-Crate/PROV/nanopublications/ORKG, OpenMath/OMDoc, CWL and domain model standards. Many parts already exist. Slean will combine selected parts around **explicit scientific reasoning that connects formal models to tests and observations**. Checked reuse is the first bounded test of that foundation.
 
 The strongest alternative is Lean/Physlib plus an existing viewer and RO-Crate with a small integration script. It has a lower maintenance burden. Slean must beat that baseline on a real reuse task, not on a format comparison designed to favor Slean.
 
@@ -58,7 +72,15 @@ Import the selected harmonic-oscillator module from pinned Physlib. Inspect the 
 
 Attempt to apply the undamped result to a context where the required equation of motion has not been established. Report the missing obligation. If measured energy falls, preserve the mathematical theorem and attach the observation as evidence about applicability; do not retract the proof automatically.
 
-These paths prove representation, composition and interoperability. Discovery ability, cross-domain adoption and improved scientific outcomes are separate claims. A later biology or materials profile must be possible without changing the meanings of the initial core fields.
+### C. New evidence changes what can be used next
+
+Extend the same sensor fixture into a complete, small research cycle. State an explicit hypothesis extending the affine model to a new operating condition. Bind a prediction and an evaluation rule to an application plan before revealing that fixture's new observations to the consumer. Run the named comparison, then introduce a synthetic observation outside the declared residual bound but within the hypothesis's stated test scope. An out-of-scope test must not be recorded as a refutation of the narrower original claim.
+
+Record the failed prediction and the precise context it challenges. Find potentially affected applications by following exact assumption references and selected branches within the indexed corpus, retaining their context. List them for reassessment; do not assert that their outputs or the conditional Lean theorem are automatically false. Publish an explicit revised model/condition as a new component and make a new prediction for a separate observation. Preserve the original hypothesis, failed test and the reason for the revision.
+
+Acceptance: another consumer reconstructs the hypothesis → prediction → protocol → observation → assessment → revision links from exported objects, with no private chat transcript. Changing a rule after seeing observations must produce a new revision and cannot alter the earlier assessment. The recorded order is a property of this controlled example, not proof of real-world preregistration. This fixture demonstrates the research contract; it does not claim an autonomous discovery.
+
+These paths establish initial representation, composition and scientific-cycle behavior. Cross-domain adoption and improved scientific outcomes have their own horizons below. A later biology or materials profile must be possible without changing the meanings of the initial core fields.
 
 ## 4. The contract
 
@@ -74,7 +96,7 @@ There are three record families. They must not become an unrestricted collection
 | Application | A use of an exact component with explicit input bindings, requirements, selected alternatives and outputs | A theorem application; a method invocation; a model-to-observation comparison |
 | Evidence | A justification about a precise subject and context, with method, artifacts and check result | A proof check, a recomputed calculation, an empirical evaluation or an attributed assertion |
 
-Files, people, software and executions use existing research-object metadata. Questions, historical contributions, annotations, citations, costs and instrument inventories can attach through profiles. They are not mandatory for every module.
+Files, people, software and executions use existing research-object metadata. The initial research profile links a question to target claims and observables through profile metadata. A hypothesis is a claim with unresolved obligations; a prediction names an expected observable under stated conditions; a planned test is an application. Assessment and revision use evidence and explicit version links. A planned application has no executed output or execution evidence until those are explicitly supplied. Formal-only modules do not need an experiment. Historical contributions, annotations, citations, costs and instrument inventories can attach through further profiles.
 
 A claim may have several justifications. The claim and its proof are distinct. Two different proofs may have different dependencies. An empirical contradiction does not invalidate a conditional theorem; it can change the assessment of its applicability. No single `true`, `verified` or numerical confidence field collapses those distinctions.
 
@@ -157,6 +179,8 @@ pack:    exported components + dependencies + artifacts -> portable module
 uses:    exact component -> recorded applications within the selected corpus
 ```
 
+Authoring a hypothesis, binding a prediction/test and appending a revision use the typed library API and the research profile. Freeze those signatures and their fixtures in M0. Do not add a separate service or CLI subsystem for each scientific concept. Experiment execution remains an explicit call to an existing tool; Slean checks and exports the resulting records at its supported level.
+
 Use one public-source monorepo with independent package builds: `spec/`, `packages/lean/`, `packages/python/`, `profiles/`, `conformance/`, `examples/reuse/`, and `explorer/`. These paths are planned. Existing `Slean/`, CLI, fixtures and site remain intact during the first milestones. The public marketing website already has a separate `slean-web` repository; do not merge or modify it in this work. Documentation generated from the library stays with the library.
 
 ## 6. Required behavior
@@ -166,14 +190,14 @@ Use one public-source monorepo with independent package builds: `spec/`, `packag
 | SR-01 | A fresh checkout builds the new Lean package independently of Mutome and the legacy dossier package; all dependencies are pinned. |
 | SR-02 | A Lean producer and separately authored Python producer emit modules consumed by both a CLI and a separate minimal reader. Same IDs, conditions, evidence kinds and dependencies survive interchange. |
 | SR-03 | A selected real Physlib theorem is reused in another Lake project and its new formal dependency is extracted from checked code. The theorem is not copied into a string or replaced with a synthetic validator theorem. |
-| SR-04 | Two separate computational investigations reuse the calibration component. The consumer never needs the producer's private journal. Omitted offset correction is exposed by reproduction against the declared method. |
+| SR-04 | Two separate computational investigations reuse the calibration component and complete the prediction/test/revision cycle in section 3C. The consumer never needs the producer's private journal or chat. Omitted offset correction is exposed by reproduction against the declared method. |
 | SR-05 | Wrong dimensions, missing assumptions, wrong context/version, forged evidence and unsupported profiles produce explicit diagnostics. No listed negative fixture is accepted as an unconditional application. |
 | SR-06 | Several proofs of one claim and several alternative methods remain separate. `all`/`any` witnesses and unresolved requirements agree between the reference checker and the reader. |
-| SR-07 | A contrary observation can change an applicability assessment without changing a checked conditional theorem or old evidence. Unknown is not false, zero or an implicit success. |
+| SR-07 | A contrary observation changes a contextual assessment and identifies recorded applications whose assumptions need reassessment, without changing a checked conditional theorem or old evidence. A revision creates a new identity. Unknown is not false, zero or an implicit success. |
 | SR-08 | A receiver recomputes verification at the declared level. Missing dependencies, `sorry`, unexpected axioms, changed statements and fake receipts cannot produce the stronger verification level. |
 | SR-09 | A generated RO-Crate passes base/profile checks and can be read by an existing independent RO-Crate tool. All supported Slean records survive a Slean round trip; unsupported extensions are retained but not executed. |
 | SR-10 | Explorer and CLI expose matching objects and obligations, with direct/reverse dependencies and cited evidence. Browser checks cover desktop/mobile, keyboard, reduced motion and an equivalent accessible list. |
-| SR-11 | An agent-shaped consumer completes inspect -> apply -> check -> export through the public library/CLI contract, without importing private Mutome code or modifying its repository. |
+| SR-11 | An agent-shaped consumer resumes the section 3C investigation through the public library/CLI contract: inspect its unresolved hypothesis, bind a test, ingest the named tool output, record the assessment, and export a revision. It needs no private conversation state, Mutome imports or repository changes. |
 | SR-12 | The package works offline after dependencies are installed, requires no hosted account, and executes no package code during inspection. An explicit publication projection contains only selected publishable artifacts; hidden fields cannot affect public IDs or derived views. |
 | SR-13 | Changing a component produces a new identity; old applications remain reproducible. Unknown mandatory semantics fail closed. A migration produces a new module and an explicit mapping/loss report. |
 | SR-14 | The specification, conformance fixtures and reference tools are enough to implement a reader without importing Slean's implementation. External adoption and independent validation are reported separately from internal interoperability. |
@@ -187,8 +211,8 @@ All tasks below are **not started** at this decision commit. Existing V0 work is
 ### M0: reuse the ecosystem and freeze the comparison
 
 - [ ] **SR-T01: pin and build the formal sample.** Build the selected Physlib module in its own Lake package. Record exact toolchain/lock, theorem name/type and transitive axioms. Select a reviewed theorem or expose an unsupported dependency; do not silently swap the task for an internal invariant. Covers SR-01, SR-03, SR-08.
-- [ ] **SR-T02: make the direct-tool baseline.** Express the two reuse paths using Lean/Physlib and Python with RO-Crate, without a Slean wrapper. Inventory the mapping code and manual decisions. Freeze the identical inputs, negative cases, tasks and effort accounting for both paths. Inspect at most two Atlas/Blueprint integration candidates, then select reuse, a bounded port or a small native extractor with a written reason.
-- [ ] **SR-T03: specify the first contract and fixtures.** Turn section 4 into `spec/` documents and positive/negative fixtures. Demonstrate exactly which interoperability gaps require new terms. No universal science ontology or unexplained opaque blobs for the example's core conditions.
+- [ ] **SR-T02: make the direct-tool baseline.** Express the two reuse paths, including the section 3C prediction/test/revision cycle, using Lean/Physlib and Python with RO-Crate, without a Slean wrapper. Inventory the mapping code and manual decisions. Freeze the identical inputs, negative cases, tasks and effort accounting for both paths. Inspect at most two Atlas/Blueprint integration candidates, then select reuse, a bounded port or a small native extractor with a written reason.
+- [ ] **SR-T03: specify the first contract and fixtures.** Turn section 4 into `spec/` documents, typed authoring signatures and positive/negative fixtures, including an unresolved hypothesis, a planned test, a failed prediction and a revision. Demonstrate which shared scientific meanings require new terms. No universal science ontology or unexplained opaque blobs for the example's core conditions.
 
 ### M1: formal components can actually be reused
 
@@ -199,7 +223,7 @@ All tasks below are **not started** at this decision commit. Existing V0 work is
 ### M2: empirical methods compose with explicit conditions
 
 - [ ] **SR-T07: implement the Python method/profile API.** Declare quantities, ports, range and identity constraints; emit method/application/evidence records. Keep exact decimals and explicit uncertainty interpretation. Test dimensional conversion rather than string equality alone. Covers SR-02, SR-04, SR-05.
-- [ ] **SR-T08: deliver the two-investigation calibration path.** Run and package the synthetic calibration, reuse it in an independently authored consumer, reproduce its result, and check the conditional Lean error theorem. Run every negative case from section 3. Covers SR-04–07.
+- [ ] **SR-T08: deliver the calibration and research-cycle path.** Run and package the synthetic calibration, reuse it in an independently authored consumer, reproduce its result, and check the conditional Lean error theorem. Complete section 3C with a failed prediction, affected-use query and explicit revision. Run every negative case from section 3, including an attempt to change the old evaluation rule. Covers SR-04–07.
 - [ ] **SR-T09: implement portable package identity and RO-Crate export.** Pin dependencies and payload bytes, generate the envelope, validate with an existing RO-Crate reader/validator and report any unimplemented profile checks. Covers SR-09, SR-12, SR-13.
 - [ ] **SR-T10: prove the narrow composition property.** Show that successful core application exposes witnesses for its required leaves under the declared policy. Test that this property does not turn empirical assumptions into formal proofs. The theorem is infrastructure evidence, not the main product demonstration. Covers SR-05–08.
 
@@ -207,14 +231,14 @@ All tasks below are **not started** at this decision commit. Existing V0 work is
 
 Compare Slean with the direct-tool baseline on both paths. Record all errors, extra mapping code, author interventions, environment/setup costs, commands and elapsed execution. Count schema and adapter construction as Slean cost. Compare against both a simple baseline and one allowed to reuse its own helpers; do not handicap the alternative.
 
-Pass requires: actual reuse in both paths, all enumerated invalid applications rejected or left conditional, lossless preservation of all needed fields, and removal of at least one recurring manual reconstruction/mapping step in the second consumer without introducing a different bespoke step. Record the before/after artifacts so this is inspectable. Report time/cost as measured values, not a promised percentage.
+Pass requires: actual reuse in both paths, a reconstructable prediction/test/revision cycle, all enumerated invalid applications rejected or left conditional, lossless preservation of all needed fields, and removal of at least one recurring manual reconstruction/mapping step in the second consumer without introducing a different bespoke step. Record the before/after artifacts so this is inspectable. Report time/cost as measured values, not a promised percentage.
 
 Fail if the result is only a graph, metadata conversion, manually scripted success, or more machinery with no demonstrated reuse advantage. Keep useful adapters and revise or remove the extra contract. An internal pass supports the next implementation milestone; it is not independent user validation or community adoption.
 
 ### M3: humans and agents use the same component
 
-- [ ] **SR-T11: deliver the agent-shaped consumer.** Exercise the same library/CLI from a small independent local client. Inspect requirements, choose compatible bindings, preserve failures and export a result. No LLM purchase or Mutome mutation is needed. Covers SR-11.
-- [ ] **SR-T12: add component inspection to Explorer.** Show what the object means, what it needs, what supports it and where it was used. Select between proofs/applications without combining their edges. Follow the repository UI protocol and verify rendered desktop/mobile, keyboard and reduced-motion paths. Covers SR-10.
+- [ ] **SR-T11: deliver the agent-shaped consumer.** Resume the section 3C investigation from exported objects in a small independent local client. Inspect requirements, construct the planned test, ingest tool output, preserve the failed assessment and export a revision. No private conversation state, LLM purchase or Mutome mutation is needed. Covers SR-11.
+- [ ] **SR-T12: add scientific-object inspection to Explorer.** Show what the object means, what it needs, what supports or challenges it and where it was used. Follow the example's prediction/test/revision chain. Select between proofs/applications without combining their edges. Follow the repository UI protocol and verify rendered desktop/mobile, keyboard and reduced-motion paths. Covers SR-10.
 - [ ] **SR-T13: document one complete reuse path.** Every code snippet comes from a compiled/executed example at the displayed version. A newcomer can install, reuse and export locally without a private service. Integrate Lean4web only after a local compatibility/security probe; online deployment remains separately authorized.
 
 ### M4: standard candidate and external use
@@ -223,11 +247,23 @@ Fail if the result is only a graph, metadata conversion, manually scripted succe
 - [ ] **SR-T15: prepare open-source release.** Apply the selected Apache-2.0 licence to owned code/specification with third-party attribution and per-dataset rights. Publish the profile description, examples, governance and compatibility policy only when publication is authorized. Do not claim RO-Crate profile conformance before its required description is resolvable.
 - [ ] **SR-T16: validate external adoption.** With authorized outreach, have an independent maintainer produce or consume a component in their own tool. Record changes needed. A stable 1.0 requires at least one such external use in addition to internal conformance; otherwise remain an experimental specification. Covers SR-14.
 
+### Longer-term horizons and their evidence
+
+These horizons state the intended destination. They do not enlarge the first implementation lot or count as delivered features. Reaching M4 establishes a usable core candidate; the broader foundation claim needs further evidence.
+
+| Horizon | Next capability | Evidence required before claiming it |
+|---|---|---|
+| Domain libraries | Independent communities express and extend real scientific work using domain profiles. | A second scientific domain beyond the initial physics/calibration examples, authored with an independent domain contributor, can express its assumptions, observations and revisions without reinterpreting core fields. Slean owns profile/conformance work. |
+| Persistent research across agents | Different research systems contribute to and resume the same investigation over time. | A second agent implementation continues a versioned investigation, preserves unresolved conditions and negative evidence, and produces a contribution usable by the first. Mutome integration belongs to Mutome; Slean owns the neutral contract. |
+| Measured scientific progress | Cumulative knowledge improves later investigations at comparable resources. | A preregistered GERMINAL study compares the same agent and tools with and without shared Slean knowledge, uses held-out tasks, accounts for curation and compute, and independently checks results. Measure supported results, invalid claims and downstream reuse; report null or negative findings. This is an external evaluation task, not a Slean feature checkbox. |
+
+The initial formal example and synthetic empirical example test whether the foundation can carry scientific work. Broad scientific impact requires real research use and evidence across these horizons; it cannot be inferred from a successful package exchange.
+
 ## 8. Mutome boundary
 
-Mutome can ask for a component and its conditions, obtain its exact dependencies, create an application plan, run its chosen tools, and contribute a resulting module. Slean returns structured obligations and evidence, not a choice of research direction or a scientific importance score.
+Mutome can express an unresolved hypothesis, ask for relevant components and their conditions, bind a prediction and a test, run its chosen tools, submit observations, inspect the resulting assessments and contribute a revision. Slean supplies the shared scientific representation and supported checks. Mutome owns the choice of research direction and next action.
 
-This creates a possible persistent scientific memory for Mutome: a method from investigation A remains callable and inspectable in investigation B, including known failures and limits. Mutome's retrieval, planner, worker and knowledge store can adopt the contract incrementally. No migration of all historical records is required.
+This creates a possible persistent scientific memory for Mutome: an investigation retains its hypotheses, methods, predictions, failures and remaining questions across agents and sessions. A method from investigation A remains callable and inspectable in investigation B. Mutome's retrieval, planner, worker and knowledge store can adopt the contract incrementally. No migration of all historical records is required.
 
 Slean-owned delivery includes a standalone consumer contract and fixtures. Implementing the real Mutome adapter belongs to that repository and requires its own authorized task. GERMINAL owns held-out studies of whether reuse improves research at matched budgets. Interface integration, successful replay and scientific benefit remain separate results.
 
@@ -257,6 +293,6 @@ The first distribution path is useful tooling for existing Lean/Physlib and Pyth
 
 Execute M0–M2 as the first bounded engineering lot, with the explicit Gate U before adding M3 features. Use existing local tools/subscriptions, with no incremental API/GPU purchase or new service. Record account allowance and actual build/storage/agent effort per milestone. No calendar or cost forecast is credible before M0. Romain's only required involvement in this lot is review of the concrete result or a material change in direction; routine choices belong to the implementing agent.
 
-The design decisions above are closed for the first lot. The remaining questions are empirical: whether the selected upstream versions work together, whether the contract removes repeated effort, whether authors can express conditions without excessive annotation, and whether an independent tool wants to adopt it. Each has a named task or Gate U. A negative answer changes the implementation or the scope, not the recorded success criterion.
+The design decisions above are selected for the first lot. The remaining questions are empirical: whether the selected upstream versions work together, whether the contract preserves a complete investigation while removing repeated effort, whether authors can express conditions without excessive annotation, and whether an independent tool wants to adopt it. Each has a named task or Gate U. A negative answer changes the implementation or the scope, not the recorded success criterion.
 
 Engineering acceptance requires current, requirement-specific evidence for SR-01 through SR-14, with internal interoperability distinguished from external validation. M4 additionally records publication and external-use outcomes when those actions are authorized. A successful V0 build or a polished viewer cannot close this PRD; an unavailable external participant cannot be counted as adoption.

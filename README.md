@@ -7,7 +7,7 @@
 </h1>
 
 <p align="center">
-  Make every research decision traceable.
+  An open foundation for cumulative science in the age of AI.
 </p>
 
 <p align="center">
@@ -16,7 +16,7 @@
 
 > **Status:** Early, local V0 research prototype. The repository is private; no public license or contribution guide is available.
 
-The selected next direction is **reusable scientific components**: apply a result or method in another investigation with explicit assumptions and evidence. The [PRD and task checklist](tasks/prd-slean-scientific-reuse.md) describe that planned library and open-standard candidate. The instructions below describe the existing V0 dossier prototype.
+Slean's ambition is to provide a shared foundation for humans and AI to express, test, challenge and extend scientific knowledge. The [PRD and task checklist](tasks/prd-slean-scientific-reuse.md) describe the planned scientific library and open-standard candidate. Checked reuse and a small hypothesis/prediction/test/revision cycle are its first engineering milestones. The instructions below describe the existing V0 dossier prototype.
 
 A structured decision record brings together observations, assumptions, rules, and conclusions. Slean checks that the record is consistent—including references, event order, units, and exact thresholds—and replays it so readers can see which recorded inputs led to each conclusion. It checks traceability and consistency; it does not establish whether measurements or external scientific claims are true.
 
@@ -68,7 +68,7 @@ This is a local research prototype, not a general scientific evaluator or releas
 ## Further reading
 
 - [Product scope](PRODUCT.md)
-- [Scientific reuse PRD and roadmap](tasks/prd-slean-scientific-reuse.md)
+- [Scientific foundation PRD and roadmap](tasks/prd-slean-scientific-reuse.md)
 - [Research and alternatives](docs/research/slean-standard-landscape-2026-09-27.md)
 - [Architecture and trust boundary](ARCHITECTURE.md)
 - [Versioned schemas](schema/README.md)

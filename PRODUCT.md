@@ -1,18 +1,22 @@
 # Product direction
 
-**Slean makes scientific results and methods reusable across investigations and tools.** A person or agent should be able to inspect a component's assumptions and evidence, apply it to new inputs, check the remaining obligations, and export the resulting work for someone else to use.
+**Slean aims to become an open foundation for advancing science in the age of AI.** Humans and AI systems should be able to express, test, challenge and extend scientific work through a shared language and library, with its assumptions and evidence intact.
 
-The selected direction is an open library and interoperability contract built on Lean, existing scientific libraries, Python and research-object standards. The central product action is checked reuse. A graph displays the resulting dependencies; it is not the source of their scientific meaning. Slean must work without Mutome, a website, an LLM or a hosted account.
+Its scope is the scientific cycle: questions, hypotheses and models, predictions, experiments, observations, assessments and revisions that enable further research. Unresolved hypotheses and negative results are part of that record. A new agent or tool should be able to resume an investigation from explicit artifacts rather than a private conversation.
 
-The initial users are computational research-tool developers and authors of reusable Lean/Python components. The first demonstrations are a calibration method reused by another investigation and a real Physlib theorem applied in another Lean project. Their success is measured against the same tasks using Lean/Physlib, Python and RO-Crate directly.
+The selected implementation is a scientific library and interaction contract built on Lean, existing scientific libraries, Python and research-object standards. The first operation is checked reuse. The graph displays the resulting relationships. Slean must work without Mutome, a website, an LLM or a hosted account; other research systems can implement the same contract.
 
-The [scientific reuse PRD](tasks/prd-slean-scientific-reuse.md) owns the selected scope, implementation choices, acceptance criteria and task checklist. The [research comparison](docs/research/slean-standard-landscape-2026-09-27.md) explains the existing alternatives. The [roadmap](ROADMAP.md) separates that forward work from V0 history. This direction is planned; it is not a released standard or implemented feature set.
+The intended users are researchers and AI systems. The initial adoption route is through computational research-tool developers and Lean/Python authors. The first demonstrations are a real Physlib theorem applied in another Lean project and a calibration used in a second investigation, extended through a prediction, a failed test and an explicit revision. These are tests of the foundation, not its long-term scope. Their success is measured against the same tasks using Lean/Physlib, Python and RO-Crate directly.
+
+The [foundation PRD](tasks/prd-slean-scientific-reuse.md) owns the selected scope, implementation choices, acceptance criteria and task checklist. The [research comparison](docs/research/slean-standard-landscape-2026-09-27.md) explains the existing alternatives. The [roadmap](ROADMAP.md) separates the first delivery lot, longer-term scientific impact and V0 history. This direction is planned; it is not a released standard or implemented feature set.
 
 ## Boundaries
 
 Lean checks formal statements under explicit hypotheses. Computational reproduction checks a named computation. Observations and applicability evidence remain contextual. Slean never merges those into one universal truth or confidence score.
 
-Mutome owns research strategy, execution and resource allocation. It can consume and produce Slean components through the same interface as other tools. GERMINAL owns evaluations of scientific benefit. Slean owns the reusable component contract, its reference tools and conformance fixtures. Initial delivery remains in this repository.
+Mutome owns research strategy, execution and resource allocation. Slean is intended to provide its shared scientific representation: hypotheses, methods, predictions, observations, evidence and revisions that survive across agents and sessions. Mutome uses the same interface as other research systems. GERMINAL owns evaluations of scientific benefit. Slean owns the scientific contract, its reference tools and conformance fixtures. Initial delivery remains in this repository.
+
+Progress is judged in stages: working scientific operations, independent interoperability, use in another scientific domain, then measured benefit to later investigations. Core conformance and a synthetic demonstration do not by themselves establish scientific impact.
 
 ## Implemented V0
 

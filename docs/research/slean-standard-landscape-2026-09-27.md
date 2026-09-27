@@ -4,11 +4,13 @@ Status: source-backed comparison and engineering decision. This is not an adopti
 
 We want scientific results to remain usable across investigations and tools. This matters because storing a conclusion does not preserve the conditions needed to apply it again. The immediate objective is to choose a small, useful interoperability contract and test it against existing tools before expanding it.
 
-## Decision
+## Initial engineering decision
+
+**Mission clarification, 28 September 2026:** the user set the ambition of Slean becoming a new foundation for advancing science in the age of AI. The [updated PRD](../../tasks/prd-slean-scientific-reuse.md) positions checked reuse as the first test of a broader scientific language, checking contract and cumulative library. It adds a hypothesis/prediction/test/revision cycle and separates longer-term impact from initial interoperability. The source comparison below remains evidence about reusable foundations, not proof of that broader ambition.
 
 Build **Slean as an open library and interoperability contract for reusable scientific components**. A component exposes a claim, model, method or dataset with explicit conditions and supporting artifacts. An application records how another investigation uses that component. Lean checks formal statements and applications; computational evidence remains tied to a named method, inputs and context.
 
-The central operation is applying an existing component to a new problem and exposing the obligations that remain. A package format, provenance graph, proof badge, or viewer alone is insufficient. The selected direction and delivery criteria are in the [PRD](../../tasks/prd-slean-scientific-reuse.md).
+The first operation is applying an existing component to a new problem and exposing the obligations that remain. A package format, provenance graph, proof badge, or viewer alone is insufficient. The selected direction and delivery criteria are in the [PRD](../../tasks/prd-slean-scientific-reuse.md).
 
 This is an engineering hypothesis: a thin common contract around formal and empirical reuse can remove repeated integration work. The sources below establish overlap and reusable foundations, not that the gap is unique or commercially validated.
 
@@ -63,7 +65,7 @@ The falsifiable claim is reduced integration/reuse effort without more invalid a
 
 - Further expansion of the V0 audit model as the main product.
 - New work on 3D, a global knowledge graph, a hosted proof service, or a bespoke editor before local reuse is demonstrated.
-- A new scientific expression language, numerical solver, package registry or orchestration engine.
+- A separate general-purpose mathematical expression grammar, numerical solver, package registry or orchestration engine. The research profile can add scientific concepts using the selected Lean/Python foundations.
 - Mandatory campaign budgets, promotion decisions and private benchmark fields in every scientific component.
 
 The existing validator, projections and Explorer remain available. They are not deleted, rewritten as successes of the new direction, or treated as evidence that the new standard exists.
