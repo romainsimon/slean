@@ -1,5 +1,7 @@
 # V0 architecture and trust boundary
 
+This document describes the **implemented dossier architecture**. The selected next architecture is the library/profile design in the [scientific reuse PRD](tasks/prd-slean-scientific-reuse.md#5-standards-and-implementation-choices). Its component contract and general Lean/Python adapters are planned separately; they do not change V0's semantics or verification claims.
+
 ## Data and execution
 
 `Slean/Core.lean` defines case, question, empirical claim, frozen protocol, run, observation, artifact reference, cost, assessment, decision, formal claim reference, relation, dependency gate, and event. Each recorded object has an ID, positive version, domain, provenance, and audience. IDs are unique within a case. A run names one frozen protocol ID. An observation names a run, metric, unit, exact decimal text or unknown state, artifact reference, and UTC time. Artifacts are references and digests, not embedded blobs. Schema 0.3 records explicit `all_of` and `any_of` dependency groups with prior member and target references. `DependencyExpr` remains reserved for future evaluation; a recorded gate is not a proof or a computed verdict.

@@ -1,4 +1,25 @@
-# Local roadmap outcome
+# Slean roadmap
+
+## Selected direction: reusable scientific components
+
+The [scientific reuse PRD](tasks/prd-slean-scientific-reuse.md), selected on 27 September 2026, owns the forward implementation plan. It supersedes expansion of the dossier model as the main product. The research and decision are documented; the new implementation tasks are not started. Existing code and historical evidence remain available.
+
+| Milestone | Deliverable and acceptance | State |
+|---|---|---|
+| M0 · SR-T01–03 | Build the pinned Physlib example, freeze a fair direct-tool baseline, and specify the minimal contract with fixtures. | Not started |
+| M1 · SR-T04–06 | Export and actually reuse a real Lean theorem across projects; expose assumptions, dependencies and verification policy. | Not started |
+| M2 · SR-T07–10 | Reuse a calibration method across two investigations, reproduce its output, expose conditions, and exchange a portable package. | Not started |
+| Gate U | Demonstrate less repeated integration work than Lean/Physlib + Python + RO-Crate at equivalent inputs and accounting, with every negative case detected or left conditional. | Not evaluated |
+| M3 · SR-T11–13 | An independent agent-shaped consumer and the Explorer use the same objects; document a complete working path. | After Gate U |
+| M4 · SR-T14–16 | Independent reader and conformance kit, open-source release preparation, then authorized external adoption validation. | After M3; publication and outreach retain their existing authority boundaries |
+
+Update task completion and evidence in the PRD; this table only summarizes milestone state. Do not mark new tasks complete because V0 has a similarly named concept. The first engineering lot is M0–M2 followed by Gate U. It excludes new paid services and changes to Mutome or other repositories.
+
+Current V0 was validated at `origin/main` revision `4f0c40a`: source checks and the final local ARM64 image smoke checks passed. The [dated evidence](docs/research/slean-standard-landscape-2026-09-27.md#current-v0-execution-evidence) records the exact revision, image and limits. This does not establish new-contract behavior, public release or scientific benefit.
+
+## Historical dossier roadmap
+
+The remainder of this file is the preserved integration-era snapshot. References below to candidates being open or unmerged describe that earlier state, not current GitHub status. These records explain what was built and must not be used as the current delivery checklist.
 
 The CEO Slean PRD review version 1.1 (`tasks/prd-slean-mutome-program.md` at `457660b`, SHA-256 `65e3896ce7639c4360aff0bc272eacc2c5b5135f9877e5e18791f708b9d0db01`) is the program baseline authorized for local implementation. CEO PR #17 remains open. This file records local implementation state, not a public release plan. The integrated Slean code commit `347484d` combines the open privacy, DOC-02 payload, and prebuilt-image candidates on `codex/slean-prd-integration`; it remains unmerged.
 
