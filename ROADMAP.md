@@ -2,15 +2,15 @@
 
 ## Selected direction: a foundation for cumulative science
 
-The [foundation PRD](tasks/prd-slean-scientific-reuse.md), selected on 27 September and clarified on 28 September 2026, owns the forward implementation plan. Slean's mission is to become an open foundation for advancing science with humans and AI. Checked reuse is the first operation; the first research profile must also carry a hypothesis through prediction, observation and revision. The research and decision are documented; the new implementation tasks are not started. Existing code and historical evidence remain available.
+The [foundation PRD](tasks/prd-slean-scientific-reuse.md), selected on 27 September and clarified on 28 September 2026, owns the forward implementation plan. Slean's mission is to become an open foundation for advancing science with humans and AI. Checked reuse is the first operation; the first research profile must also carry a hypothesis through prediction, observation and revision, and preserve blocked applications that a later contribution may help resolve. The first formal baseline is validated; the new contract is not implemented. Existing code and historical evidence remain available.
 
 | Milestone | Deliverable and acceptance | State |
 |---|---|---|
-| M0 · SR-T01–03 | Build the pinned Physlib example, freeze a fair direct-tool baseline, and specify the minimal contract with fixtures. | Not started |
+| M0 · SR-T01–03 | Build the pinned Physlib example, freeze a fair direct-tool baseline, and specify the minimal contract with fixtures. | SR-T01 complete; SR-T02–03 pending |
 | M1 · SR-T04–06 | Export and actually reuse a real Lean theorem across projects; expose assumptions, dependencies and verification policy. | Not started |
 | M2 · SR-T07–10 | Reuse a calibration across investigations, reproduce its output, and carry a prediction through a failed test and a model revision. | Not started |
 | Gate U | Preserve the complete example research cycle while reducing repeated integration work against Lean/Physlib + Python + RO-Crate at equivalent inputs and accounting; detect every negative case or leave it conditional. | Not evaluated |
-| M3 · SR-T11–13 | An independent agent-shaped consumer resumes the investigation from its artifacts; Explorer exposes the same claims, tests and revisions. | After Gate U |
+| M3 · SR-T11–13 | An independent agent-shaped consumer resumes an investigation and rechecks a blocked application after a new contribution; Explorer exposes the same claims, tests and revisions. | After Gate U |
 | M4 · SR-T14–16 | Independent reader and conformance kit, open-source release preparation, then authorized external adoption validation. | After M3; publication and outreach retain their existing authority boundaries |
 
 Update task completion and evidence in the PRD; this table only summarizes milestone state. Do not mark new tasks complete because V0 has a similarly named concept. The first engineering lot is M0–M2 followed by Gate U. It excludes new paid services and changes to Mutome or other repositories.

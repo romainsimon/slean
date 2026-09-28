@@ -1,0 +1,12 @@
+ClassicalMechanics.HarmonicOscillator.energy_conservation_of_equationOfMotion' : ∀
+  (S : ClassicalMechanics.HarmonicOscillator) (xₜ : Time → EuclideanSpace ℝ (Fin 1)),
+  ContDiff ℝ ∞ xₜ → S.EquationOfMotion xₜ → ∀ (t : Time), S.energy xₜ t = S.energy xₜ 0
+'ClassicalMechanics.HarmonicOscillator.energy_conservation_of_equationOfMotion'' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+DirectReuse.energy_at_two_times : ∀ (system : ClassicalMechanics.HarmonicOscillator)
+  (trajectory : Time → EuclideanSpace ℝ (Fin 1)),
+  ContDiff ℝ ∞ trajectory →
+    system.EquationOfMotion trajectory →
+      ∀ (first second : Time), system.energy trajectory first = system.energy trajectory second
+'DirectReuse.energy_at_two_times' depends on axioms: [propext, Classical.choice, Quot.sound]

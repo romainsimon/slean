@@ -1,0 +1,11 @@
+name = "direct_reuse"
+version = "0.1.0"
+defaultTargets = ["DirectReuse"]
+
+[[require]]
+name = "Physlib"
+git = "https://github.com/leanprover-community/physlib.git"
+rev = "44c66d54be78db4693be9f8f92bd3b5ad124ed6f"
+
+[[lean_lib]]
+name = "DirectReuse"
