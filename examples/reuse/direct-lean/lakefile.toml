@@ -23,3 +23,6 @@ name = "DirectReuse"
 
 [[lean_lib]]
 name = "ArchitectProbe"
+
+[[lean_lib]]
+name = "CalibrationProof"

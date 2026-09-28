@@ -1,0 +1,215 @@
+{
+  "authored_source_line_counts": {
+    "direct-lean/ArchitectProbe.lean": 78,
+    "direct-lean/Audit.lean": 12,
+    "direct-lean/CalibrationAudit.lean": 6,
+    "direct-lean/CalibrationProof.lean": 25,
+    "direct-lean/DirectReuse.lean": 27,
+    "direct-lean/check.sh": 56,
+    "direct-lean/check_architect.py": 86,
+    "direct-lean/check_calibration.py": 45,
+    "direct-lean/negative/CalibrationMissingGain.lean": 6,
+    "direct-lean/negative/CalibrationMissingResidual.lean": 7,
+    "direct-lean/negative/ChangedStatement.lean": 16,
+    "direct-lean/negative/MissingHypothesis.lean": 15,
+    "direct-python/check_baseline.py": 87,
+    "direct-python/consumer.py": 76,
+    "direct-python/method.py": 26,
+    "direct-python/package_baseline.py": 94,
+    "direct-python/producer.py": 60,
+    "direct-python/read_crate.mjs": 47,
+    "direct-python/research.py": 94,
+    "direct-python/test_baseline.py": 154
+  },
+  "cases": [
+    {
+      "check": "direct-lean/check.sh",
+      "id": "F01",
+      "operation": "Apply the real upstream conservation theorem",
+      "required_outcome": "checked under explicit smoothness and equation-of-motion hypotheses"
+    },
+    {
+      "check": "direct-lean/negative/MissingHypothesis.lean",
+      "id": "F02",
+      "operation": "Omit the equation of motion",
+      "required_outcome": "unsolved equation-of-motion obligation"
+    },
+    {
+      "check": "direct-lean/negative/ChangedStatement.lean",
+      "id": "F03",
+      "operation": "Change the theorem conclusion by adding one",
+      "required_outcome": "type mismatch"
+    },
+    {
+      "check": "direct-lean/check_architect.py",
+      "id": "F04",
+      "operation": "Suppress an actual blueprint proof edge",
+      "required_outcome": "native dependency is still present"
+    },
+    {
+      "check": "direct-lean/check_architect.py",
+      "id": "F05",
+      "operation": "Use an unapproved axiom",
+      "required_outcome": "axiom policy rejects the declaration"
+    },
+    {
+      "check": "direct-lean/check_architect.py",
+      "id": "F06",
+      "operation": "Use sorry directly, transitively or with a suppressed annotation",
+      "required_outcome": "axiom policy rejects all three declarations"
+    },
+    {
+      "check": "direct-lean/check_calibration.py",
+      "id": "F07",
+      "operation": "Prove affine inverse and residual bound",
+      "required_outcome": "checked only under the recorded hypotheses"
+    },
+    {
+      "check": "direct-lean/negative/CalibrationMissingGain.lean",
+      "id": "F08",
+      "operation": "Omit nonzero gain",
+      "required_outcome": "unsolved gain obligation"
+    },
+    {
+      "check": "direct-lean/negative/CalibrationMissingResidual.lean",
+      "id": "F09",
+      "operation": "Omit the residual bound",
+      "required_outcome": "unsolved residual obligation"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_fit_inverse_bound_and_unknown_parameter_uncertainty",
+      "id": "C01",
+      "operation": "Apply 2 V/mm and 0.5 V offset to 8.5 V",
+      "required_outcome": "4 mm and 0.01 mm conditional bound; parameter uncertainty unresolved"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_unit_conversion_including_temperature_offset",
+      "id": "C02",
+      "operation": "Convert 8500 mV and 20 degrees Celsius",
+      "required_outcome": "same result and compatible temperature"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_wrong_dimension_range_sensor_and_output",
+      "id": "C03",
+      "operation": "Wrong dimension, outside range, wrong sensor or omitted-offset output",
+      "required_outcome": "each specific incompatibility is reported"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_missing_applicability_and_unsupported_uncertainty",
+      "id": "C04",
+      "operation": "Remove applicability evidence or request a confidence interval",
+      "required_outcome": "missing condition remains; unsupported uncertainty is explicit"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_method_and_version_bindings",
+      "id": "C05",
+      "operation": "Change method bytes, selected version or model bytes",
+      "required_outcome": "specific integrity/version diagnostic"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_noninvertible_gain_and_invalid_error_bound",
+      "id": "C06",
+      "operation": "Use zero gain or a negative residual bound",
+      "required_outcome": "each is incompatible"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_research_revision_preserves_the_original_and_unknowns",
+      "id": "C07",
+      "operation": "Fail the first prediction and create a tested revision",
+      "required_outcome": "old assessment retained, only matching applications selected, unresolved alternative retained"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_frozen_rule_cannot_be_relaxed_after_observation",
+      "id": "C08",
+      "operation": "Relax the original threshold, with or without rehashing it",
+      "required_outcome": "original expected protocol rejects the change"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_out_of_scope_observation_does_not_refute_the_model",
+      "id": "C09",
+      "operation": "Evaluate a mismatched temperature",
+      "required_outcome": "not applicable; no refutation of the narrow claim"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_unrelated_contribution_and_wrong_context_do_not_resolve_obstacle",
+      "id": "C10",
+      "operation": "Provide an unrelated model or the original wrong-context model",
+      "required_outcome": "unsupported or incompatible; original result unchanged"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_research_revision_preserves_the_original_and_unknowns",
+      "id": "C11",
+      "operation": "Retry the same measurement after a new model/assessment",
+      "required_outcome": "same input and executable method; new model reference; remaining assumptions visible"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_independent_rocrate_reader_and_payload_tampering",
+      "id": "C12",
+      "operation": "Read the export with the existing JS library and explicitly run exported Python outside the checkout",
+      "required_outcome": "fields retained and computational output reproduced; formal reports need receiver rechecking"
+    },
+    {
+      "check": "direct-python/test_baseline.py::DirectToolBaseline.test_independent_rocrate_reader_and_payload_tampering",
+      "id": "C13",
+      "operation": "Alter a result payload",
+      "required_outcome": "digest check rejects it"
+    }
+  ],
+  "conditions": [
+    "Both paths use the same physical quantities, hypotheses, expected results and negative mutations.",
+    "Both paths may reuse helpers. Count adapter/schema/authoring/setup work on both sides.",
+    "Keep physical validity conditional; compilation, finite observations and a new citation cannot establish it.",
+    "Later-use attempts preserve exactly the same measurement input.",
+    "Authoring time and total setup cost are not retrospectively measured."
+  ],
+  "id": "direct-tool-baseline/2026-09-28.1",
+  "input_files": [
+    "direct-python/fixtures/calibration.csv",
+    "direct-python/fixtures/sample.json",
+    "direct-python/fixtures/research.json",
+    "direct-python/fixtures/pint-definitions.json"
+  ],
+  "measurements": {
+    "authoring_time": "not_measured",
+    "complete_setup_time": "not_measured",
+    "external_adoption": "not_evaluated",
+    "slean_comparison": "not_run"
+  },
+  "purpose": "Fixed inputs and direct-tool source for Gate U; not the Slean module format",
+  "sha256": {
+    "direct-lean/ArchitectProbe.lean": "d1e82385f164909814f046c977a12db8031b18897cbea80692310125101ef23c",
+    "direct-lean/Audit.lean": "9523abd5c423cfdd1f7e8a24db1775cd5af0dc6f7174d635a0d20e653094759c",
+    "direct-lean/CalibrationAudit.lean": "dbe39ea4e189164c451ef98c9433a6e24cd34465738ed81076a3571642ad9dd1",
+    "direct-lean/CalibrationProof.lean": "71f4bec9f6d662adcf669a026787c72fb1fcca2aa08590c8b6cd715596ee9d25",
+    "direct-lean/DirectReuse.lean": "293ead0b004aa481cdd084094ab3e911d0e8662432c47b8fe0499aee360fc853",
+    "direct-lean/check.sh": "956cb49b402d528d6d722cf8465787f97a887d2f91a1d6c46eefe0e5b6a5ed42",
+    "direct-lean/check_architect.py": "ca312ba3a71806254a15000cb236d2bb429fdb3e4fe819376a35b381f90d698a",
+    "direct-lean/check_calibration.py": "ba8df71813acd5cd8a024a3f67089595b9387e633dc88f3537baef322a5ae3f3",
+    "direct-lean/lake-manifest.json": "bb6052f2b190389a82d2c2ddcc6edba69c9a89c910273f76e07c62720a79a9cb",
+    "direct-lean/lakefile.toml": "36b1f01935379fcb4498c34c735b841be311a7c8bf101598b640eca4f010d38b",
+    "direct-lean/lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+    "direct-lean/mathlib-cache-roots.txt": "ef882e856d596dee6d047c0607c8914da2ce516c6a992befa93c6e33ad766cb6",
+    "direct-lean/negative/CalibrationMissingGain.lean": "e9a75e1d149253b74f5b181ac3049fbc62f4b442fdd3a9551b1481c9c42bb672",
+    "direct-lean/negative/CalibrationMissingResidual.lean": "9a399d49b24ac63c1b3267f3c1d1058d0e457a5efaf4e4787ace5fba66c13539",
+    "direct-lean/negative/ChangedStatement.lean": "d055ad9f23ab5e8412e90f5a6d0595f93e02d6c131a190bc2df7cb3dee66a374",
+    "direct-lean/negative/MissingHypothesis.lean": "887062022fcf940c28a69621565356833c084091f298e66a2ca50ecaacddbc32",
+    "direct-lean/observed-architect.json": "ae0744bb40d35d42dd25b302c3d3dc83027e00576567075f98a906e472e440bb",
+    "direct-lean/observed-calibration.json": "02068490191541845139c4eb70a30b429c14d7257c56c6e6f04c254d3857eed5",
+    "direct-lean/observed-interface.txt": "9754c90ecef00eaf04354b8b90ba0006ef12f95f85e42929422a987165153ef4",
+    "direct-python/check_baseline.py": "b42a94a2ac362aa0e01253cf94533aa510652c66a4c1cb9caf270c3b2a31370d",
+    "direct-python/consumer.py": "bc3e7dc974c3731207543b5e560e9aa410baedf62f7eaa86370ec86273c809cf",
+    "direct-python/fixtures/calibration.csv": "1961f53ca4179a6660b85ac2bc3d0c3b1f5923193cb9f9af67371e76e6cea5a2",
+    "direct-python/fixtures/pint-definitions.json": "e1dfab945d299c7715bae6d42b0ee25e14f91efa7a0c2f7926e4a3ebf271a15a",
+    "direct-python/fixtures/research.json": "513bab773d4f019cca8ff83d56a30e399a8dcd8f70be95790bc7125d903940d5",
+    "direct-python/fixtures/sample.json": "d24db716823b2ca683a4cd2c308489b2ba912659c995162c03811e9d5419e5bd",
+    "direct-python/method.py": "904b8b3027d93f3eaa29204843809ba2a648480687783bd59e526beb7e77e19b",
+    "direct-python/package-lock.json": "70a232ff49d5122a74c0c113be084f7db9c77b4cde7a5df81200d4d44b27f44f",
+    "direct-python/package.json": "ae463350b1c6a642bff92b859b96fe9de516a3aed0e4e22b73892cb83f1d4831",
+    "direct-python/package_baseline.py": "f798477ffa820a3af0074a30a4e82f700729289426809ff01d4c28a4e854a55f",
+    "direct-python/producer.py": "aad394bda4f5d972fef30b47c301c83f7c3ba40d6f9aa4d546a73fd26d9e3912",
+    "direct-python/read_crate.mjs": "d8ea934873807054f12302f42b4664f328e6b62038ebb927c9ffd762a1819cfd",
+    "direct-python/requirements.lock": "b14cabd983545f741936a2506ec7e0dba91b1ac59a7e9e4b7bc31f118053d04d",
+    "direct-python/research.py": "cff41573fe2c28cde811edb74d42c34a327e1dfc823a60271a8755feab64644b",
+    "direct-python/test_baseline.py": "176915b703bfe607d7400f0bba4065df9ed53cb4369e7ecd5f7e16f1d0372396"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "pint": "0.26.1",
+  "sha256": {
+    "constants_en.txt": "a713dd2974ee78de1fb89c9ac633afdc262938b07ea77a5275ae3091147b2e7b",
+    "default_en.txt": "d6d6e8fd4f930a4cf79e3669aa9608a0336547074ae56861287e38dca8689036",
+    "xtranslated.txt": "ec4242bf905d33ebecb8292a3f4856edee6ea82cef3d670ede849203fbada426"
+  }
+}

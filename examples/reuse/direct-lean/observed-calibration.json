@@ -1,0 +1,19 @@
+{
+  "axioms": {
+    "CalibrationProof.inverse_exact": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "CalibrationProof.inverse_residual_bound": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  "interfaces": "CalibrationProof.inverse_exact : \u2200 (gain offset input : \u211d), gain \u2260 0 \u2192 (gain * input + offset - offset) / gain = input\n'CalibrationProof.inverse_exact' depends on axioms: [propext, Classical.choice, Quot.sound]\nCalibrationProof.inverse_residual_bound : \u2200 (gain offset input residual bound : \u211d),\n  gain \u2260 0 \u2192 |residual| \u2264 bound \u2192 |(gain * input + offset + residual - offset) / gain - input| \u2264 bound / |gain|\n'CalibrationProof.inverse_residual_bound' depends on axioms: [propext, Classical.choice, Quot.sound]\n",
+  "kind": "direct_calibration_algebra_check",
+  "missing_gain_rejected": true,
+  "missing_residual_assumption_rejected": true,
+  "physical_applicability": "not_verified"
+}

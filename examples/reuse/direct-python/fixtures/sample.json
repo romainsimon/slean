@@ -1,0 +1,6 @@
+{
+  "sensor": "sensor-A",
+  "reading": { "value": "8.5", "unit": "volt" },
+  "temperature": { "value": "293.15", "unit": "kelvin" },
+  "applicability_evidence": "synthetic-calibration-at-293.15K"
+}

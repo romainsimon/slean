@@ -1,0 +1,10 @@
+{
+  "temperature": {"value": "313.15", "unit": "kelvin"},
+  "first_displacement": {"value": "4", "unit": "millimeter"},
+  "first_observation": {"value": "8.6", "unit": "volt"},
+  "second_displacement": {"value": "3", "unit": "millimeter"},
+  "second_observation": {"value": "6.6", "unit": "volt"},
+  "absolute_bound": {"value": "0.02", "unit": "volt"},
+  "follow_up": "Does the gain also change with temperature?",
+  "unresolved_alternative": "The observed shift could come from temporal drift rather than temperature."
+}

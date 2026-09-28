@@ -1,0 +1,8 @@
+{
+  "name": "slean-direct-tool-baseline-reader",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "dependencies": { "ro-crate": "3.7.2" }
+}

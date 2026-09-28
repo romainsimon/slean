@@ -3,8 +3,8 @@
 This is an internal engineering fixture for SR-T01, and the first part of the
 direct-tool comparison. It uses ordinary Lean and Physlib, without a Slean
 wrapper. It is not the selected scientific research topic for Mutome. The
-computational baseline and the cumulative-exploration evaluation are still to
-be built.
+computational baseline now lives in [direct-python](../direct-python/README.md).
+The cumulative-exploration evaluation remains future work.
 
 `DirectReuse.energy_at_two_times` applies Physlib's existing energy-conservation
 theorem at two times. Its smoothness and equation-of-motion hypotheses are
@@ -88,6 +88,19 @@ The [integration decision](../../../docs/research/slean-formal-integration-2026-
 defines what Slean can reuse and what its formal profile must still check.
 
 ## Validation on 28 September 2026
+
+The additional calibration algebra check is available with:
+
+```sh
+python3 check_calibration.py
+```
+
+It checks the affine inverse and its conditional residual error bound. Both
+theorems use only the same three allowed axioms. Omitting the nonzero gain or
+the residual-bound hypothesis leaves the intended unsolved goal. The
+[recorded report](observed-calibration.json) includes the native statements.
+They concern real-valued magnitudes; they do not establish that a physical
+sensor follows the model or that fitted parameters are exact.
 
 `bash check.sh` passed on macOS ARM64 with the environment above. Lake reported
 3,258 jobs including cached dependencies. The two inspected declarations both

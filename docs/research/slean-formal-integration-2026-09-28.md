@@ -1,8 +1,8 @@
 # Formal integration decision — 28 September 2026
 
-This closes the formal-tool compatibility probe within SR-T02. The Python
-research-cycle baseline, complete feature/cost inventory and frozen shared
-comparison still remain before SR-T02 can be marked complete.
+This records the formal-tool compatibility probe within SR-T02. The task now
+also has a [computational baseline and frozen comparison](../../examples/reuse/COMPARISON.md).
+That milestone does not establish an advantage for the proposed Slean contract.
 
 ## Selected integration
 
