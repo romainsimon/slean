@@ -1,0 +1,268 @@
+[
+  {
+    "operator": "all",
+    "inputs": [
+      "satisfied",
+      "satisfied"
+    ],
+    "expected": "satisfied"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "satisfied",
+      "violated"
+    ],
+    "expected": "violated"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "satisfied",
+      "unresolved"
+    ],
+    "expected": "unresolved"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "satisfied",
+      "unsupported"
+    ],
+    "expected": "unsupported"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "violated",
+      "satisfied"
+    ],
+    "expected": "violated"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "violated",
+      "violated"
+    ],
+    "expected": "violated"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "violated",
+      "unresolved"
+    ],
+    "expected": "violated"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "violated",
+      "unsupported"
+    ],
+    "expected": "violated"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "unresolved",
+      "satisfied"
+    ],
+    "expected": "unresolved"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "unresolved",
+      "violated"
+    ],
+    "expected": "violated"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "unresolved",
+      "unresolved"
+    ],
+    "expected": "unresolved"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "unresolved",
+      "unsupported"
+    ],
+    "expected": "unsupported"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "unsupported",
+      "satisfied"
+    ],
+    "expected": "unsupported"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "unsupported",
+      "violated"
+    ],
+    "expected": "violated"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "unsupported",
+      "unresolved"
+    ],
+    "expected": "unsupported"
+  },
+  {
+    "operator": "all",
+    "inputs": [
+      "unsupported",
+      "unsupported"
+    ],
+    "expected": "unsupported"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "satisfied",
+      "satisfied"
+    ],
+    "expected": "satisfied"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "satisfied",
+      "violated"
+    ],
+    "expected": "satisfied"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "satisfied",
+      "unresolved"
+    ],
+    "expected": "satisfied"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "satisfied",
+      "unsupported"
+    ],
+    "expected": "satisfied"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "violated",
+      "satisfied"
+    ],
+    "expected": "satisfied"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "violated",
+      "violated"
+    ],
+    "expected": "violated"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "violated",
+      "unresolved"
+    ],
+    "expected": "unresolved"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "violated",
+      "unsupported"
+    ],
+    "expected": "unsupported"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "unresolved",
+      "satisfied"
+    ],
+    "expected": "satisfied"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "unresolved",
+      "violated"
+    ],
+    "expected": "unresolved"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "unresolved",
+      "unresolved"
+    ],
+    "expected": "unresolved"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "unresolved",
+      "unsupported"
+    ],
+    "expected": "unsupported"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "unsupported",
+      "satisfied"
+    ],
+    "expected": "satisfied"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "unsupported",
+      "violated"
+    ],
+    "expected": "unsupported"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "unsupported",
+      "unresolved"
+    ],
+    "expected": "unsupported"
+  },
+  {
+    "operator": "any",
+    "inputs": [
+      "unsupported",
+      "unsupported"
+    ],
+    "expected": "unsupported"
+  },
+  {
+    "operator": "all",
+    "inputs": [],
+    "expected": "satisfied"
+  },
+  {
+    "operator": "any",
+    "inputs": [],
+    "expected": "violated"
+  }
+]

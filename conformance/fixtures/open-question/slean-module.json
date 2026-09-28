@@ -1,0 +1,28 @@
+{
+  "format": "slean-module/0.1-draft.1",
+  "profiles": [
+    {
+      "id": "slean-research/0.1-draft.1",
+      "required": true
+    }
+  ],
+  "dependencies": [],
+  "payloads": [],
+  "components": [],
+  "applications": [],
+  "evidence": [],
+  "annotations": {
+    "slean-research/0.1-draft.1": {
+      "questions": [
+        {
+          "id": "question",
+          "wording": "What distinguishes these behaviors?",
+          "source": "Illustrative research metadata",
+          "targets": []
+        }
+      ],
+      "alternatives": []
+    }
+  },
+  "id": "sha256:716503ecda5fa7b5bc41792fe421a696af6827518e6fae02e4f077e303ef6c4a"
+}

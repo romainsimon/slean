@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:slean:lean:0.1-draft.1",
+  "$defs": {
+    "text": {"type": "string", "minLength": 1},
+    "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "name": {"type": "array", "items": {"oneOf": [
+      {"type": "array", "prefixItems": [{"const": "str"}, {"type": "string"}], "minItems": 2, "maxItems": 2},
+      {"type": "array", "prefixItems": [{"const": "num"}, {"type": "string", "pattern": "^(0|[1-9][0-9]*)$"}], "minItems": 2, "maxItems": 2}
+    ]}},
+    "artifact": {"type": "object", "additionalProperties": false, "required": ["path"], "properties": {
+      "path": {"type": "string"}, "module": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}}},
+    "interface": {"type": "object", "additionalProperties": false,
+      "required": ["declaration", "module", "source", "toolchain", "lock", "statement"], "properties": {
+        "declaration": {"$ref": "#/$defs/name"}, "module": {"$ref": "#/$defs/text"},
+        "source": {"$ref": "#/$defs/artifact"}, "lock": {"$ref": "#/$defs/artifact"},
+        "toolchain": {"const": "leanprover/lean4:v4.34.1"},
+        "statement": {"type": "object", "additionalProperties": false,
+          "required": ["encoding", "artifact", "fingerprint"], "properties": {
+            "encoding": {"const": "lean-expr/0.1-draft.1"}, "artifact": {"$ref": "#/$defs/artifact"}, "fingerprint": {"$ref": "#/$defs/digest"}}}}},
+    "result": {"type": "object", "additionalProperties": false,
+      "required": ["status", "policy", "statement_fingerprint", "statement_dependencies", "proof_dependencies", "axioms"], "properties": {
+        "status": {"enum": ["passed", "failed", "unsupported"]}, "policy": {"$ref": "#/$defs/text"},
+        "statement_fingerprint": {"$ref": "#/$defs/digest"},
+        "statement_dependencies": {"type": "array", "items": {"$ref": "#/$defs/name"}},
+        "proof_dependencies": {"type": "array", "items": {"$ref": "#/$defs/name"}},
+        "axioms": {"type": "array", "items": {"$ref": "#/$defs/name"}}}}
+  }
+}

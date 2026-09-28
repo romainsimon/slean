@@ -1,0 +1,1 @@
+{"conversions_checked": 21, "physlib_adapter": "ISQ source mapping specified; runtime adapter not implemented", "pint": "0.26.1", "profile": "slean-quantity/0.1-draft.1", "status": "passed", "units_checked": ["degree_Celsius", "kelvin", "meter", "millimeter", "millivolt", "volt", "volt/millimeter"]}

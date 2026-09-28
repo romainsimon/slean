@@ -3,6 +3,8 @@
 /examples/reuse/direct-python/node_modules/
 /examples/reuse/direct-python/.venv/
 /examples/reuse/direct-python/_out/
+/conformance/.venv/
+/conformance/_out/
 /site/.lake/
 /site/_out/
 /site/node_modules/

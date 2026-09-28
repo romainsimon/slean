@@ -1,0 +1,1587 @@
+{
+  "format": "slean-module/0.1-draft.1",
+  "profiles": [
+    {
+      "id": "slean-quantity/0.1-draft.1",
+      "required": true
+    },
+    {
+      "id": "slean-research/0.1-draft.1",
+      "required": true
+    }
+  ],
+  "dependencies": [],
+  "payloads": [
+    {
+      "path": "calibration.csv",
+      "size": "56",
+      "sha256": "1961f53ca4179a6660b85ac2bc3d0c3b1f5923193cb9f9af67371e76e6cea5a2"
+    },
+    {
+      "path": "compare.py",
+      "size": "145",
+      "sha256": "ed3d155b8bea1ecf1c06301f41dea6c84798c134f1aa86f226643c94f3ac1684"
+    },
+    {
+      "path": "method.py",
+      "size": "767",
+      "sha256": "904b8b3027d93f3eaa29204843809ba2a648480687783bd59e526beb7e77e19b"
+    },
+    {
+      "path": "observation-1.json",
+      "size": "394",
+      "sha256": "7b50f20056295403de8ef802f81e90e36c305e821a52aa45b7deafe8ada062b8"
+    },
+    {
+      "path": "observation-2.json",
+      "size": "394",
+      "sha256": "0295c32363ec751ddffe810c21b37633f677ee7f8953873dc148dbb18a769781"
+    },
+    {
+      "path": "observations.csv",
+      "size": "49",
+      "sha256": "a8f834f7a04cf87d8c343e34d00dacc35e21b17136fa6e2e44511ffd106dfd5f"
+    }
+  ],
+  "components": [
+    {
+      "id": "physical-assumption",
+      "kind": "claim",
+      "name": "physical-assumption",
+      "interface": {
+        "profile": "slean-quantity/0.1-draft.1",
+        "value": {
+          "inputs": {},
+          "outputs": {},
+          "parameters": {}
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": []
+      },
+      "sources": [
+        {
+          "path": "method.py"
+        }
+      ],
+      "license": "Apache-2.0",
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "hypothesis"
+        }
+      }
+    },
+    {
+      "id": "calibration-original",
+      "kind": "method",
+      "name": "calibration-original",
+      "interface": {
+        "profile": "slean-quantity/0.1-draft.1",
+        "value": {
+          "inputs": {
+            "reading": {
+              "kind": "scalar",
+              "unit": "volt",
+              "dimension": "voltage",
+              "allow_missing": false
+            }
+          },
+          "outputs": {
+            "displacement": {
+              "kind": "scalar",
+              "unit": "millimeter",
+              "dimension": "length",
+              "allow_missing": false
+            }
+          },
+          "parameters": {
+            "gain": {
+              "kind": "scalar",
+              "value": "2",
+              "unit": "volt/millimeter",
+              "dimension": "gain",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            },
+            "offset": {
+              "kind": "scalar",
+              "value": "0.5",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          },
+          "entrypoint": {
+            "artifact": {
+              "path": "method.py"
+            },
+            "symbol": "inverse"
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": [
+          {
+            "id": "temperature",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "equals",
+              "arguments": {
+                "location": "context",
+                "field": "temperature",
+                "expected": {
+                  "typed": {
+                    "profile": "slean-quantity/0.1-draft.1",
+                    "value": {
+                      "kind": "scalar",
+                      "value": "293.15",
+                      "unit": "kelvin",
+                      "dimension": "temperature",
+                      "uncertainty": {
+                        "kind": "unknown"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "physical",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "applicability",
+              "arguments": {
+                "claim": {
+                  "id": "physical-assumption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "sources": [
+        {
+          "path": "method.py"
+        }
+      ],
+      "license": "Apache-2.0",
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "method"
+        }
+      }
+    },
+    {
+      "id": "model-hypothesis",
+      "kind": "model",
+      "name": "model-hypothesis",
+      "interface": {
+        "profile": "slean-quantity/0.1-draft.1",
+        "value": {
+          "inputs": {
+            "displacement": {
+              "kind": "scalar",
+              "unit": "millimeter",
+              "dimension": "length",
+              "allow_missing": false
+            }
+          },
+          "outputs": {
+            "voltage": {
+              "kind": "scalar",
+              "unit": "volt",
+              "dimension": "voltage",
+              "allow_missing": false
+            }
+          },
+          "parameters": {
+            "gain": {
+              "kind": "scalar",
+              "value": "2",
+              "unit": "volt/millimeter",
+              "dimension": "gain",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            },
+            "offset": {
+              "kind": "scalar",
+              "value": "0.5",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": [
+          {
+            "id": "temperature",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "equals",
+              "arguments": {
+                "location": "context",
+                "field": "temperature",
+                "expected": {
+                  "typed": {
+                    "profile": "slean-quantity/0.1-draft.1",
+                    "value": {
+                      "kind": "scalar",
+                      "value": "313.15",
+                      "unit": "kelvin",
+                      "dimension": "temperature",
+                      "uncertainty": {
+                        "kind": "unknown"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "physical",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "applicability",
+              "arguments": {
+                "claim": {
+                  "id": "physical-assumption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "sources": [
+        {
+          "path": "method.py"
+        }
+      ],
+      "license": "Apache-2.0",
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "hypothesis"
+        }
+      }
+    },
+    {
+      "id": "model-revision",
+      "kind": "model",
+      "name": "model-revision",
+      "interface": {
+        "profile": "slean-quantity/0.1-draft.1",
+        "value": {
+          "inputs": {
+            "displacement": {
+              "kind": "scalar",
+              "unit": "millimeter",
+              "dimension": "length",
+              "allow_missing": false
+            }
+          },
+          "outputs": {
+            "voltage": {
+              "kind": "scalar",
+              "unit": "volt",
+              "dimension": "voltage",
+              "allow_missing": false
+            }
+          },
+          "parameters": {
+            "gain": {
+              "kind": "scalar",
+              "value": "2",
+              "unit": "volt/millimeter",
+              "dimension": "gain",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            },
+            "offset": {
+              "kind": "scalar",
+              "value": "0.6",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": [
+          {
+            "id": "temperature",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "equals",
+              "arguments": {
+                "location": "context",
+                "field": "temperature",
+                "expected": {
+                  "typed": {
+                    "profile": "slean-quantity/0.1-draft.1",
+                    "value": {
+                      "kind": "scalar",
+                      "value": "313.15",
+                      "unit": "kelvin",
+                      "dimension": "temperature",
+                      "uncertainty": {
+                        "kind": "unknown"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "physical",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "applicability",
+              "arguments": {
+                "claim": {
+                  "id": "physical-assumption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "sources": [
+        {
+          "path": "method.py"
+        }
+      ],
+      "license": "Apache-2.0",
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "revision",
+          "motivated_by": {
+            "id": "assessment-1"
+          }
+        }
+      },
+      "supersedes": [
+        {
+          "id": "model-hypothesis"
+        }
+      ]
+    },
+    {
+      "id": "calibration-revised",
+      "kind": "method",
+      "name": "calibration-revised",
+      "interface": {
+        "profile": "slean-quantity/0.1-draft.1",
+        "value": {
+          "inputs": {
+            "reading": {
+              "kind": "scalar",
+              "unit": "volt",
+              "dimension": "voltage",
+              "allow_missing": false
+            }
+          },
+          "outputs": {
+            "displacement": {
+              "kind": "scalar",
+              "unit": "millimeter",
+              "dimension": "length",
+              "allow_missing": false
+            }
+          },
+          "parameters": {
+            "gain": {
+              "kind": "scalar",
+              "value": "2",
+              "unit": "volt/millimeter",
+              "dimension": "gain",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            },
+            "offset": {
+              "kind": "scalar",
+              "value": "0.6",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          },
+          "entrypoint": {
+            "artifact": {
+              "path": "method.py"
+            },
+            "symbol": "inverse"
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": [
+          {
+            "id": "temperature",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "equals",
+              "arguments": {
+                "location": "context",
+                "field": "temperature",
+                "expected": {
+                  "typed": {
+                    "profile": "slean-quantity/0.1-draft.1",
+                    "value": {
+                      "kind": "scalar",
+                      "value": "313.15",
+                      "unit": "kelvin",
+                      "dimension": "temperature",
+                      "uncertainty": {
+                        "kind": "unknown"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "physical",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "applicability",
+              "arguments": {
+                "claim": {
+                  "id": "physical-assumption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "sources": [
+        {
+          "path": "method.py"
+        }
+      ],
+      "license": "Apache-2.0",
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "revision",
+          "motivated_by": {
+            "id": "assessment-2"
+          }
+        }
+      },
+      "supersedes": [
+        {
+          "id": "calibration-original"
+        }
+      ]
+    },
+    {
+      "id": "observation-1",
+      "kind": "data",
+      "name": "observation-1",
+      "interface": {
+        "profile": "slean-quantity/0.1-draft.1",
+        "value": {
+          "inputs": {},
+          "outputs": {},
+          "parameters": {
+            "voltage": {
+              "kind": "scalar",
+              "value": "8.6",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": []
+      },
+      "sources": [
+        {
+          "path": "observation-1.json"
+        }
+      ],
+      "license": "Apache-2.0",
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "observation"
+        }
+      }
+    },
+    {
+      "id": "observation-2",
+      "kind": "data",
+      "name": "observation-2",
+      "interface": {
+        "profile": "slean-quantity/0.1-draft.1",
+        "value": {
+          "inputs": {},
+          "outputs": {},
+          "parameters": {
+            "voltage": {
+              "kind": "scalar",
+              "value": "6.6",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": []
+      },
+      "sources": [
+        {
+          "path": "observation-2.json"
+        }
+      ],
+      "license": "Apache-2.0",
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "observation"
+        }
+      }
+    },
+    {
+      "id": "calibration-fit",
+      "kind": "method",
+      "name": "Planned calibration fit; execution not supplied by this wire fixture",
+      "interface": {
+        "profile": "slean-quantity/0.1-draft.1",
+        "value": {
+          "inputs": {
+            "source": {
+              "kind": "table",
+              "format": "csv",
+              "columns": {
+                "displacement_mm": {
+                  "kind": "scalar",
+                  "unit": "millimeter",
+                  "dimension": "length",
+                  "allow_missing": false
+                },
+                "voltage_V": {
+                  "kind": "scalar",
+                  "unit": "volt",
+                  "dimension": "voltage",
+                  "allow_missing": false
+                }
+              }
+            }
+          },
+          "outputs": {
+            "gain": {
+              "kind": "scalar",
+              "unit": "volt/millimeter",
+              "dimension": "gain",
+              "allow_missing": false
+            },
+            "offset": {
+              "kind": "scalar",
+              "unit": "volt",
+              "dimension": "voltage",
+              "allow_missing": false
+            }
+          },
+          "parameters": {}
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": []
+      },
+      "sources": [
+        {
+          "path": "method.py"
+        }
+      ],
+      "license": "Apache-2.0"
+    }
+  ],
+  "applications": [
+    {
+      "id": "blocked-attempt",
+      "component": {
+        "id": "calibration-original"
+      },
+      "phase": "planned",
+      "bindings": {
+        "reading": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "8.6",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "context": {
+        "sensor": {
+          "literal": "sensor-A"
+        },
+        "temperature": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "313.15",
+              "unit": "kelvin",
+              "dimension": "temperature",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": [
+          {
+            "id": "temperature",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "equals",
+              "arguments": {
+                "location": "context",
+                "field": "temperature",
+                "expected": {
+                  "typed": {
+                    "profile": "slean-quantity/0.1-draft.1",
+                    "value": {
+                      "kind": "scalar",
+                      "value": "293.15",
+                      "unit": "kelvin",
+                      "dimension": "temperature",
+                      "uncertainty": {
+                        "kind": "unknown"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "physical",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "applicability",
+              "arguments": {
+                "claim": {
+                  "id": "physical-assumption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "reuse-attempt",
+          "question": {
+            "id": "reconstruction"
+          },
+          "attempt_of": "measurement-at-313K",
+          "contributions": [],
+          "obstacles": [
+            {
+              "requirement": "temperature",
+              "status": "violated",
+              "reason": "Original temperature differs"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "test-plan-1",
+      "component": {
+        "id": "model-hypothesis"
+      },
+      "phase": "planned",
+      "bindings": {
+        "displacement": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "4",
+              "unit": "millimeter",
+              "dimension": "length",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "context": {
+        "sensor": {
+          "literal": "sensor-A"
+        },
+        "temperature": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "313.15",
+              "unit": "kelvin",
+              "dimension": "temperature",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": [
+          {
+            "id": "temperature",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "equals",
+              "arguments": {
+                "location": "context",
+                "field": "temperature",
+                "expected": {
+                  "typed": {
+                    "profile": "slean-quantity/0.1-draft.1",
+                    "value": {
+                      "kind": "scalar",
+                      "value": "313.15",
+                      "unit": "kelvin",
+                      "dimension": "temperature",
+                      "uncertainty": {
+                        "kind": "unknown"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "physical",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "applicability",
+              "arguments": {
+                "claim": {
+                  "id": "physical-assumption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "test-plan",
+          "question": {
+            "id": "reconstruction"
+          },
+          "prediction": {
+            "observable": "voltage",
+            "expected": {
+              "kind": "scalar",
+              "value": "8.5",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            },
+            "comparison": "absolute_difference",
+            "bound": {
+              "kind": "scalar",
+              "value": "0.02",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            },
+            "observation": "observation-1"
+          }
+        }
+      }
+    },
+    {
+      "id": "test-run-1",
+      "component": {
+        "id": "model-hypothesis"
+      },
+      "phase": "executed",
+      "bindings": {
+        "displacement": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "4",
+              "unit": "millimeter",
+              "dimension": "length",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "context": {
+        "sensor": {
+          "literal": "sensor-A"
+        },
+        "temperature": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "313.15",
+              "unit": "kelvin",
+              "dimension": "temperature",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": [
+          {
+            "id": "temperature",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "equals",
+              "arguments": {
+                "location": "context",
+                "field": "temperature",
+                "expected": {
+                  "typed": {
+                    "profile": "slean-quantity/0.1-draft.1",
+                    "value": {
+                      "kind": "scalar",
+                      "value": "313.15",
+                      "unit": "kelvin",
+                      "dimension": "temperature",
+                      "uncertainty": {
+                        "kind": "unknown"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "physical",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "applicability",
+              "arguments": {
+                "claim": {
+                  "id": "physical-assumption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "outputs": {
+        "voltage": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "8.6",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "plan": {
+        "id": "test-plan-1"
+      },
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "test-execution"
+        }
+      }
+    },
+    {
+      "id": "test-plan-2",
+      "component": {
+        "id": "model-revision"
+      },
+      "phase": "planned",
+      "bindings": {
+        "displacement": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "3",
+              "unit": "millimeter",
+              "dimension": "length",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "context": {
+        "sensor": {
+          "literal": "sensor-A"
+        },
+        "temperature": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "313.15",
+              "unit": "kelvin",
+              "dimension": "temperature",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": [
+          {
+            "id": "temperature",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "equals",
+              "arguments": {
+                "location": "context",
+                "field": "temperature",
+                "expected": {
+                  "typed": {
+                    "profile": "slean-quantity/0.1-draft.1",
+                    "value": {
+                      "kind": "scalar",
+                      "value": "313.15",
+                      "unit": "kelvin",
+                      "dimension": "temperature",
+                      "uncertainty": {
+                        "kind": "unknown"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "physical",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "applicability",
+              "arguments": {
+                "claim": {
+                  "id": "physical-assumption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "test-plan",
+          "question": {
+            "id": "reconstruction"
+          },
+          "prediction": {
+            "observable": "voltage",
+            "expected": {
+              "kind": "scalar",
+              "value": "6.6",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            },
+            "comparison": "absolute_difference",
+            "bound": {
+              "kind": "scalar",
+              "value": "0.02",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            },
+            "observation": "observation-2"
+          }
+        }
+      }
+    },
+    {
+      "id": "test-run-2",
+      "component": {
+        "id": "model-revision"
+      },
+      "phase": "executed",
+      "bindings": {
+        "displacement": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "3",
+              "unit": "millimeter",
+              "dimension": "length",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "context": {
+        "sensor": {
+          "literal": "sensor-A"
+        },
+        "temperature": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "313.15",
+              "unit": "kelvin",
+              "dimension": "temperature",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": [
+          {
+            "id": "temperature",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "equals",
+              "arguments": {
+                "location": "context",
+                "field": "temperature",
+                "expected": {
+                  "typed": {
+                    "profile": "slean-quantity/0.1-draft.1",
+                    "value": {
+                      "kind": "scalar",
+                      "value": "313.15",
+                      "unit": "kelvin",
+                      "dimension": "temperature",
+                      "uncertainty": {
+                        "kind": "unknown"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "physical",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "applicability",
+              "arguments": {
+                "claim": {
+                  "id": "physical-assumption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "outputs": {
+        "voltage": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "6.6",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "plan": {
+        "id": "test-plan-2"
+      },
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "test-execution"
+        }
+      }
+    },
+    {
+      "id": "retry-attempt",
+      "component": {
+        "id": "calibration-revised"
+      },
+      "phase": "planned",
+      "bindings": {
+        "reading": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "8.6",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "context": {
+        "sensor": {
+          "literal": "sensor-A"
+        },
+        "temperature": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "313.15",
+              "unit": "kelvin",
+              "dimension": "temperature",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": [
+          {
+            "id": "temperature",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "equals",
+              "arguments": {
+                "location": "context",
+                "field": "temperature",
+                "expected": {
+                  "typed": {
+                    "profile": "slean-quantity/0.1-draft.1",
+                    "value": {
+                      "kind": "scalar",
+                      "value": "313.15",
+                      "unit": "kelvin",
+                      "dimension": "temperature",
+                      "uncertainty": {
+                        "kind": "unknown"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "physical",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "applicability",
+              "arguments": {
+                "claim": {
+                  "id": "physical-assumption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "slean-research/0.1-draft.1": {
+          "role": "reuse-attempt",
+          "question": {
+            "id": "reconstruction"
+          },
+          "attempt_of": "measurement-at-313K",
+          "previous_attempt": {
+            "id": "blocked-attempt"
+          },
+          "contributions": [
+            {
+              "id": "calibration-revised"
+            },
+            {
+              "id": "assessment-2"
+            }
+          ],
+          "obstacles": [
+            {
+              "requirement": "physical",
+              "status": "unresolved",
+              "reason": "Finite observations do not prove physical applicability or exact gain"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "retry-run",
+      "component": {
+        "id": "calibration-revised"
+      },
+      "phase": "executed",
+      "bindings": {
+        "reading": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "8.6",
+              "unit": "volt",
+              "dimension": "voltage",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "context": {
+        "sensor": {
+          "literal": "sensor-A"
+        },
+        "temperature": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "313.15",
+              "unit": "kelvin",
+              "dimension": "temperature",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "requires": {
+        "id": "conditions",
+        "all": [
+          {
+            "id": "temperature",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "equals",
+              "arguments": {
+                "location": "context",
+                "field": "temperature",
+                "expected": {
+                  "typed": {
+                    "profile": "slean-quantity/0.1-draft.1",
+                    "value": {
+                      "kind": "scalar",
+                      "value": "313.15",
+                      "unit": "kelvin",
+                      "dimension": "temperature",
+                      "uncertainty": {
+                        "kind": "unknown"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "physical",
+            "leaf": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "predicate": "applicability",
+              "arguments": {
+                "claim": {
+                  "id": "physical-assumption"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "outputs": {
+        "displacement": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "4",
+              "unit": "millimeter",
+              "dimension": "length",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "plan": {
+        "id": "retry-attempt"
+      }
+    },
+    {
+      "id": "inspect-table",
+      "component": {
+        "id": "calibration-fit"
+      },
+      "phase": "planned",
+      "bindings": {
+        "source": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "table",
+              "format": "csv",
+              "columns": {
+                "displacement_mm": {
+                  "kind": "scalar",
+                  "unit": "millimeter",
+                  "dimension": "length",
+                  "allow_missing": false
+                },
+                "voltage_V": {
+                  "kind": "scalar",
+                  "unit": "volt",
+                  "dimension": "voltage",
+                  "allow_missing": false
+                }
+              },
+              "artifact": {
+                "path": "calibration.csv"
+              }
+            }
+          }
+        }
+      },
+      "context": {},
+      "requires": {
+        "id": "conditions",
+        "all": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "id": "assessment-1",
+      "kind": "empirical",
+      "subject": {
+        "id": "test-run-1"
+      },
+      "context": {
+        "sensor": {
+          "literal": "sensor-A"
+        },
+        "temperature": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "313.15",
+              "unit": "kelvin",
+              "dimension": "temperature",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "method": {
+        "policy": "absolute-difference/0.1-draft.1",
+        "implementation": {
+          "path": "compare.py"
+        }
+      },
+      "artifacts": [
+        {
+          "path": "observations.csv"
+        }
+      ],
+      "result": {
+        "profile": "slean-research/0.1-draft.1",
+        "value": {
+          "plan": {
+            "id": "test-plan-1"
+          },
+          "model": {
+            "id": "model-hypothesis"
+          },
+          "observation": {
+            "id": "observation-1"
+          },
+          "outcome": "failed_prediction",
+          "absolute_error": {
+            "kind": "scalar",
+            "value": "0.1",
+            "unit": "volt",
+            "dimension": "voltage",
+            "uncertainty": {
+              "kind": "unknown"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "assessment-2",
+      "kind": "empirical",
+      "subject": {
+        "id": "test-run-2"
+      },
+      "context": {
+        "sensor": {
+          "literal": "sensor-A"
+        },
+        "temperature": {
+          "typed": {
+            "profile": "slean-quantity/0.1-draft.1",
+            "value": {
+              "kind": "scalar",
+              "value": "313.15",
+              "unit": "kelvin",
+              "dimension": "temperature",
+              "uncertainty": {
+                "kind": "unknown"
+              }
+            }
+          }
+        }
+      },
+      "method": {
+        "policy": "absolute-difference/0.1-draft.1",
+        "implementation": {
+          "path": "compare.py"
+        }
+      },
+      "artifacts": [
+        {
+          "path": "observations.csv"
+        }
+      ],
+      "result": {
+        "profile": "slean-research/0.1-draft.1",
+        "value": {
+          "plan": {
+            "id": "test-plan-2"
+          },
+          "model": {
+            "id": "model-revision"
+          },
+          "observation": {
+            "id": "observation-2"
+          },
+          "outcome": "within_bound",
+          "absolute_error": {
+            "kind": "scalar",
+            "value": "0",
+            "unit": "volt",
+            "dimension": "voltage",
+            "uncertainty": {
+              "kind": "unknown"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "annotations": {
+    "slean-research/0.1-draft.1": {
+      "questions": [
+        {
+          "id": "reconstruction",
+          "wording": "Can this measurement be reconstructed at the new temperature?",
+          "source": "Owned synthetic fixture",
+          "targets": []
+        },
+        {
+          "id": "follow-up",
+          "wording": "Does gain also change with temperature?",
+          "source": "Owned synthetic fixture",
+          "motivated_by": {
+            "id": "assessment-1"
+          },
+          "targets": []
+        }
+      ],
+      "alternatives": [
+        {
+          "explanation": "The offset could reflect temporal drift.",
+          "source": "Owned synthetic fixture",
+          "status": "unresolved"
+        }
+      ]
+    }
+  },
+  "id": "sha256:ac7994395fb8f68ebd1298f5171e35374bf765e4f358b5e982bc8d688a417d85"
+}

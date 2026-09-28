@@ -1,0 +1,43 @@
+{
+  "jcs": [
+    {
+      "input_json": "{}",
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input_json": "{\"numbers\":[333333333.33333329,1e30,4.50,2e-3,1e-27]}",
+      "canonical": "{\"numbers\":[333333333.3333333,1e+30,4.5,0.002,1e-27]}",
+      "sha256": "7c892d3452ad85ad65857a43e8dcac93b79475d2334fc3e85bac5c599142c158"
+    },
+    {
+      "input_json": "{\"😀\":\"astral\",\"דּ\":\"bmp\",\"é\":\"composed\",\"é\":\"decomposed\"}",
+      "canonical": "{\"é\":\"decomposed\",\"é\":\"composed\",\"😀\":\"astral\",\"דּ\":\"bmp\"}",
+      "sha256": "c7dcffc3bb32f3df8495d4a836279b3826fd75c3a6bd9ec9d82d3a1073ee4033"
+    },
+    {
+      "input_json": "{\"value\":\"9007199254740993.0000000000000001\",\"missing\":null}",
+      "canonical": "{\"missing\":null,\"value\":\"9007199254740993.0000000000000001\"}",
+      "sha256": "b2b68fc316508f763dc4fa3eeb7afe0e7d7fa057ddfcde38e450f99991f9c488"
+    },
+    {
+      "input_json": "{\"negative_zero\":-0.0}",
+      "canonical": "{\"negative_zero\":0}",
+      "sha256": "f2303fcbf6a2d8523a5e672226b90b8dd919606d4707574eee02b83573a968de"
+    }
+  ],
+  "modules": [
+    {
+      "fixture": "formal",
+      "id": "sha256:653bdebf13146ccee968450134587df565e3436c7c0800738b502e3d71813826"
+    },
+    {
+      "fixture": "research",
+      "id": "sha256:ac7994395fb8f68ebd1298f5171e35374bf765e4f358b5e982bc8d688a417d85"
+    },
+    {
+      "fixture": "open-question",
+      "id": "sha256:716503ecda5fa7b5bc41792fe421a696af6827518e6fae02e4f077e303ef6c4a"
+    }
+  ]
+}

@@ -2,11 +2,11 @@
 
 ## Selected direction: a foundation for cumulative science
 
-The [foundation PRD](tasks/prd-slean-scientific-reuse.md), selected on 27 September and clarified on 28 September 2026, owns the forward implementation plan. Slean's mission is to become an open foundation for advancing science with humans and AI. Checked reuse is the first operation; the first research profile must also carry a hypothesis through prediction, observation and revision, and preserve blocked applications that a later contribution may help resolve. The direct-tool baselines are validated and frozen; the new contract is not implemented. Existing code and historical evidence remain available.
+The [foundation PRD](tasks/prd-slean-scientific-reuse.md), selected on 27 September and clarified on 28 September 2026, owns the forward implementation plan. Slean's mission is to become an open foundation for advancing science with humans and AI. Checked reuse is the first operation; the first research profile must also carry a hypothesis through prediction, observation and revision, and preserve blocked applications that a later contribution may help resolve. The direct-tool baselines are frozen and the [draft contract with executable fixtures](conformance/README.md) is checked. General adapters and runtime operations remain unimplemented. Existing code and historical evidence remain available.
 
 | Milestone | Deliverable and acceptance | State |
 |---|---|---|
-| M0 · SR-T01–03 | Build the pinned Physlib example, freeze a fair direct-tool baseline, and specify the minimal contract with fixtures. | SR-T01 and SR-T02 complete; SR-T03 pending |
+| M0 · SR-T01–03 | Build the pinned Physlib example, freeze a fair direct-tool baseline, and specify the minimal contract with fixtures. | Complete; local evidence linked in the PRD |
 | M1 · SR-T04–06 | Export and actually reuse a real Lean theorem across projects; expose assumptions, dependencies and verification policy. | Not started |
 | M2 · SR-T07–10 | Reuse a calibration across investigations, reproduce its output, and carry a prediction through a failed test and a model revision. | Not started |
 | Gate U | Preserve the complete example research cycle while reducing repeated integration work against Lean/Physlib + Python + RO-Crate at equivalent inputs and accounting; detect every negative case or leave it conditional. | Not evaluated |

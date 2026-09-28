@@ -1,0 +1,515 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:slean:module:0.1-draft.1",
+  "title": "Slean module 0.1-draft.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "profiles",
+    "dependencies",
+    "payloads",
+    "components",
+    "applications",
+    "evidence"
+  ],
+  "properties": {
+    "format": {
+      "const": "slean-module/0.1-draft.1"
+    },
+    "id": {
+      "$ref": "#/$defs/moduleId"
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "required"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/profileId"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/moduleId"
+      }
+    },
+    "payloads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "size",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "$ref": "#/$defs/path"
+          },
+          "size": {
+            "$ref": "#/$defs/natural"
+          },
+          "sha256": {
+            "$ref": "#/$defs/digest"
+          }
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/component"
+      }
+    },
+    "applications": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/application"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "annotations": {
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "localId": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,127}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "moduleId": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "natural": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)$"
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_][A-Za-z0-9._-]*(/[A-Za-z0-9_][A-Za-z0-9._-]*)*$"
+    },
+    "ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/localId"
+        },
+        "module": {
+          "$ref": "#/$defs/moduleId"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "module": {
+          "$ref": "#/$defs/moduleId"
+        }
+      }
+    },
+    "profileValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile",
+        "value"
+      ],
+      "properties": {
+        "profile": {
+          "$ref": "#/$defs/profileId"
+        },
+        "value": {
+          "type": "object"
+        }
+      }
+    },
+    "binding": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "literal"
+          ],
+          "properties": {
+            "literal": {
+              "type": [
+                "string",
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ref"
+          ],
+          "properties": {
+            "ref": {
+              "$ref": "#/$defs/ref"
+            },
+            "output": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "artifact"
+          ],
+          "properties": {
+            "artifact": {
+              "$ref": "#/$defs/artifact"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typed"
+          ],
+          "properties": {
+            "typed": {
+              "$ref": "#/$defs/profileValue"
+            }
+          }
+        }
+      ]
+    },
+    "bindings": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/binding"
+      }
+    },
+    "requirement": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "all"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/localId"
+            },
+            "all": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/requirement"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "any"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/localId"
+            },
+            "any": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/requirement"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "leaf"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/localId"
+            },
+            "leaf": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "profile",
+                "predicate",
+                "arguments"
+              ],
+              "properties": {
+                "profile": {
+                  "$ref": "#/$defs/profileId"
+                },
+                "predicate": {
+                  "$ref": "#/$defs/text"
+                },
+                "arguments": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "name",
+        "interface",
+        "requires",
+        "sources",
+        "license"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/localId"
+        },
+        "kind": {
+          "enum": [
+            "claim",
+            "model",
+            "method",
+            "data"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "interface": {
+          "$ref": "#/$defs/profileValue"
+        },
+        "requires": {
+          "$ref": "#/$defs/requirement"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        },
+        "license": {
+          "$ref": "#/$defs/text"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ref"
+          }
+        },
+        "annotations": {
+          "type": "object"
+        }
+      }
+    },
+    "application": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "component",
+        "phase",
+        "bindings",
+        "context",
+        "requires"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/localId"
+        },
+        "component": {
+          "$ref": "#/$defs/ref"
+        },
+        "phase": {
+          "enum": [
+            "planned",
+            "executed"
+          ]
+        },
+        "bindings": {
+          "$ref": "#/$defs/bindings"
+        },
+        "context": {
+          "$ref": "#/$defs/bindings"
+        },
+        "requires": {
+          "$ref": "#/$defs/requirement"
+        },
+        "outputs": {
+          "$ref": "#/$defs/bindings"
+        },
+        "plan": {
+          "$ref": "#/$defs/ref"
+        },
+        "witnesses": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ref"
+            }
+          }
+        },
+        "selections": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/localId"
+          }
+        },
+        "annotations": {
+          "type": "object"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "phase": {
+                "const": "planned"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "outputs"
+                  ]
+                },
+                {
+                  "required": [
+                    "plan"
+                  ]
+                }
+              ]
+            }
+          },
+          "else": {
+            "required": [
+              "outputs"
+            ]
+          }
+        }
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "subject",
+        "context",
+        "method",
+        "artifacts",
+        "result"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/localId"
+        },
+        "kind": {
+          "enum": [
+            "formal",
+            "computation",
+            "empirical",
+            "assertion"
+          ]
+        },
+        "subject": {
+          "$ref": "#/$defs/ref"
+        },
+        "context": {
+          "$ref": "#/$defs/bindings"
+        },
+        "method": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "policy",
+            "implementation"
+          ],
+          "properties": {
+            "policy": {
+              "$ref": "#/$defs/text"
+            },
+            "implementation": {
+              "$ref": "#/$defs/artifact"
+            }
+          }
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        },
+        "result": {
+          "$ref": "#/$defs/profileValue"
+        },
+        "annotations": {
+          "type": "object"
+        }
+      }
+    },
+    "profileId": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9._:/-]*$"
+    }
+  }
+}

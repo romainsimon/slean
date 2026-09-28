@@ -1,0 +1,1 @@
+These two saved declarations are deliberately untrusted. A wire reader must not promote them to locally verified proofs.

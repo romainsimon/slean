@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:slean:research:0.1-draft.1",
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,127}$"},
+    "text": {"type": "string", "minLength": 1},
+    "ref": {"type": "object", "additionalProperties": false, "required": ["id"], "properties": {
+      "id": {"$ref": "#/$defs/id"}, "module": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}}},
+    "module": {"type": "object", "additionalProperties": false, "required": ["questions", "alternatives"], "properties": {
+      "questions": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+        "required": ["id", "wording", "source", "targets"], "properties": {
+          "id": {"$ref": "#/$defs/id"}, "wording": {"$ref": "#/$defs/text"}, "source": {"$ref": "#/$defs/text"},
+          "motivated_by": {"$ref": "#/$defs/ref"}, "targets": {"type": "array", "items": {"$ref": "#/$defs/ref"}}}}},
+      "alternatives": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+        "required": ["explanation", "source", "status"], "properties": {
+          "explanation": {"$ref": "#/$defs/text"}, "source": {"$ref": "#/$defs/text"}, "status": {"const": "unresolved"}}}}
+    }},
+    "component": {"type": "object", "additionalProperties": false, "required": ["role"], "properties": {
+      "role": {"enum": ["hypothesis", "revision", "observation", "method"]}, "motivated_by": {"$ref": "#/$defs/ref"}}},
+    "application": {"type": "object", "additionalProperties": false, "properties": {
+      "role": {"enum": ["test-plan", "test-execution", "reuse-attempt"]},
+      "question": {"$ref": "#/$defs/ref"}, "attempt_of": {"$ref": "#/$defs/id"},
+      "previous_attempt": {"$ref": "#/$defs/ref"}, "contributions": {"type": "array", "items": {"$ref": "#/$defs/ref"}},
+      "obstacles": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+        "required": ["requirement", "status", "reason"], "properties": {
+          "requirement": {"$ref": "#/$defs/id"}, "status": {"enum": ["violated", "unresolved", "unsupported"]}, "reason": {"$ref": "#/$defs/text"}}}},
+      "prediction": {"type": "object", "additionalProperties": false,
+        "required": ["observable", "expected", "comparison", "bound", "observation"], "properties": {
+          "observable": {"$ref": "#/$defs/text"}, "expected": {"type": "object"}, "comparison": {"const": "absolute_difference"},
+          "bound": {"type": "object"}, "observation": {"$ref": "#/$defs/id"}}}
+    }},
+    "result": {"type": "object", "additionalProperties": false,
+      "required": ["plan", "observation", "model", "outcome"], "properties": {
+        "plan": {"$ref": "#/$defs/ref"}, "observation": {"$ref": "#/$defs/ref"}, "model": {"$ref": "#/$defs/ref"},
+        "outcome": {"enum": ["failed_prediction", "within_bound", "not_applicable", "unresolved"]}, "absolute_error": {"type": "object"}}}
+  }
+}

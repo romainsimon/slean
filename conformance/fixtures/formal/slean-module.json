@@ -1,0 +1,175 @@
+{
+  "format": "slean-module/0.1-draft.1",
+  "profiles": [
+    {
+      "id": "slean-lean/0.1-draft.1",
+      "required": true
+    }
+  ],
+  "dependencies": [],
+  "payloads": [
+    {
+      "path": "FormalFixture.lean",
+      "size": "42",
+      "sha256": "891c89e704928502164d1830130d521b72087e72045f76159224777a05d6ee80"
+    },
+    {
+      "path": "check-description.txt",
+      "size": "121",
+      "sha256": "f7de95b366d1120f60989ce7aca36f606ddaeda20ed835fa4877256767df58dd"
+    },
+    {
+      "path": "lake-manifest.json",
+      "size": "105",
+      "sha256": "e6f8729bec0ca73a2f5e92b2f07174704ba8f980e87aa9f669e1b1c5a1123ad9"
+    },
+    {
+      "path": "statement.json",
+      "size": "113",
+      "sha256": "a5564f256bb43bce00025dcdabe4bf8b4ec85d4ad09cec59c9f0618e3a335123"
+    }
+  ],
+  "components": [
+    {
+      "id": "true-claim",
+      "kind": "claim",
+      "name": "Native encoding example; no science claim",
+      "interface": {
+        "profile": "slean-lean/0.1-draft.1",
+        "value": {
+          "declaration": [
+            [
+              "str",
+              "wire_example"
+            ]
+          ],
+          "module": "FormalFixture",
+          "source": {
+            "path": "FormalFixture.lean"
+          },
+          "toolchain": "leanprover/lean4:v4.34.1",
+          "lock": {
+            "path": "lake-manifest.json"
+          },
+          "statement": {
+            "encoding": "lean-expr/0.1-draft.1",
+            "artifact": {
+              "path": "statement.json"
+            },
+            "fingerprint": "a9e5b9db09f5d271a8f0e45a0e3a5751d579abbeb480cd7afa9716d53d477db2"
+          }
+        }
+      },
+      "requires": {
+        "id": "formal-conditions",
+        "all": []
+      },
+      "sources": [
+        {
+          "path": "FormalFixture.lean"
+        }
+      ],
+      "license": "Apache-2.0"
+    }
+  ],
+  "applications": [],
+  "evidence": [
+    {
+      "id": "proof-1",
+      "kind": "formal",
+      "subject": {
+        "id": "true-claim"
+      },
+      "context": {},
+      "method": {
+        "policy": "reviewed-source/0.1-draft.1",
+        "implementation": {
+          "path": "check-description.txt"
+        }
+      },
+      "artifacts": [
+        {
+          "path": "FormalFixture.lean"
+        }
+      ],
+      "result": {
+        "profile": "slean-lean/0.1-draft.1",
+        "value": {
+          "status": "passed",
+          "policy": "reviewed-source/0.1-draft.1",
+          "statement_fingerprint": "a9e5b9db09f5d271a8f0e45a0e3a5751d579abbeb480cd7afa9716d53d477db2",
+          "statement_dependencies": [
+            [
+              [
+                "str",
+                "True"
+              ]
+            ]
+          ],
+          "proof_dependencies": [
+            [
+              [
+                "str",
+                "True"
+              ],
+              [
+                "str",
+                "intro"
+              ]
+            ]
+          ],
+          "axioms": []
+        }
+      }
+    },
+    {
+      "id": "proof-2",
+      "kind": "formal",
+      "subject": {
+        "id": "true-claim"
+      },
+      "context": {},
+      "method": {
+        "policy": "reviewed-source/0.1-draft.1",
+        "implementation": {
+          "path": "check-description.txt"
+        }
+      },
+      "artifacts": [
+        {
+          "path": "FormalFixture.lean"
+        }
+      ],
+      "result": {
+        "profile": "slean-lean/0.1-draft.1",
+        "value": {
+          "status": "passed",
+          "policy": "reviewed-source/0.1-draft.1",
+          "statement_fingerprint": "a9e5b9db09f5d271a8f0e45a0e3a5751d579abbeb480cd7afa9716d53d477db2",
+          "statement_dependencies": [
+            [
+              [
+                "str",
+                "True"
+              ]
+            ]
+          ],
+          "proof_dependencies": [
+            [
+              [
+                "str",
+                "True"
+              ],
+              [
+                "str",
+                "intro"
+              ]
+            ]
+          ],
+          "axioms": []
+        }
+      }
+    }
+  ],
+  "id": "sha256:653bdebf13146ccee968450134587df565e3436c7c0800738b502e3d71813826"
+}

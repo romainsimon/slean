@@ -16,7 +16,7 @@
 
 > **Status:** Early, local V0 research prototype. The repository is private; no public license or contribution guide is available.
 
-Slean's ambition is to provide a shared foundation for humans and AI to express, test, challenge and extend scientific knowledge. The [PRD and task checklist](tasks/prd-slean-scientific-reuse.md) describe the planned scientific library and open-standard candidate. Checked reuse and a small hypothesis/prediction/test/revision cycle are its first engineering milestones. The instructions below describe the existing V0 dossier prototype.
+Slean's ambition is to provide a shared foundation for humans and AI to express, test, challenge and extend scientific knowledge. The [PRD and task checklist](tasks/prd-slean-scientific-reuse.md) describe the planned scientific library and open-standard candidate. Its [draft contract and executable fixtures](conformance/README.md) specify checked reuse and a small hypothesis/prediction/test/revision cycle; runtime adapters remain to be built. The instructions below describe the existing V0 dossier prototype.
 
 A structured decision record brings together observations, assumptions, rules, and conclusions. Slean checks that the record is consistent—including references, event order, units, and exact thresholds—and replays it so readers can see which recorded inputs led to each conclusion. It checks traceability and consistency; it does not establish whether measurements or external scientific claims are true.
 

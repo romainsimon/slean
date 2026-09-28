@@ -1,0 +1,552 @@
+[
+  {
+    "id": "unknown-core-field",
+    "fixture": "open-question",
+    "operations": [
+      {
+        "op": "add",
+        "path": "/verified",
+        "value": true
+      }
+    ],
+    "rehash": true,
+    "expected_error": "schema"
+  },
+  {
+    "id": "changed-id",
+    "fixture": "open-question",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/id",
+        "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "rehash": false,
+    "expected_error": "module_identity"
+  },
+  {
+    "id": "duplicate-record",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/components/1/id",
+        "value": "physical-assumption"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "duplicate_record_id"
+  },
+  {
+    "id": "dangling-component",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/applications/0/component/id",
+        "value": "missing"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "missing_reference"
+  },
+  {
+    "id": "planned-output",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "add",
+        "path": "/applications/1/outputs",
+        "value": {}
+      }
+    ],
+    "rehash": true,
+    "expected_error": "schema"
+  },
+  {
+    "id": "weakened-conditions",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/applications/0/requires",
+        "value": {
+          "id": "none",
+          "all": []
+        }
+      }
+    ],
+    "rehash": true,
+    "expected_error": "weakened_requirements"
+  },
+  {
+    "id": "changed-plan-input",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/applications/2/bindings/displacement/typed/value/value",
+        "value": "5"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "changed_execution_plan"
+  },
+  {
+    "id": "wrong-plan",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/applications/2/plan/id",
+        "value": "test-plan-2"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "changed_execution_plan"
+  },
+  {
+    "id": "changed-retry-input",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/applications/5/bindings/reading/typed/value/value",
+        "value": "8.7"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "changed_retry_input"
+  },
+  {
+    "id": "wrong-previous-attempt",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/applications/5/annotations/slean-research~10.1-draft.1/attempt_of",
+        "value": "other-use"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "attempt_identity"
+  },
+  {
+    "id": "unknown-obstacle",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/applications/0/annotations/slean-research~10.1-draft.1/obstacles/0/requirement",
+        "value": "missing"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "obstacle_requirement"
+  },
+  {
+    "id": "invalid-alternative",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "add",
+        "path": "/applications/5/selections",
+        "value": {
+          "conditions": "temperature"
+        }
+      }
+    ],
+    "rehash": true,
+    "expected_error": "invalid_alternative"
+  },
+  {
+    "id": "wrong-witness-kind",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "add",
+        "path": "/applications/5/witnesses",
+        "value": {
+          "physical": [
+            {
+              "id": "model-revision"
+            }
+          ]
+        }
+      }
+    ],
+    "rehash": true,
+    "expected_error": "reference_kind"
+  },
+  {
+    "id": "future-output",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "add",
+        "path": "/applications/5/bindings/future",
+        "value": {
+          "ref": {
+            "id": "test-plan-1"
+          },
+          "output": "voltage"
+        }
+      }
+    ],
+    "rehash": true,
+    "expected_error": "missing_output"
+  },
+  {
+    "id": "wrong-dimension",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/components/1/interface/value/parameters/gain/unit",
+        "value": "volt"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "unit_dimension_mismatch"
+  },
+  {
+    "id": "inexact-wire-value",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/components/1/interface/value/parameters/offset/value",
+        "value": 0.5
+      }
+    ],
+    "rehash": true,
+    "expected_error": "schema"
+  },
+  {
+    "id": "negative-uncertainty",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/components/1/interface/value/parameters/offset/uncertainty",
+        "value": {
+          "kind": "absolute_bound",
+          "value": "-0.02",
+          "unit": "volt"
+        }
+      }
+    ],
+    "rehash": true,
+    "expected_error": "negative_bound"
+  },
+  {
+    "id": "undeclared-profile",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/components/1/interface/profile",
+        "value": "missing/1"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "undeclared_profile"
+  },
+  {
+    "id": "undeclared-dependency",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "add",
+        "path": "/applications/0/component/module",
+        "value": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "undeclared_dependency"
+  },
+  {
+    "id": "wrong-assessment-model",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/evidence/0/result/value/model/id",
+        "value": "model-revision"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "assessment_model"
+  },
+  {
+    "id": "wrong-assessment-observation",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/evidence/0/result/value/observation/id",
+        "value": "observation-2"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "assessment_observation"
+  },
+  {
+    "id": "planned-execution-evidence",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/evidence/0/subject/id",
+        "value": "test-plan-1"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "planned_execution_evidence"
+  },
+  {
+    "id": "wrong-evidence-context",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/evidence/0/context/sensor/literal",
+        "value": "sensor-B"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "evidence_context"
+  },
+  {
+    "id": "numeric-out-of-scope-assessment",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/evidence/0/result/value/outcome",
+        "value": "not_applicable"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "assessment_error"
+  },
+  {
+    "id": "changed-statement-fingerprint",
+    "fixture": "formal",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/components/0/interface/value/statement/fingerprint",
+        "value": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "statement_fingerprint"
+  },
+  {
+    "id": "mismatched-evidence-statement",
+    "fixture": "formal",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/evidence/0/result/value/statement_fingerprint",
+        "value": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "evidence_statement"
+  },
+  {
+    "id": "mismatched-policy",
+    "fixture": "formal",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/evidence/0/result/value/policy",
+        "value": "different-policy"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "evidence_policy"
+  },
+  {
+    "id": "wrong-evidence-layer",
+    "fixture": "formal",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/evidence/0/kind",
+        "value": "computation"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "evidence_kind_profile"
+  },
+  {
+    "id": "unsafe-payload-path",
+    "fixture": "formal",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/payloads/0/path",
+        "value": "../outside"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "schema"
+  },
+  {
+    "id": "duplicate-payload-path",
+    "fixture": "formal",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/payloads/1/path",
+        "value": "FormalFixture.lean"
+      }
+    ],
+    "rehash": true,
+    "expected_error": "collection_order_or_duplicate"
+  },
+  {
+    "id": "duplicate-json-key",
+    "raw_json": "{\"id\":\"a\",\"id\":\"b\"}",
+    "expected_error": "duplicate_json_key"
+  },
+  {
+    "id": "escaped-duplicate-key",
+    "raw_json": "{\"a\":1,\"\\u0061\":2}",
+    "expected_error": "duplicate_json_key"
+  },
+  {
+    "id": "nonfinite-json",
+    "raw_json": "{\"x\":NaN}",
+    "expected_error": "non_finite_json_number"
+  },
+  {
+    "id": "unsafe-integer",
+    "raw_json": "{\"x\":9007199254740993}",
+    "expected_error": "unsafe_json_integer"
+  },
+  {
+    "id": "lone-surrogate",
+    "raw_json": "{\"x\":\"\\ud800\"}",
+    "expected_error": "json_encoding"
+  },
+  {
+    "id": "free-variable",
+    "fixture": "formal",
+    "operations": [],
+    "payload_replacements": {
+      "statement.json": {
+        "encoding": "lean-expr/0.1-draft.1",
+        "expression": [
+          "fvar",
+          "x"
+        ],
+        "universe_parameters": []
+      }
+    },
+    "update_payloads": true,
+    "rehash": true,
+    "expected_error": "native_expression"
+  },
+  {
+    "id": "loose-variable",
+    "fixture": "formal",
+    "operations": [],
+    "payload_replacements": {
+      "statement.json": {
+        "encoding": "lean-expr/0.1-draft.1",
+        "expression": [
+          "bvar",
+          "0"
+        ],
+        "universe_parameters": []
+      }
+    },
+    "update_payloads": true,
+    "rehash": true,
+    "expected_error": "loose_bound_variable"
+  },
+  {
+    "id": "universe-metavariable",
+    "fixture": "formal",
+    "operations": [],
+    "payload_replacements": {
+      "statement.json": {
+        "encoding": "lean-expr/0.1-draft.1",
+        "expression": [
+          "sort",
+          [
+            "mvar",
+            []
+          ]
+        ],
+        "universe_parameters": []
+      }
+    },
+    "update_payloads": true,
+    "rehash": true,
+    "expected_error": "native_expression"
+  },
+  {
+    "id": "supersession-cycle",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/components/3/supersedes",
+        "value": [
+          {
+            "id": "model-revision"
+          }
+        ]
+      }
+    ],
+    "rehash": true,
+    "expected_error": "chronological_cycle"
+  },
+  {
+    "id": "attempt-cycle",
+    "fixture": "research",
+    "operations": [
+      {
+        "op": "replace",
+        "path": "/applications/5/annotations/slean-research~10.1-draft.1/previous_attempt",
+        "value": {
+          "id": "retry-attempt"
+        }
+      }
+    ],
+    "rehash": true,
+    "expected_error": "chronological_cycle"
+  },
+  {
+    "id": "unbound-universe",
+    "fixture": "formal",
+    "operations": [],
+    "payload_replacements": {
+      "statement.json": {
+        "encoding": "lean-expr/0.1-draft.1",
+        "universe_parameters": [],
+        "expression": [
+          "sort",
+          [
+            "param",
+            [
+              [
+                "str",
+                "u"
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    "update_payloads": true,
+    "rehash": true,
+    "expected_error": "unbound_universe"
+  }
+]
