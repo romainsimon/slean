@@ -85,6 +85,10 @@ The exporter issues no proof receipt and imports no claim of scientific validity
 Local Lake path dependencies still require the original projects; this is not
 the standalone package reconstruction promised by later milestones.
 
+SR-T06 now has a [local Comparator primitive](verification/README.md) for
+separately supplied statements and self-contained proof candidates. It issues
+no module receipt and does not yet change either Slean verification policy.
+
 ## Apply a declaration in ordinary Lean
 
 SR-T05 adds `slean_apply`, which uses Lean's native `apply` elaborator. For

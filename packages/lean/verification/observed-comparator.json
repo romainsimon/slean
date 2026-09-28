@@ -1,0 +1,245 @@
+{
+  "architecture": "arm64",
+  "cases": [
+    {
+      "acceptance": "passed",
+      "case": "valid-proof",
+      "comparator_sha256": "7321ede8b82226a69fddcf03d9204d63677050aded6c3cf141410204e133f891",
+      "environment": "receiver whitelist; no inherited credentials",
+      "exit_code": 0,
+      "exporter_sha256": "17da1e168bf5d41484c940e41c1f68230798ebb38d09174b564e955895279d0f",
+      "format": "slean-comparator-run/0.1-draft.1",
+      "isolation": "macos-sandbox-exec",
+      "lean_version": "Lean (version 4.34.1, arm64-apple-darwin24.6.0, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)",
+      "limitations": [
+        "No hard memory or aggregate disk quota on this backend",
+        "Local primitive tested with reviewed fixtures; not a hostile-upload service",
+        "No receiver Slean-module reconstruction or receipt authority",
+        "No separately implemented external proof kernel"
+      ],
+      "limits": {
+        "address_bytes": null,
+        "cpu_seconds": 300,
+        "file_bytes": 268435456,
+        "log_bytes": 4194304,
+        "open_files": 1024,
+        "source_bytes_each": 1048576,
+        "user_process_ceiling": 611,
+        "wall_seconds": 600
+      },
+      "log": "Building Challenge\n\u26a0 [2/3] Built Challenge (3.4s)\nwarning: Challenge.lean:1:8: declaration uses `sorry`\nBuild completed successfully (3 jobs).\nExporting #[Quot, Quot.mk, Quot.lift, Quot.ind, reusable_identity, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Challenge\nBuilding Solution\n\u2714 [2/3] Built Solution (532ms)\nBuild completed successfully (3 jobs).\nExporting #[Quot, Quot.mk, Quot.lift, Quot.ind, reusable_identity, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Solution\nRunning Lean default kernel on solution.\nLean default kernel accepts the solution\nYour solution is okay!\n",
+      "module_receipt": "not_issued",
+      "network": "denied",
+      "outcome": "passed",
+      "seconds": 8.183,
+      "slean_policy": "unsupported",
+      "sources": {
+        "Challenge.lean": "7a6367d15beccc5f46a7d7f72b2d42cde09a25d3c90b5cd64c0895867051157b",
+        "Solution.lean": "b907271538770f8c2e7b0eb6cc7f86e02de313e0d83dd1ce9348959a907c8f5d"
+      },
+      "theorems": [
+        "reusable_identity"
+      ],
+      "toolchain": "leanprover/lean4:v4.34.1"
+    },
+    {
+      "acceptance": "rejected_as_expected",
+      "case": "changed-statement",
+      "comparator_sha256": "7321ede8b82226a69fddcf03d9204d63677050aded6c3cf141410204e133f891",
+      "environment": "receiver whitelist; no inherited credentials",
+      "exit_code": 1,
+      "exporter_sha256": "17da1e168bf5d41484c940e41c1f68230798ebb38d09174b564e955895279d0f",
+      "format": "slean-comparator-run/0.1-draft.1",
+      "isolation": "macos-sandbox-exec",
+      "lean_version": "Lean (version 4.34.1, arm64-apple-darwin24.6.0, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)",
+      "limitations": [
+        "No hard memory or aggregate disk quota on this backend",
+        "Local primitive tested with reviewed fixtures; not a hostile-upload service",
+        "No receiver Slean-module reconstruction or receipt authority",
+        "No separately implemented external proof kernel"
+      ],
+      "limits": {
+        "address_bytes": null,
+        "cpu_seconds": 300,
+        "file_bytes": 268435456,
+        "log_bytes": 4194304,
+        "open_files": 1024,
+        "source_bytes_each": 1048576,
+        "user_process_ceiling": 614,
+        "wall_seconds": 600
+      },
+      "log": "Building Challenge\n\u26a0 [2/3] Built Challenge (894ms)\nwarning: Challenge.lean:1:8: declaration uses `sorry`\nBuild completed successfully (3 jobs).\nExporting #[Quot, Quot.mk, Quot.lift, Quot.ind, reusable_identity, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Challenge\nBuilding Solution\n\u2714 [2/3] Built Solution (392ms)\nBuild completed successfully (3 jobs).\nExporting #[Quot, Quot.mk, Quot.lift, Quot.ind, reusable_identity, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Solution\nuncaught exception: Challenge and solution theorem statement do not match: 'reusable_identity'\n",
+      "module_receipt": "not_issued",
+      "network": "denied",
+      "outcome": "failed",
+      "seconds": 4.508,
+      "slean_policy": "unsupported",
+      "sources": {
+        "Challenge.lean": "7a6367d15beccc5f46a7d7f72b2d42cde09a25d3c90b5cd64c0895867051157b",
+        "Solution.lean": "bc03a20306e5a4753628cdf965d1e78c09f58d33d2df412f1965a831ef598fe3"
+      },
+      "theorems": [
+        "reusable_identity"
+      ],
+      "toolchain": "leanprover/lean4:v4.34.1"
+    },
+    {
+      "acceptance": "rejected_as_expected",
+      "case": "incomplete-proof",
+      "comparator_sha256": "7321ede8b82226a69fddcf03d9204d63677050aded6c3cf141410204e133f891",
+      "environment": "receiver whitelist; no inherited credentials",
+      "exit_code": 1,
+      "exporter_sha256": "17da1e168bf5d41484c940e41c1f68230798ebb38d09174b564e955895279d0f",
+      "format": "slean-comparator-run/0.1-draft.1",
+      "isolation": "macos-sandbox-exec",
+      "lean_version": "Lean (version 4.34.1, arm64-apple-darwin24.6.0, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)",
+      "limitations": [
+        "No hard memory or aggregate disk quota on this backend",
+        "Local primitive tested with reviewed fixtures; not a hostile-upload service",
+        "No receiver Slean-module reconstruction or receipt authority",
+        "No separately implemented external proof kernel"
+      ],
+      "limits": {
+        "address_bytes": null,
+        "cpu_seconds": 300,
+        "file_bytes": 268435456,
+        "log_bytes": 4194304,
+        "open_files": 1024,
+        "source_bytes_each": 1048576,
+        "user_process_ceiling": 617,
+        "wall_seconds": 600
+      },
+      "log": "Building Challenge\n\u26a0 [2/3] Built Challenge (1.3s)\nwarning: Challenge.lean:1:8: declaration uses `sorry`\nBuild completed successfully (3 jobs).\nExporting #[Quot, Quot.mk, Quot.lift, Quot.ind, reusable_identity, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Challenge\nBuilding Solution\n\u26a0 [2/3] Built Solution (1.4s)\nwarning: Solution.lean:1:8: declaration uses `sorry`\nBuild completed successfully (3 jobs).\nExporting #[Quot, Quot.mk, Quot.lift, Quot.ind, reusable_identity, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Solution\nuncaught exception: Illegal axiom detected: 'sorryAx'\n",
+      "module_receipt": "not_issued",
+      "network": "denied",
+      "outcome": "failed",
+      "seconds": 8.328,
+      "slean_policy": "unsupported",
+      "sources": {
+        "Challenge.lean": "7a6367d15beccc5f46a7d7f72b2d42cde09a25d3c90b5cd64c0895867051157b",
+        "Solution.lean": "7a6367d15beccc5f46a7d7f72b2d42cde09a25d3c90b5cd64c0895867051157b"
+      },
+      "theorems": [
+        "reusable_identity"
+      ],
+      "toolchain": "leanprover/lean4:v4.34.1"
+    },
+    {
+      "acceptance": "rejected_as_expected",
+      "case": "unapproved-axiom",
+      "comparator_sha256": "7321ede8b82226a69fddcf03d9204d63677050aded6c3cf141410204e133f891",
+      "environment": "receiver whitelist; no inherited credentials",
+      "exit_code": 1,
+      "exporter_sha256": "17da1e168bf5d41484c940e41c1f68230798ebb38d09174b564e955895279d0f",
+      "format": "slean-comparator-run/0.1-draft.1",
+      "isolation": "macos-sandbox-exec",
+      "lean_version": "Lean (version 4.34.1, arm64-apple-darwin24.6.0, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)",
+      "limitations": [
+        "No hard memory or aggregate disk quota on this backend",
+        "Local primitive tested with reviewed fixtures; not a hostile-upload service",
+        "No receiver Slean-module reconstruction or receipt authority",
+        "No separately implemented external proof kernel"
+      ],
+      "limits": {
+        "address_bytes": null,
+        "cpu_seconds": 300,
+        "file_bytes": 268435456,
+        "log_bytes": 4194304,
+        "open_files": 1024,
+        "source_bytes_each": 1048576,
+        "user_process_ceiling": 616,
+        "wall_seconds": 600
+      },
+      "log": "Building Challenge\n\u26a0 [2/3] Built Challenge (699ms)\nwarning: Challenge.lean:1:8: declaration uses `sorry`\nBuild completed successfully (3 jobs).\nExporting #[Quot, Quot.mk, Quot.lift, Quot.ind, reusable_identity, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Challenge\nBuilding Solution\n\u2714 [2/3] Built Solution (687ms)\nBuild completed successfully (3 jobs).\nExporting #[Quot, Quot.mk, Quot.lift, Quot.ind, reusable_identity, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Solution\nuncaught exception: Illegal axiom detected: 'unapproved_identity'\n",
+      "module_receipt": "not_issued",
+      "network": "denied",
+      "outcome": "failed",
+      "seconds": 5.537,
+      "slean_policy": "unsupported",
+      "sources": {
+        "Challenge.lean": "7a6367d15beccc5f46a7d7f72b2d42cde09a25d3c90b5cd64c0895867051157b",
+        "Solution.lean": "76ac121588ac83476fe7370d70e8229c35739fdf1eee60d4e8a50abd0dc56217"
+      },
+      "theorems": [
+        "reusable_identity"
+      ],
+      "toolchain": "leanprover/lean4:v4.34.1"
+    },
+    {
+      "acceptance": "unsupported_fixture",
+      "case": "upstream-prelude-compatibility",
+      "comparator_sha256": "7321ede8b82226a69fddcf03d9204d63677050aded6c3cf141410204e133f891",
+      "environment": "receiver whitelist; no inherited credentials",
+      "exit_code": 1,
+      "exporter_sha256": "17da1e168bf5d41484c940e41c1f68230798ebb38d09174b564e955895279d0f",
+      "format": "slean-comparator-run/0.1-draft.1",
+      "isolation": "macos-sandbox-exec",
+      "lean_version": "Lean (version 4.34.1, arm64-apple-darwin24.6.0, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)",
+      "limitations": [
+        "No hard memory or aggregate disk quota on this backend",
+        "Local primitive tested with reviewed fixtures; not a hostile-upload service",
+        "No receiver Slean-module reconstruction or receipt authority",
+        "No separately implemented external proof kernel"
+      ],
+      "limits": {
+        "address_bytes": null,
+        "cpu_seconds": 300,
+        "file_bytes": 268435456,
+        "log_bytes": 4194304,
+        "open_files": 1024,
+        "source_bytes_each": 1048576,
+        "user_process_ceiling": 615,
+        "wall_seconds": 600
+      },
+      "log": "Building Challenge\n\u26a0 [2/3] Built Challenge (455ms)\nwarning: Challenge.lean:1:8: declaration uses `sorry`\nBuild completed successfully (3 jobs).\nExporting #[Quot, Quot.mk, Quot.lift, Quot.ind, boom, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Challenge\nBuilding Solution\n\u2714 [2/3] Built Solution (125ms)\nBuild completed successfully (3 jobs).\nPANIC at dumpConstant Export:237:48: Constant String.mk not found in environment.\nbacktrace:\n0   lean4export                         0x000000010b673920 _ZN4leanL15print_backtraceEb + 60\n1   lean4export                         0x000000010b66a464 _ZN4leanL15lean_panic_implEPKcmb + 176\n2   lean4export                         0x000000010b66a580 lean_panic_fn_borrowed + 64\n3   lean4export                         0x0000000104ec3348 panic spec at dumpConstant (lean4export) + 596\n4   lean4export                         0x0000000104eb4a80 List.forIn'.loop [arity\u2193] spec at main (lean4export) + 576\n5   lean4export                         0x0000000104eb4fb8 main [\u03bb] (lean4export) + 384\n6   lean4export                         0x0000000104eb5268 main [boxed, \u03bb] (lean4export) + 32\n7   lean4export                         0x000000010b67b978 <apply/3> + 2732\n8   lean4export                         0x0000000104eb74b8 M.run [arity\u2193] (lean4export) + 224\n9   lean4export                         0x000000010b6681f8 _ZNSt3__110__function6__funcIZ13lean_run_mainE3$_0NS_9allocatorIS2_EEFvvEEclEv + 40\n10  lean4export                         0x000000010b667d70 _ZN4lean7lthread3imp5_mainEPv + 52\n11  libsystem_pthread.dylib             0x00000001903dfc58 _pthread_start + 136\n12  libsystem_pthread.dylib             0x00000001903dac1c thread_start + 8\nExporting #[Quot, Quot.mk, Quot.lift, Quot.ind, boom, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Solution\nuncaught exception: Child exited with 134\n",
+      "module_receipt": "not_issued",
+      "network": "denied",
+      "outcome": "tool_failure",
+      "seconds": 3.278,
+      "slean_policy": "unsupported",
+      "sources": {
+        "Challenge.lean": "6d3f403b66c51ef62a99b25a72bf750da3250ef8e865834815107eae9c4846d9",
+        "Solution.lean": "13ce508c4c4f1f1614cc697c6b71c0253a854e6e56a3baa917a218baf2bcc47c"
+      },
+      "theorems": [
+        "boom"
+      ],
+      "toolchain": "leanprover/lean4:v4.34.1"
+    }
+  ],
+  "frozen_baseline_files_unchanged": 34,
+  "module_receipt": "not_issued",
+  "platform": "Darwin",
+  "remaining": [
+    "Receiver reconstruction and exact Slean module/statement/environment binding",
+    "Separate reviewed-source and unreviewed-contribution policy reports",
+    "Receiver-owned receipt authority and forged/downgraded receipt controls",
+    "Dependency-bearing modules, resource containment and portable isolation backends",
+    "Upstream minimal-prelude primitive substitution fixture fails during export; semantic rejection unverified"
+  ],
+  "scope": "SR-T06 local Comparator primitive only",
+  "seconds": 33.156,
+  "slean_policy": "unsupported",
+  "source_sha256": {
+    "packages/lean/verification/boundary.py": "1e73de40f1d54bb08e7b58fe43d069699d0aa7b7083877cf593eb45ba96d9a1e",
+    "packages/lean/verification/check_verification.py": "da5a4f177be69668b3069b75ad22a4530ed0c16d8a409cf9e85e1246687ee058",
+    "packages/lean/verification/darwin_landrun.py": "9c6a44c11c14f48ef66e7d495d6b55e96f0b21612015945f6bfb84b8cdd14fbc",
+    "packages/lean/verification/lake-manifest.json": "adf6e20c10290b2f5c2cdbf6e91d2eecefff5dc1146f3970c576f0a376733813",
+    "packages/lean/verification/lakefile.toml": "61c94baf31716050737f4a7f45f8b789a76b57f87d255a9999c34954654c846a",
+    "packages/lean/verification/lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+    "packages/lean/verification/run_comparator.py": "a9d30d7454d44f7622d316a3d6c3817703784d94a953eeba52a15bacce836b02",
+    "packages/lean/verification/tests/Challenge.lean": "7a6367d15beccc5f46a7d7f72b2d42cde09a25d3c90b5cd64c0895867051157b",
+    "packages/lean/verification/tests/ChangedStatement.lean": "bc03a20306e5a4753628cdf965d1e78c09f58d33d2df412f1965a831ef598fe3",
+    "packages/lean/verification/tests/Incomplete.lean": "7a6367d15beccc5f46a7d7f72b2d42cde09a25d3c90b5cd64c0895867051157b",
+    "packages/lean/verification/tests/Solution.lean": "b907271538770f8c2e7b0eb6cc7f86e02de313e0d83dd1ce9348959a907c8f5d",
+    "packages/lean/verification/tests/UnapprovedAxiom.lean": "76ac121588ac83476fe7370d70e8229c35739fdf1eee60d4e8a50abd0dc56217",
+    "packages/lean/verification/tests/test_boundary.py": "841add9afac89a23c151f5850f36c2b9ccbf32f1e6ded8cdedf91175834bbcc5",
+    "packages/lean/verification/tests/test_process.py": "590cf09debefaf6341c8b3f02054febac6ba528938c955ed01d36f32edc82a83"
+  },
+  "status": "passed",
+  "tool_source_pins": {
+    "Comparator": "d03acab154d269c06e60e4de7e4cc85deebff94b",
+    "lean4export": "076e8e57707e813375e8f9da8bf989799ace9680"
+  },
+  "unit_tests": 10
+}

@@ -1,6 +1,6 @@
 # Slean: an open foundation for cumulative science in the age of AI
 
-Version: direction 2.7, updated 28 September 2026. Status: M0, the general Lean exporter (SR-T04) and native formal application (SR-T05) are complete. Receiver verification, the Python runtime library and the usefulness comparison remain to be implemented; no standard is released. Owner: Slean maintainer. The user delegated the product and architecture decision, then clarified that Slean must aim to become a new foundation for advancing science in the age of AI. Reuse is the first engineering test of that mission, not its full scope.
+Version: direction 2.8, updated 28 September 2026. Status: M0, the general Lean exporter (SR-T04) and native formal application (SR-T05) are complete. Receiver verification (SR-T06) is in progress; its local Comparator primitive does not yet establish either Slean verification policy. The Python runtime library and usefulness comparison remain to be implemented; no standard is released. Owner: Slean maintainer. The user delegated the product and architecture decision, then clarified that Slean must aim to become a new foundation for advancing science in the age of AI. Reuse is the first engineering test of that mission, not its full scope.
 
 This PRD supersedes the **forward implementation direction** of the dossier-first PRD. It preserves V0's code, evidence and limitations. It does not declare the earlier full-program goal complete. Release, repository publication, deployment, outside-project changes, external outreach and new spending retain their existing boundaries.
 
@@ -235,7 +235,7 @@ For SR-12, export only an explicit selection of publishable components and suppo
 
 ## 7. Delivery order and tasks
 
-SR-T01–04 are **complete** with the local evidence linked below. Other tasks below are **not started** until their acceptance evidence is recorded. Existing V0 work is not used to tick them. The repository's roadmap links here so milestone status has one owner.
+SR-T01–05 are **complete** with the local evidence linked below. SR-T06 is **in progress** and remains unchecked. SR-T07–16 are **not started**. A task is complete only when its full acceptance evidence is recorded. Existing V0 work is not used to tick them. The repository's roadmap links here so milestone status has one owner.
 
 ### M0: reuse the ecosystem and freeze the comparison
 
@@ -256,6 +256,8 @@ SR-T01–04 are **complete** with the local evidence linked below. Other tasks b
 
   Evidence: [native application and trust limits](../packages/lean/README.md#apply-a-declaration-in-ordinary-lean), [two real uses](../examples/reuse/with-slean-lean/ApplicationExample.lean), and [recorded application check](../packages/lean/observed-applications.json). Both consumer proofs compile under the original hypotheses. One capture exposes the equation-of-motion goal before the following proof step closes it; the complete invocation leaves no goal. Whole-declaration and nested-goal controls preserve the correct scope. Lean rejects the missing hypothesis and changed conclusion. Eleven application tests and eight exporter bridge regressions pass; all 34 frozen baseline files remain unchanged. Exact module/statement references and actual proof dependencies accompany the applications. Input plans are retrospective projections, not preregistration. Imported results remain declared and inspection remains conditional without receiver proof verification. This closes native application, not general offline planning, the broader covered requirements, SR-T06 or Gate U.
 - [ ] **SR-T06: implement the verification policies.** Reviewed-source checks and an isolated unreviewed-contribution path have distinct reports. Recompute from exact artifacts; reject forged or downgraded receipts. Covers SR-08, SR-12.
+
+  In progress: the [local Comparator primitive](../packages/lean/verification/README.md) uses pinned upstream comparison/export tools, a receiver-selected challenge and restricted macOS builds. Its [dated local evidence](../packages/lean/verification/observed-comparator.json) covers boundary/process controls and proof-comparison fixtures. It issues no Slean receipt. Receiver module reconstruction, exact native statement/environment binding, distinct policy reports and forged/downgraded receipt controls remain. The macOS backend has no hard memory or aggregate disk/job quota; it is not qualified for hostile uploads. This checkpoint does not close SR-T06, SR-08, SR-12 or Gate U.
 
 ### M2: empirical methods compose with explicit conditions
 
@@ -307,6 +309,8 @@ Mutome can express an unresolved hypothesis, ask for relevant components and the
 Mutome may evolve research directions through changed assumptions, new definitions, recombination, counterexamples or experiments that distinguish models. Its eventual selection policy should account for diversity and delayed usefulness; Slean does not mandate an evolutionary algorithm or encode a scientific-importance score into the core. An observed reuse is recorded with its evidence, while claims that it caused scientific progress require the separate evaluation above.
 
 Exploration of small rewriting systems and alternative representations is a candidate future campaign. It does not change the frozen engineering fixtures or select a scientific flagship. Proposed analogies, alternative descriptions and checked equivalences must retain distinct evidence. A content identity alone establishes neither mathematical equivalence nor empirical validity. Choosing the campaign and allocating its search budget remain Mutome responsibilities.
+
+Exploration may also propose what to measure. Observable extractors and translations between representations should use the same versioned component and evidence contract as other methods. Preserve the model or generative rule, initial conditions, extraction method and interpretation assumptions together. An assessment of a new representation must account for the translation's complexity and cost; a short rule alone is not evidence of a compact explanation. Evaluate the frozen contribution on cases not used to construct it, and keep later changes as new revisions. Slean records these tests and their scope; Mutome proposes the concepts and chooses where to investigate next. This requirement adds no universal score of scientific importance and selects no physical theory as established.
 
 This creates a possible persistent scientific memory for Mutome: an investigation retains its hypotheses, methods, predictions, failures and remaining questions across agents and sessions. A method from investigation A remains callable and inspectable in investigation B. Mutome's retrieval, planner, worker and knowledge store can adopt the contract incrementally. No migration of all historical records is required.
 

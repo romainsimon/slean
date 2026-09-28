@@ -7,6 +7,7 @@
 /conformance/_out/
 /packages/lean/.lake/
 /packages/lean/_out/
+/packages/lean/verification/.lake/
 /examples/reuse/with-slean-lean/.lake/
 /examples/reuse/with-slean-lean/_out/
 /site/.lake/
