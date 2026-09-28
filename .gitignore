@@ -5,6 +5,10 @@
 /examples/reuse/direct-python/_out/
 /conformance/.venv/
 /conformance/_out/
+/packages/lean/.lake/
+/packages/lean/_out/
+/examples/reuse/with-slean-lean/.lake/
+/examples/reuse/with-slean-lean/_out/
 /site/.lake/
 /site/_out/
 /site/node_modules/

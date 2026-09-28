@@ -1,0 +1,16 @@
+name = "slean_export"
+version = "0.1.0"
+defaultTargets = ["SleanExport"]
+
+[[require]]
+name = "LeanArchitect"
+git = "https://github.com/hanwenzhu/LeanArchitect.git"
+rev = "468e8f58fb4ad6e6ad672a08da6d0d0531e95a97"
+
+[[require]]
+name = "batteries"
+git = "https://github.com/leanprover-community/batteries"
+rev = "f2effa3d803fda822b1f97b806c47cf2adfbcbc2"
+
+[[lean_lib]]
+name = "SleanExport"

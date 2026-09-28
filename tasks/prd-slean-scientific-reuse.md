@@ -1,6 +1,6 @@
 # Slean: an open foundation for cumulative science in the age of AI
 
-Version: direction 2.5, updated 28 September 2026. Status: the direct-tool baselines and draft wire specification with executable fixtures complete M0. The general Lean/Python adapters, runtime library and usefulness comparison remain unimplemented; no standard is released. Owner: Slean maintainer. The user delegated the product and architecture decision, then clarified that Slean must aim to become a new foundation for advancing science in the age of AI. Reuse is the first engineering test of that mission, not its full scope.
+Version: direction 2.6, updated 28 September 2026. Status: M0 and the general Lean exporter (SR-T04) are complete. Formal application/receiver verification, the Python runtime library and the usefulness comparison remain to be implemented; no standard is released. Owner: Slean maintainer. The user delegated the product and architecture decision, then clarified that Slean must aim to become a new foundation for advancing science in the age of AI. Reuse is the first engineering test of that mission, not its full scope.
 
 This PRD supersedes the **forward implementation direction** of the dossier-first PRD. It preserves V0's code, evidence and limitations. It does not declare the earlier full-program goal complete. Release, repository publication, deployment, outside-project changes, external outreach and new spending retain their existing boundaries.
 
@@ -210,7 +210,7 @@ uses:    exact component -> recorded applications within the selected corpus
 
 Authoring a hypothesis, binding a prediction/test and appending a revision use the typed library API and the research profile. Freeze those signatures and their fixtures in M0. Do not add a separate service or CLI subsystem for each scientific concept. Experiment execution remains an explicit call to an existing tool; Slean checks and exports the resulting records at its supported level.
 
-Use one public-source monorepo with independent package builds: `spec/`, `packages/lean/`, `packages/python/`, `profiles/`, `conformance/`, `examples/reuse/`, and `explorer/`. M0 supplies the specification, profiles, draft conformance fixtures and direct-tool examples; the runtime packages and new Explorer behavior remain planned. Existing `Slean/`, CLI, fixtures and site remain intact during the first milestones. The public marketing website already has a separate `slean-web` repository; do not merge or modify it in this work. Documentation generated from the library stays with the library.
+Use one public-source monorepo with independent package builds: `spec/`, `packages/lean/`, `packages/python/`, `profiles/`, `conformance/`, `examples/reuse/`, and `explorer/`. M0 supplies the specification, profiles, draft conformance fixtures and direct-tool examples. `packages/lean/` now supplies selected-declaration extraction; the Python runtime and new Explorer behavior remain planned. Existing `Slean/`, CLI, fixtures and site remain intact during the first milestones. The public marketing website already has a separate `slean-web` repository; do not merge or modify it in this work. Documentation generated from the library stays with the library.
 
 ## 6. Required behavior
 
@@ -235,7 +235,7 @@ For SR-12, export only an explicit selection of publishable components and suppo
 
 ## 7. Delivery order and tasks
 
-SR-T01–03 are **complete** with the local evidence linked below. Other tasks below are **not started** until their acceptance evidence is recorded. Existing V0 work is not used to tick them. The repository's roadmap links here so milestone status has one owner.
+SR-T01–04 are **complete** with the local evidence linked below. Other tasks below are **not started** until their acceptance evidence is recorded. Existing V0 work is not used to tick them. The repository's roadmap links here so milestone status has one owner.
 
 ### M0: reuse the ecosystem and freeze the comparison
 
@@ -249,7 +249,9 @@ SR-T01–03 are **complete** with the local evidence linked below. Other tasks b
 
 ### M1: formal components can actually be reused
 
-- [ ] **SR-T04: implement the general Lean exporter.** Adapt the upstream export selected in M0 where possible. Export selected declarations, exact source identities, distinct statement/proof dependencies, axioms and formal interface. Import modules through ordinary Lean/Lake; no hard-coded theorem names. Verify that suppressed presentation edges, incomplete plans and agent diagnoses cannot produce stronger verification results. Covers SR-03, SR-08.
+- [x] **SR-T04: implement the general Lean exporter.** Adapt the upstream export selected in M0 where possible. Export selected declarations, exact source identities, distinct statement/proof dependencies, axioms and formal interface. Import modules through ordinary Lean/Lake; no hard-coded theorem names. Verify that suppressed presentation edges, incomplete plans and agent diagnoses cannot produce stronger verification results. Covers SR-03, SR-08.
+
+  Evidence: [exporter and trust boundary](../packages/lean/README.md), [second Lake project](../examples/reuse/with-slean-lean/README.md), and [recorded end-to-end check](../packages/lean/observed-export.json). Eleven declarations are selected through Lean's name resolver, including a Physlib theorem, two uses, a definition, a polymorphic theorem, a quoted name and negative proof fixtures. Native encoding passes ten constructor vectors and five open-term rejections; three invalid selections are rejected. Eight bridge tests preserve actual dependencies despite presentation suppression, distinguish transitive `sorryAx`/custom axioms, bind source and statement bytes, and keep forged readiness/receipts at declared status. The output uses extraction-only evidence, not a receiver proof receipt. Source snapshots and compiled identities are separate; reconstruction and verification remain SR-T05–06. This closes extraction, not all of SR-03/SR-08 or Gate U.
 - [ ] **SR-T05: implement formal application.** Bind a real theorem in a second project, expose remaining hypotheses, check the new proof and export its actual dependencies. Test a changed statement and missing hypothesis. Covers SR-03, SR-05, SR-06.
 - [ ] **SR-T06: implement the verification policies.** Reviewed-source checks and an isolated unreviewed-contribution path have distinct reports. Recompute from exact artifacts; reject forged or downgraded receipts. Covers SR-08, SR-12.
 

@@ -1,0 +1,303 @@
+{
+  "bridge_tests": 8,
+  "declarations": [
+    {
+      "axioms": [
+        [
+          [
+            "str",
+            "Classical"
+          ],
+          [
+            "str",
+            "choice"
+          ]
+        ],
+        [
+          [
+            "str",
+            "Quot"
+          ],
+          [
+            "str",
+            "sound"
+          ]
+        ],
+        [
+          [
+            "str",
+            "propext"
+          ]
+        ]
+      ],
+      "kind": "theorem",
+      "name": "ClassicalMechanics.HarmonicOscillator.energy_conservation_of_equationOfMotion'",
+      "proof_dependency_count": 101,
+      "statement_dependency_count": 41
+    },
+    {
+      "axioms": [
+        [
+          [
+            "str",
+            "Classical"
+          ],
+          [
+            "str",
+            "choice"
+          ]
+        ],
+        [
+          [
+            "str",
+            "Quot"
+          ],
+          [
+            "str",
+            "sound"
+          ]
+        ],
+        [
+          [
+            "str",
+            "propext"
+          ]
+        ]
+      ],
+      "kind": "theorem",
+      "name": "DirectReuse.energy_at_two_times",
+      "proof_dependency_count": 43,
+      "statement_dependency_count": 40
+    },
+    {
+      "axioms": [
+        [
+          [
+            "str",
+            "Classical"
+          ],
+          [
+            "str",
+            "choice"
+          ]
+        ],
+        [
+          [
+            "str",
+            "Quot"
+          ],
+          [
+            "str",
+            "sound"
+          ]
+        ],
+        [
+          [
+            "str",
+            "propext"
+          ]
+        ]
+      ],
+      "kind": "theorem",
+      "name": "FormalExample.energy_preserved",
+      "proof_dependency_count": 39,
+      "statement_dependency_count": 40
+    },
+    {
+      "axioms": [],
+      "kind": "theorem",
+      "name": "FormalExample.identity_law",
+      "proof_dependency_count": 1,
+      "statement_dependency_count": 1
+    },
+    {
+      "axioms": [],
+      "kind": "definition",
+      "name": "FormalExample.double",
+      "proof_dependency_count": 4,
+      "statement_dependency_count": 1
+    },
+    {
+      "axioms": [],
+      "kind": "theorem",
+      "name": "FormalExample.\u00abname.with.dots\u00bb",
+      "proof_dependency_count": 1,
+      "statement_dependency_count": 1
+    },
+    {
+      "axioms": [
+        [
+          [
+            "str",
+            "Classical"
+          ],
+          [
+            "str",
+            "choice"
+          ]
+        ],
+        [
+          [
+            "str",
+            "Quot"
+          ],
+          [
+            "str",
+            "sound"
+          ]
+        ],
+        [
+          [
+            "str",
+            "propext"
+          ]
+        ]
+      ],
+      "kind": "theorem",
+      "name": "ArchitectProbe.suppressedEdge",
+      "proof_dependency_count": 39,
+      "statement_dependency_count": 40
+    },
+    {
+      "axioms": [
+        [
+          [
+            "str",
+            "ArchitectProbe"
+          ],
+          [
+            "str",
+            "inventedEvidence"
+          ]
+        ]
+      ],
+      "kind": "theorem",
+      "name": "ArchitectProbe.unapprovedAxiom",
+      "proof_dependency_count": 1,
+      "statement_dependency_count": 1
+    },
+    {
+      "axioms": [
+        [
+          [
+            "str",
+            "sorryAx"
+          ]
+        ]
+      ],
+      "kind": "theorem",
+      "name": "ArchitectProbe.unfinishedPlan",
+      "proof_dependency_count": 10,
+      "statement_dependency_count": 1
+    },
+    {
+      "axioms": [
+        [
+          [
+            "str",
+            "sorryAx"
+          ]
+        ]
+      ],
+      "kind": "theorem",
+      "name": "ArchitectProbe.inheritsUnfinishedPlan",
+      "proof_dependency_count": 1,
+      "statement_dependency_count": 1
+    },
+    {
+      "axioms": [
+        [
+          [
+            "str",
+            "sorryAx"
+          ]
+        ]
+      ],
+      "kind": "theorem",
+      "name": "ArchitectProbe.suppressedSorry",
+      "proof_dependency_count": 10,
+      "statement_dependency_count": 1
+    }
+  ],
+  "declarations_exported": 11,
+  "elapsed_seconds": 482.809,
+  "lean": "4.34.1",
+  "limitations": [
+    "No receiver rebuild or proof receipt",
+    "No unreviewed-code isolation",
+    "No new runtime apply/verify operation",
+    "Gate U not evaluated"
+  ],
+  "module": "sha256:3d4c6bdd2f23e58e7cb5e20ca158594e5f7ea4c016b542b45f2f455548f2fc4a",
+  "native_constructor_vectors": 10,
+  "open_expression_rejections": 5,
+  "payloads": 20,
+  "receiver_report": {
+    "imported_evidence": "declared",
+    "scientific_verification": "not_performed",
+    "unresolved_dependencies": [],
+    "unsupported": [],
+    "wire": "valid"
+  },
+  "scope": "SR-T04 selected-declaration extraction and packaging",
+  "selection_rejections": 3,
+  "setup": "Existing pinned Lean/Physlib cache; complete setup and authoring costs not measured",
+  "source_sha256": {
+    "examples/reuse/with-slean-lean/Export.lean": "3e89c28f4beafc29f196cc89402cca021469f92f6259b0c373e1d6c1aef73e5f",
+    "examples/reuse/with-slean-lean/FormalExample.lean": "b7d12ce794d63314a73da66e3042c626b684570dbea2fa18d13abbe570271d9f",
+    "examples/reuse/with-slean-lean/lake-manifest.json": "bb3babbfff3140f54a03bc6bb2682419b45a612e28ea285c298e771d79a3bc0e",
+    "examples/reuse/with-slean-lean/lakefile.toml": "7c4d63ff487f08f008611c24ec3807dbfbdeed8734106c62ea3a407d5886c6dc",
+    "examples/reuse/with-slean-lean/lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+    "packages/lean/SleanExport.lean": "33b4881923869ee7527b466c01d7f43f821ff87fec7c3c1cd1dad468c34d771a",
+    "packages/lean/SleanExport/Native.lean": "59ce50f8e8ff3be8c2d2c0c9e37c2c594520290451494a8de072a9d4a21e8dd2",
+    "packages/lean/check_export.py": "f7e23969e746d40ba1a24b69a9555ba37506c34049bdd127ae1a80107ae42743",
+    "packages/lean/export.py": "1c6904aaef9ca0accaa251aa4d30e138c2f489776f42528bdf11554803eff61b",
+    "packages/lean/lake-manifest.json": "5d14997742b3555772d42bbc47e31a2fdc16be67cb7be45249131498291f9d7f",
+    "packages/lean/lakefile.toml": "cebb9ef544b0218a5aab9e8884f1b3434c5d745c71aef2964db9efd6807e260e",
+    "packages/lean/tests/NativeEncoding.lean": "5f48dfed058cab09246f1052a9d639c4e516ac4980d7a8408891b740f9c4eb4b",
+    "packages/lean/tests/test_export.py": "879dbd1b0650ac56081197fa5b05a9d13426b8d08de04af5228b518f0b4a1ef8"
+  },
+  "status": "passed",
+  "steps": [
+    {
+      "check": "library-build",
+      "outcome": "passed",
+      "seconds": 24.331
+    },
+    {
+      "check": "native-encoding",
+      "outcome": "passed",
+      "seconds": 52.689
+    },
+    {
+      "check": "consumer-build",
+      "outcome": "passed",
+      "seconds": 16.805
+    },
+    {
+      "check": "native-export",
+      "outcome": "passed",
+      "seconds": 255.603
+    },
+    {
+      "check": "unknown-declaration",
+      "outcome": "rejected_as_expected",
+      "seconds": 43.678
+    },
+    {
+      "check": "empty-selection",
+      "outcome": "rejected_as_expected",
+      "seconds": 14.606
+    },
+    {
+      "check": "unbuilt-local-declaration",
+      "outcome": "rejected_as_expected",
+      "seconds": 62.764
+    },
+    {
+      "check": "bridge-tests",
+      "outcome": "passed",
+      "seconds": 7.248
+    }
+  ]
+}
