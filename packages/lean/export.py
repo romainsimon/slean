@@ -41,7 +41,7 @@ def read_json(path):
     return result
 
 
-def pack(extraction, project, destination, license_name="unknown"):
+def pack(extraction, project, destination, license_name="unknown", *, applications=None, dependency_modules=()):
     """Read only named local source/build inputs and create a new module directory."""
     project, destination = project.resolve(), destination.absolute()
     if destination.exists():
@@ -88,7 +88,8 @@ def pack(extraction, project, destination, license_name="unknown"):
         if (project / name).is_file():
             add("environment/" + name, (project / name).read_bytes())
     implementation = add("exporter/export.py", Path(__file__).read_bytes())
-    for name in ("SleanExport.lean", "SleanExport/Native.lean", "lake-manifest.json", "lean-toolchain", "lakefile.toml"):
+    for name in ("SleanExport.lean", "SleanExport/Native.lean", "SleanExport/Application.lean",
+                 "applications.py", "lake-manifest.json", "lean-toolchain", "lakefile.toml"):
         add("exporter/" + name, (HERE / name).read_bytes())
     components, evidence, origins = [], [], []
     names = set()
@@ -132,10 +133,18 @@ def pack(extraction, project, destination, license_name="unknown"):
                 "statement_fingerprint": fingerprint, "statement_dependencies": declaration["statement_dependencies"],
                 "proof_dependencies": declaration["proof_dependencies"], "axioms": declaration["axioms"]}}})
     add("environment/origins.json", canonical({"toolchain": TOOLCHAIN, "declarations": origins}) + b"\n")
-    manifest = {"format": FORMAT, "profiles": [{"id": PROFILE, "required": True}], "dependencies": [],
+    application_records, dependencies = [], []
+    if applications is not None:
+        from applications import build_applications
+        application_records, application_evidence, dependencies = build_applications(
+            read_json(applications), dependency_modules, components, evidence, add, canonical, digest)
+        evidence.extend(application_evidence)
+    elif dependency_modules:
+        raise ValueError("Dependency modules require an application capture")
+    manifest = {"format": FORMAT, "profiles": [{"id": PROFILE, "required": True}], "dependencies": dependencies,
         "payloads": [{"path": name, "size": str(len(data)), "sha256": digest(data)}
                      for name, data in sorted(files.items())],
-        "components": components, "applications": [], "evidence": evidence}
+        "components": components, "applications": application_records, "evidence": evidence}
     manifest["id"] = "sha256:" + digest((FORMAT + "\n").encode() + canonical(manifest))
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix=".slean-export-", dir=destination.parent))
@@ -158,6 +167,9 @@ if __name__ == "__main__":
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--license", default="unknown")
+    parser.add_argument("--applications", type=Path)
+    parser.add_argument("--dependency-module", type=Path, action="append", default=[])
     args = parser.parse_args()
-    print(json.dumps({"module": pack(args.input, args.project, args.output, args.license)["id"],
+    print(json.dumps({"module": pack(args.input, args.project, args.output, args.license,
+                                    applications=args.applications, dependency_modules=args.dependency_module)["id"],
                       "verification": "not_performed"}))

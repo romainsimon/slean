@@ -26,6 +26,47 @@ proof fixtures. The [exporter check](../../../packages/lean/README.md#validation
 recomputes their native data, verifies the package structure and checks that
 presentation readiness cannot create a stronger verification result.
 
-The current receiver retains these extractions as declarations. Application
-planning, remaining-obligation diagnostics and receiver proof verification
-remain SR-T05–06. The comparison with direct tools remains Gate U work.
+## Native application trace
+
+[`ApplicationExample.lean`](ApplicationExample.lean) applies the same theorem
+twice with `slean_apply`. One use leaves an equation-of-motion goal for the next
+proof step; the other supplies all six arguments. Both final theorems remain
+conditional on the caller's smoothness and equation-of-motion hypotheses.
+
+```sh
+lake build ApplicationExample
+mkdir -p _out
+lake env lean ExportApplications.lean
+```
+
+[`ExportApplications.lean`](ExportApplications.lean) writes the producer,
+consumer and native application extractions. From the repository root:
+
+```sh
+conformance/.venv/bin/python packages/lean/export.py \
+  --project examples/reuse/with-slean-lean \
+  --input examples/reuse/with-slean-lean/_out/application-producer.json \
+  --output examples/reuse/with-slean-lean/_out/application-producer-module
+
+conformance/.venv/bin/python packages/lean/export.py \
+  --project examples/reuse/with-slean-lean \
+  --input examples/reuse/with-slean-lean/_out/application-consumer.json \
+  --applications examples/reuse/with-slean-lean/_out/applications.json \
+  --dependency-module examples/reuse/with-slean-lean/_out/application-producer-module \
+  --output examples/reuse/with-slean-lean/_out/application-consumer-module
+```
+
+The output directories must be new. The application records link exact producer
+and consumer versions, source/statement artifacts, native proof dependencies,
+input bindings and caller context. Input plans are retrospective projections
+of the recorded invocations. They do not establish preregistration.
+
+The [application check](../../../packages/lean/README.md#validation) rejects
+the [missing hypothesis](negative/MissingApplicationHypothesis.lean) and
+[changed conclusion](negative/ChangedApplicationStatement.lean), then checks
+the exported records. Its frozen direct-tool inputs remain unchanged.
+
+The receiver retains imported proof claims as declarations. Independent
+artifact verification remains SR-T06; general offline planning and the
+comparison with direct tools remain later work. This oscillator is an internal
+engineering fixture, not a selected scientific discovery campaign.

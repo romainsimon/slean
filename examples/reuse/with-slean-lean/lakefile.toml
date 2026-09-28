@@ -12,3 +12,6 @@ path = "../direct-lean"
 
 [[lean_lib]]
 name = "FormalExample"
+
+[[lean_lib]]
+name = "ApplicationExample"

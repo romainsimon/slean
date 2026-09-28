@@ -1,0 +1,231 @@
+{
+  "application_tests": 11,
+  "applications": [
+    {
+      "arguments_in_apply_term": 3,
+      "caller_context": [
+        [
+          [
+            "str",
+            "system"
+          ]
+        ],
+        [
+          [
+            "str",
+            "trajectory"
+          ]
+        ],
+        [
+          [
+            "str",
+            "smooth"
+          ]
+        ],
+        [
+          [
+            "str",
+            "motion"
+          ]
+        ],
+        [
+          [
+            "str",
+            "first"
+          ]
+        ],
+        [
+          [
+            "str",
+            "second"
+          ]
+        ]
+      ],
+      "consumer": [
+        [
+          "str",
+          "ApplicationExample"
+        ],
+        [
+          "str",
+          "energy_with_obligation"
+        ]
+      ],
+      "goals_at_apply": 1
+    },
+    {
+      "arguments_in_apply_term": 6,
+      "caller_context": [
+        [
+          [
+            "str",
+            "system"
+          ]
+        ],
+        [
+          [
+            "str",
+            "trajectory"
+          ]
+        ],
+        [
+          [
+            "str",
+            "smooth"
+          ]
+        ],
+        [
+          [
+            "str",
+            "motion"
+          ]
+        ],
+        [
+          [
+            "str",
+            "first"
+          ]
+        ],
+        [
+          [
+            "str",
+            "second"
+          ]
+        ]
+      ],
+      "consumer": [
+        [
+          "str",
+          "ApplicationExample"
+        ],
+        [
+          "str",
+          "energy_with_all_arguments"
+        ]
+      ],
+      "goals_at_apply": 0
+    }
+  ],
+  "consumer": "sha256:a1710e70fa8e617478167a183a50a9a94fea1c9d4eefaf1bda73fe4568bd12d6",
+  "consumer_payload_bytes": 606935,
+  "elapsed_seconds": 185.15,
+  "exporter_bridge_regression_tests": 8,
+  "frozen_baseline_files_unchanged": 34,
+  "inspection": [
+    {
+      "application": {
+        "id": "application-9647a38ac421d69dcf51ab2d27f9fc4781a730d42993bec04779a1bf738b41b8-execution",
+        "module": "sha256:a1710e70fa8e617478167a183a50a9a94fea1c9d4eefaf1bda73fe4568bd12d6"
+      },
+      "compatibility": "conditional",
+      "formal_verification": "not_performed",
+      "interface_trust": "declared",
+      "requirements_status": "unresolved"
+    },
+    {
+      "application": {
+        "id": "application-4d47dbe748a1632a1b9c00ca6ae6d114c34886bcdd4e29e6ddb541556523111b-execution",
+        "module": "sha256:a1710e70fa8e617478167a183a50a9a94fea1c9d4eefaf1bda73fe4568bd12d6"
+      },
+      "compatibility": "conditional",
+      "formal_verification": "not_performed",
+      "interface_trust": "declared",
+      "requirements_status": "unresolved"
+    }
+  ],
+  "lean": "4.34.1",
+  "limitations": [
+    "Ordinary author-side Lean compilation, not receiver artifact verification",
+    "Native goal snapshots precede the rest of the proof; caller assumptions remain conditional",
+    "No independently checked proof receipt or unreviewed-code isolation",
+    "No demonstrated scientific novelty, physical validation, external adoption or Gate U advantage"
+  ],
+  "missing_hypothesis_obligations": [
+    {
+      "status": "unresolved",
+      "text": "system.EquationOfMotion trajectory"
+    }
+  ],
+  "native_capture_bytes": 725030,
+  "negative_compilations": 2,
+  "producer": "sha256:426464f8e70e01a15d645814ed5f6be2cccabf44b26368acedf61329940da21e",
+  "regression_input": "Existing SR-T04 native.json; bridge checks rerun, SR-T04 extraction not recomputed",
+  "scope": "SR-T05 native formal application and declared module records",
+  "scope_controls": 3,
+  "setup": "Installed pinned Lean/Physlib cache; total authoring and setup cost not measured",
+  "source_sha256": {
+    "conformance/contract.py": "d1e5875a6853dc9f45a94f114c52c83dfa9b6eab6716ac22ec52a50fd9b8b6cb",
+    "examples/reuse/frozen-baseline.json": "99fb51733fc31ecd975a833de8758187aa141d71fd3002ae4f7593c32ba726c7",
+    "examples/reuse/with-slean-lean/ApplicationExample.lean": "c0dba0653e1b3cfbe8b155441d4632669a9dff60ead6a98fd0827fe4093e5746",
+    "examples/reuse/with-slean-lean/ExportApplications.lean": "93b2a102fefa13c04a9dc1e5d4b1dc34630a5453ded52a4854256de75ffdbda3",
+    "examples/reuse/with-slean-lean/lake-manifest.json": "bb3babbfff3140f54a03bc6bb2682419b45a612e28ea285c298e771d79a3bc0e",
+    "examples/reuse/with-slean-lean/lakefile.toml": "625f2c129c7a4b49c82794584b43c09d1225510879c3ee7868009955289f78be",
+    "examples/reuse/with-slean-lean/lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+    "examples/reuse/with-slean-lean/negative/ChangedApplicationStatement.lean": "e6cbbb854fbdb0e432c6c97c70508bbc371218a43faac76d9f169c61828ec3fd",
+    "examples/reuse/with-slean-lean/negative/MissingApplicationHypothesis.lean": "9b30d2f407149498d4685b5af7ae3f9a0447eca0e65a9930b484a3c8e73b8feb",
+    "packages/lean/SleanExport.lean": "5b0ab5da11583beb7b54540c9fd927d311f0ade21521e879caad37baa2c19bdb",
+    "packages/lean/SleanExport/Application.lean": "87abfcc73d98d461571f4abecc6146753993f8185b5c076956fc897f57edef05",
+    "packages/lean/SleanExport/Native.lean": "59ce50f8e8ff3be8c2d2c0c9e37c2c594520290451494a8de072a9d4a21e8dd2",
+    "packages/lean/applications.py": "ac34c757a2114cec22a15ab8e85ec34a7b4b17101d2b3e19374a347a895c8561",
+    "packages/lean/check_applications.py": "057e3e5ed37fd2fb8c0be0c583d9b7bc110f1d91c070bf6fa0c243768c178403",
+    "packages/lean/export.py": "57977e1737e62b62a0771ded64908dce64fd2eb12277396d69711cbb2631dc61",
+    "packages/lean/lake-manifest.json": "5d14997742b3555772d42bbc47e31a2fdc16be67cb7be45249131498291f9d7f",
+    "packages/lean/lakefile.toml": "cebb9ef544b0218a5aab9e8884f1b3434c5d745c71aef2964db9efd6807e260e",
+    "packages/lean/lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+    "packages/lean/tests/ApplicationCapture.lean": "c2d7f3a7daf7812db5b1c11ed357ecc012fcb3d09ce5466cf4e6255db868c60d",
+    "packages/lean/tests/test_applications.py": "886fff738584722792cd1254d77dee6dede27ae5fe00ea7ff3a1a15eba164f36",
+    "packages/lean/tests/test_export.py": "879dbd1b0650ac56081197fa5b05a9d13426b8d08de04af5228b518f0b4a1ef8"
+  },
+  "status": "passed",
+  "steps": [
+    {
+      "check": "application-library",
+      "outcome": "passed",
+      "seconds": 8.032
+    },
+    {
+      "check": "application-scope",
+      "outcome": "passed",
+      "seconds": 38.774
+    },
+    {
+      "check": "application-consumer",
+      "outcome": "passed",
+      "seconds": 28.908
+    },
+    {
+      "check": "application-native-export",
+      "outcome": "passed",
+      "seconds": 66.273
+    },
+    {
+      "check": "application-missing-hypothesis",
+      "outcome": "rejected_as_expected",
+      "seconds": 26.21
+    },
+    {
+      "check": "application-changed-statement",
+      "outcome": "rejected_as_expected",
+      "seconds": 11.06
+    },
+    {
+      "check": "application-bridge-tests",
+      "outcome": "passed",
+      "seconds": 4.965
+    },
+    {
+      "check": "application-export-regression",
+      "outcome": "passed",
+      "seconds": 0.468
+    }
+  ],
+  "structural_report": {
+    "imported_evidence": "declared",
+    "scientific_verification": "not_performed",
+    "unresolved_dependencies": [
+      "sha256:426464f8e70e01a15d645814ed5f6be2cccabf44b26368acedf61329940da21e"
+    ],
+    "unsupported": [],
+    "wire": "valid"
+  }
+}

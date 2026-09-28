@@ -66,7 +66,7 @@ with tempfile.TemporaryDirectory(prefix="checked-module-", dir=OUT) as temp:
 raw = json.loads((OUT / "native.json").read_text())
 source_paths = [p for p in HERE.rglob("*") if p.is_file() and not any(
     part in {".lake", "__pycache__", "_out"} for part in p.relative_to(HERE).parts)
-    and p.suffix in {".lean", ".py", ".toml", ".json"} and p.name != "observed-export.json"]
+    and p.suffix in {".lean", ".py", ".toml", ".json"} and not p.name.startswith("observed-")]
 source_paths += [PROJECT / name for name in ["FormalExample.lean", "Export.lean", "lakefile.toml", "lake-manifest.json", "lean-toolchain"]]
 print(json.dumps({
     "status": "passed", "scope": "SR-T04 selected-declaration extraction and packaging",

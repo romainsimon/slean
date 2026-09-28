@@ -1,4 +1,5 @@
 import SleanExport.Native
+import SleanExport.Application
 import Architect
 
 open Lean Elab Command
