@@ -1,0 +1,74 @@
+{
+  "annotated_declarations_exported": 7,
+  "declarations": [
+    {
+      "allowed_axioms_only": true,
+      "name": "ClassicalMechanics.HarmonicOscillator.energy_conservation_of_equationOfMotion'",
+      "presentation_proof_ready": true,
+      "transitive_axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "allowed_axioms_only": true,
+      "name": "DirectReuse.energy_at_two_times",
+      "presentation_proof_ready": true,
+      "transitive_axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "allowed_axioms_only": true,
+      "name": "ArchitectProbe.suppressedEdge",
+      "presentation_proof_ready": true,
+      "transitive_axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "allowed_axioms_only": false,
+      "name": "ArchitectProbe.unapprovedAxiom",
+      "presentation_proof_ready": true,
+      "transitive_axioms": [
+        "ArchitectProbe.inventedEvidence"
+      ]
+    },
+    {
+      "allowed_axioms_only": false,
+      "name": "ArchitectProbe.unfinishedPlan",
+      "presentation_proof_ready": false,
+      "transitive_axioms": [
+        "sorryAx"
+      ]
+    },
+    {
+      "allowed_axioms_only": false,
+      "name": "ArchitectProbe.inheritsUnfinishedPlan",
+      "presentation_proof_ready": true,
+      "transitive_axioms": [
+        "sorryAx"
+      ]
+    },
+    {
+      "allowed_axioms_only": false,
+      "name": "ArchitectProbe.suppressedSorry",
+      "presentation_proof_ready": true,
+      "transitive_axioms": [
+        "sorryAx"
+      ]
+    }
+  ],
+  "kind": "internal_upstream_compatibility_probe",
+  "lean": "4.34.1",
+  "leanarchitect": "468e8f58fb4ad6e6ad672a08da6d0d0531e95a97",
+  "limit": "Axiom policy and graph semantics only; no independent proof recheck or scientific-validity claim.",
+  "policy_rejected_declarations": 4,
+  "raw_json_contains_annotations_not_inferred_graph": true,
+  "suppressed_presentation_edge_retained_in_native_term": true
+}

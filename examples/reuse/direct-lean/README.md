@@ -63,8 +63,29 @@ The theorem is
 Physlib and Mathlib retain their upstream Apache-2.0 licences and notices in
 their Lake dependency checkouts. No third-party source is vendored here.
 
-The new Slean exporter, portable research profile, separate module consumer,
-LeanArchitect integration and usefulness gate remain subsequent tasks.
+The new Slean exporter, portable research profile, separate module consumer
+and usefulness gate remain subsequent tasks.
+
+## LeanArchitect integration probe
+
+LeanArchitect revision `468e8f58fb4ad6e6ad672a08da6d0d0531e95a97` (tag
+`v4.34.0`) also builds with this Lean 4.34.1 environment. A top-level Batteries
+pin retains the revision used by Physlib and Mathlib. Run:
+
+```sh
+python3 check_architect.py
+```
+
+The probe annotates both imported declarations, exports seven nodes through
+LeanArchitect's `blueprintJson` facet and compares its presentation graph with
+native Lean term dependencies and transitive axioms. The four deliberately
+unsupported proof fixtures live only in `ArchitectProbe.lean`; the regular
+reuse fixture does not import them. The probe requires their rejection by the
+specified axiom policy, even when the presentation readiness flag is true.
+
+[`observed-architect.json`](observed-architect.json) records the passed probe.
+The [integration decision](../../../docs/research/slean-formal-integration-2026-09-28.md)
+defines what Slean can reuse and what its formal profile must still check.
 
 ## Validation on 28 September 2026
 

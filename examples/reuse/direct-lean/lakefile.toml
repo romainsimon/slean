@@ -7,5 +7,19 @@ name = "Physlib"
 git = "https://github.com/leanprover-community/physlib.git"
 rev = "44c66d54be78db4693be9f8f92bd3b5ad124ed6f"
 
+[[require]]
+name = "LeanArchitect"
+git = "https://github.com/hanwenzhu/LeanArchitect.git"
+rev = "468e8f58fb4ad6e6ad672a08da6d0d0531e95a97"
+
+# Keep Physlib/Mathlib's Batteries revision when testing the v4.34.0 exporter.
+[[require]]
+name = "batteries"
+git = "https://github.com/leanprover-community/batteries"
+rev = "f2effa3d803fda822b1f97b806c47cf2adfbcbc2"
+
 [[lean_lib]]
 name = "DirectReuse"
+
+[[lean_lib]]
+name = "ArchitectProbe"

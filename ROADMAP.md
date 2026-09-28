@@ -6,7 +6,7 @@ The [foundation PRD](tasks/prd-slean-scientific-reuse.md), selected on 27 Septem
 
 | Milestone | Deliverable and acceptance | State |
 |---|---|---|
-| M0 · SR-T01–03 | Build the pinned Physlib example, freeze a fair direct-tool baseline, and specify the minimal contract with fixtures. | SR-T01 complete; SR-T02–03 pending |
+| M0 · SR-T01–03 | Build the pinned Physlib example, freeze a fair direct-tool baseline, and specify the minimal contract with fixtures. | SR-T01 complete; SR-T02 formal probe complete, computational comparison pending; SR-T03 pending |
 | M1 · SR-T04–06 | Export and actually reuse a real Lean theorem across projects; expose assumptions, dependencies and verification policy. | Not started |
 | M2 · SR-T07–10 | Reuse a calibration across investigations, reproduce its output, and carry a prediction through a failed test and a model revision. | Not started |
 | Gate U | Preserve the complete example research cycle while reducing repeated integration work against Lean/Physlib + Python + RO-Crate at equivalent inputs and accounting; detect every negative case or leave it conditional. | Not evaluated |

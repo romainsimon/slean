@@ -87,6 +87,8 @@ The [official project site](https://goedelarchitect.github.io/) links an availab
 
 More directly reusable for Slean is [LeanArchitect's inspected README](https://github.com/hanwenzhu/LeanArchitect/blob/f45833e26c68aa947044145184f8881a75392e30/README.md). It exposes `@[blueprint]`, separate inferred statement/proof dependencies, incomplete nodes and `lake build :blueprintJson`. It can annotate imported declarations, avoiding copies of Physlib definitions. However, `uses` and `proofUses` may override or suppress edges, and multiple declarations may share a presentation node. Such an export is not by itself the complete dependency/axiom audit required by the formal verification profile. Inspect and build the chosen compatible revision before claiming these capabilities integrate with Physlib. GitHub metadata reports Apache-2.0 for both projects.
 
+The subsequent [executed integration probe](slean-formal-integration-2026-09-28.md) establishes compatibility for tag `v4.34.0` with the selected Lean 4.34.1/Physlib environment. It also refines the JSON claim: raw JSON contains annotations, while computed dependencies and readiness require separate APIs. Presentation suppression, unapproved axioms and transitive unfinished proofs are covered by explicit controls. The earlier head snapshot above remains historical source inspection, not the selected runtime pin.
+
 The design consequences are bounded:
 
 - Evaluate LeanArchitect before writing formal annotations/export; keep Atlas as the second candidate and Blueprint for exposition. These replace the earlier candidate order without adding a new milestone.
