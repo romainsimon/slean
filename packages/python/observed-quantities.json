@@ -2,13 +2,13 @@
   "observed_on": "2026-09-30",
   "python": "3.14.3",
   "scope": "Quantity authoring and dimensional compatibility only; method SDK unfinished",
-  "seconds": 0.438,
+  "seconds": 0.566,
   "source_sha256": {
     "packages/python/check_quantities.py": "ddc7995e24fef94d92afed44067a5799e71dc8645393a1863754123d7019d46d",
     "packages/python/slean/__init__.py": "a226d04ea557eef59c485935bc2efcec56a2cbb27f3a081628010b0ec7169381",
     "packages/python/slean/data/quantity-map.json": "24e16b967a27b871f56a0873039e710db10eb525fc10ed742ed106ac0b52b4b9",
-    "packages/python/slean/quantities.py": "ddabe85c5b73dba98f058477686e711afea035500944a177b7428b529c48d62e",
-    "packages/python/tests/test_quantities.py": "e4d989f5bfe29eace8d353efc2e1be043e003b9b472a3a8d556e1f102fed6abd",
+    "packages/python/slean/quantities.py": "2a32668c2aa5d266678e992909e03974bedecda2b6e6aa6c4e81ddae8527af0d",
+    "packages/python/tests/test_quantities.py": "694ca5ca3b6eb246356ac9e4dd23d0870a518d7a438e5c94dcec46cda7542bc6",
     "profiles/quantity-map.json": "24e16b967a27b871f56a0873039e710db10eb525fc10ed742ed106ac0b52b4b9"
   },
   "status": "passed",

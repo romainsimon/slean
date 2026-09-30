@@ -22,8 +22,10 @@ Missing is distinct from zero. Allowed missing values remain `unresolved`;
 incompatible dimensions are `violated`. Unknown units or statistical-interval
 semantics are `unsupported`. An absolute Celsius value can be converted to
 Kelvin, but an error bound expressed in an offset unit is unsupported: applying
-the temperature's offset to an error magnitude would be incorrect. A bound in
-a supported zero-offset unit keeps its stated interpretation.
+the temperature's offset to an error magnitude would be incorrect. All
+temperature bounds remain unsupported in the initial profile, matching the
+conformance reader's stated lack of temperature-difference semantics. Supported
+bounds for other dimensions keep their own explicit unit and interpretation.
 
 Run the current tests from the repository root using the already pinned
 direct-baseline environment:

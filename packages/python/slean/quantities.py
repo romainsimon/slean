@@ -77,6 +77,8 @@ def _uncertainty(dimension, uncertainty):
     row = _unit(dimension, uncertainty["unit"])
     if Decimal(row["offset"]) != 0:
         raise QuantityError("unsupported_difference_unit", "An absolute-temperature offset is not an error bound", unsupported=True)
+    if dimension == "temperature":
+        raise QuantityError("unsupported_temperature_bound", "Temperature-difference semantics are outside the initial profile", unsupported=True)
 
 
 def scalar(value, *, dimension, unit, uncertainty):

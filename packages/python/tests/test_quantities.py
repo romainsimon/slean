@@ -42,6 +42,10 @@ class QuantityTests(unittest.TestCase):
             scalar('20', dimension='temperature', unit='degree_Celsius', uncertainty={'kind': 'absolute_bound', 'value': '1', 'unit': 'degree_Celsius'})
         self.assertTrue(caught.exception.unsupported)
         self.assertEqual(caught.exception.code, 'unsupported_difference_unit')
+        with self.assertRaises(QuantityError) as caught:
+            scalar('293.15', dimension='temperature', unit='kelvin', uncertainty={'kind': 'absolute_bound', 'value': '1', 'unit': 'kelvin'})
+        self.assertTrue(caught.exception.unsupported)
+        self.assertEqual(caught.exception.code, 'unsupported_temperature_bound')
         with self.assertRaises(QuantityError):
             scalar('1', dimension='voltage', unit='volt', uncertainty={'kind': 'absolute_bound', 'value': '-0.1', 'unit': 'volt'})
 
