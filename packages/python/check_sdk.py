@@ -46,7 +46,17 @@ assert second_reader.inspect(plan)["record"]["component"]["module"] == revision
 assert second_reader.uses({"module": revision, **component}) == [{"module": consumer_revision, **plan}]
 assert second_reader.verify(plan, policy=INTEGRITY_POLICY)["outcome"] == "valid"
 assert second_reader.verify(plan, policy="unknown-computation")["outcome"] == "unsupported"
-print(json.dumps({"status": "passed", "producer": revision, "consumer": consumer_revision, "outside_checkout": True, "candidate_code_executed": False}))
+from slean.execution import Executor, POLICY
+import hashlib
+source = b'from decimal import Decimal\\nimport pint\\nUNITS=pint.UnitRegistry(non_int_type=Decimal)\\ndef inverse(reading):\\n return {"distance":UNITS.Quantity((reading.to("volt").magnitude-Decimal("0.5"))/Decimal("2"),"millimeter")}\\n'
+author = Author(payloads={"method.py": source})
+method = author.component(id="inverse", kind="method", name="Installed call test", interface={"profile": profile,"value":{"inputs":{"reading":scalar_port(dimension="voltage",unit="volt")},"outputs":{"distance":scalar_port(dimension="length",unit="millimeter")},"entrypoint":{"artifact":{"path":"method.py"},"symbol":"inverse"}}}, requires={"id":"conditions","all":[]}, sources=[{"path":"method.py"}],license="unknown")
+call = author.plan(method,id="call",bindings={"reading":value("8500")},context={})
+call_revision=author.pack("call",publishable=[method,call])
+result=Executor(Reader("call")).run(call,policy=POLICY,expected_component={"module":call_revision,**method},reviewed_source_sha256=hashlib.sha256(source).hexdigest())
+assert result["outcome"] == "executed", result
+assert result["outputs"]["distance"]["typed"]["value"]["value"] == "4.000"
+print(json.dumps({"status": "passed", "producer": revision, "consumer": consumer_revision, "outside_checkout": True, "inspection_executed_candidate": False, "explicit_reviewed_execution": "passed"}))
 '''
 
 
@@ -62,8 +72,8 @@ def check():
     run([sys.executable, str(HERE/'generate_runtime.py')], cwd=ROOT)
     suite = unittest.defaultTestLoader.discover(str(HERE/'tests'))
     result = unittest.TextTestRunner(stream=sys.stderr, verbosity=2).run(suite)
-    if not result.wasSuccessful() or result.testsRun != 25:
-        raise RuntimeError('Expected all 25 SDK test groups to pass')
+    if not result.wasSuccessful() or result.testsRun != 32 or result.skipped:
+        raise RuntimeError('Expected all 32 SDK test groups to pass without skipped execution checks')
     with tempfile.TemporaryDirectory(prefix='slean-installed-sdk-') as temporary:
         directory = Path(temporary)
         wheels = directory/'wheels'; wheels.mkdir()
@@ -78,10 +88,10 @@ def check():
     hashes = frozen['sha256']
     changed = [path for path, expected in hashes.items() if hashlib.sha256((ROOT/'examples/reuse'/path).read_bytes()).hexdigest() != expected]
     if changed: raise RuntimeError('Frozen direct-tool files changed: '+repr(changed))
-    paths = [HERE/name for name in ('README.md', 'check_sdk.py', 'generate_runtime.py', 'pyproject.toml', 'requirements.lock', 'build-requirements.lock')]
+    paths = [HERE/name for name in ('README.md', 'EXECUTION.md', 'check_sdk.py', 'generate_runtime.py', 'pyproject.toml', 'requirements.lock', 'build-requirements.lock')]
     paths += sorted((HERE/'slean').glob('*.py')) + sorted((HERE/'slean/data').glob('*.json')) + sorted((HERE/'tests').glob('test_*.py'))
-    paths += [ROOT/'conformance/contract.py', ROOT/'spec/module.schema.json', ROOT/'spec/authoring.pyi', *sorted((ROOT/'profiles').glob('*.schema.json')), ROOT/'profiles/quantity-map.json']
-    return {'status': 'passed', 'observed_date': datetime.date.today().isoformat(), 'scope': 'SR-T07 bounded authoring and offline quantity planning; no computation reproduction or Gate U claim',
+    paths += [ROOT/'conformance/contract.py', ROOT/'spec/module.schema.json', ROOT/'spec/authoring.pyi', ROOT/'packages/lean/verification/boundary.py', *sorted((ROOT/'profiles').glob('*.schema.json')), ROOT/'profiles/quantity-map.json']
+    return {'status': 'passed', 'observed_date': datetime.date.today().isoformat(), 'scope': 'SR-T07 authoring/interface and SR-T08 reviewed numerical execution checkpoint; research cycle and Gate U remain open',
         'python': platform.python_version(), 'test_groups': result.testsRun, 'negative_vectors': 41, 'requirement_vectors': 34, 'positive_modules': 3,
         'installed_wheel': wheel_report, 'frozen_files_unchanged': len(hashes), 'seconds': round(time.monotonic()-started, 3),
         'source_sha256': {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}}

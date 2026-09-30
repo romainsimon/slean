@@ -8,7 +8,7 @@ The [foundation PRD](tasks/prd-slean-scientific-reuse.md), selected on 27 Septem
 |---|---|---|
 | M0 · SR-T01–03 | Build the pinned Physlib example, freeze a fair direct-tool baseline, and specify the minimal contract with fixtures. | Complete; local evidence linked in the PRD |
 | M1 · SR-T04–06 | Export and actually reuse a real Lean theorem across projects; expose assumptions, dependencies and verification policy. | Complete locally; reviewed component/application checks and separate unreviewed component comparison have authenticated receipts and recorded controls |
-| M2 · SR-T07–10 | Reuse a calibration across investigations, reproduce its output, and carry a prediction through a failed test and a model revision. | SR-T07 complete locally; calibration reproduction and the research cycle remain |
+| M2 · SR-T07–10 | Reuse a calibration across investigations, reproduce its output, and carry a prediction through a failed test and a model revision. | SR-T07 complete locally; SR-T08 numerical calibration/reproduction checkpoint passes, full research cycle and formal bridge remain |
 | Gate U | Preserve the complete example research cycle while reducing repeated integration work against Lean/Physlib + Python + RO-Crate at equivalent inputs and accounting; detect every negative case or leave it conditional. | Not evaluated |
 | M3 · SR-T11–13 | An independent agent-shaped consumer resumes an investigation and rechecks a blocked application after a new contribution; Explorer exposes the same claims, tests and revisions. | After Gate U |
 | M4 · SR-T14–16 | Independent reader and conformance kit, open-source release preparation, then authorized external adoption validation. | After M3; publication and outreach retain their existing authority boundaries |

@@ -1,10 +1,13 @@
-# Python authoring and offline reading (experimental)
+# Python authoring, offline reading and reviewed execution (experimental)
 
 The package implements SR-T07's bounded quantity/method profile API. `Author`
 creates components, plans, execution records and attributed evidence; `Reader`
 checks exact module bytes and plans quantity applications offline. Creating an
 execution record records a supplied result: it does not run or reproduce the
-method. The calibration execution/research cycle is SR-T08 and remains open.
+method. The separate, explicit `Executor` operation now runs reviewed numerical
+methods and checks per-output reproduction. See [the execution policy](EXECUTION.md)
+and [the calibration path](../../examples/reuse/with-slean-python/README.md).
+SR-T08's full research cycle and formal bridge remain open.
 This is a local candidate wheel, not a published standard or PyPI release.
 
 From the repository root, prepare the pinned environment and validate it:
@@ -24,6 +27,9 @@ are bundled resources. The canonical wire checker has one scientific-rule
 source, `conformance/contract.py`; `generate_runtime.py` changes only its resource
 loader and detects drift. This bundled copy is not the SR-T14 independent reader.
 Runtime tests apply the shared positive, negative and requirement vectors.
+The execution qualification additionally requires macOS: unsupported platforms
+do not fall back to unrestricted execution. The installed-wheel check includes
+a real reviewed numerical call as well as authoring and offline inspection.
 
 ## Declare and inspect a method
 

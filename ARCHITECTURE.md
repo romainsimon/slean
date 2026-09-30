@@ -1,6 +1,6 @@
 # V0 architecture and trust boundary
 
-This document describes the **implemented dossier architecture**. The selected next architecture is the library/profile design in the [scientific foundation PRD](tasks/prd-slean-scientific-reuse.md#5-standards-and-implementation-choices). Its [draft component contract](spec/README.md) has executable structural fixtures, a [Lean exporter/application receiver](packages/lean/README.md), and an [experimental Python authoring/offline reader](packages/python/README.md). Computational reproduction, the complete research cycle and the usefulness gate remain open. These packages do not change V0's semantics or verification claims.
+This document describes the **implemented dossier architecture**. The selected next architecture is the library/profile design in the [scientific foundation PRD](tasks/prd-slean-scientific-reuse.md#5-standards-and-implementation-choices). Its [draft component contract](spec/README.md) has executable structural fixtures, a [Lean exporter/application receiver](packages/lean/README.md), and an [experimental Python authoring/offline reader](packages/python/README.md). The [reviewed numerical execution checkpoint](packages/python/EXECUTION.md) now reproduces the synthetic calibration across separate modules; the complete research cycle, conditional formal bridge and usefulness gate remain open. These packages do not change V0's semantics or verification claims.
 
 ## Data and execution
 

@@ -5,6 +5,7 @@ Only its resource loader changes in the generated SDK copy. --check detects
 drift; --write explicitly regenerates owned files after a reviewed change.
 """
 import argparse
+import ast
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -32,6 +33,14 @@ def generated_files():
         folder = 'spec' if name == 'module' else 'profiles'
         outputs[HERE/f'slean/data/{name}.schema.json'] = (ROOT/f'{folder}/{name}.schema.json').read_bytes()
     outputs[HERE/'slean/data/quantity-map.json'] = (ROOT/'profiles/quantity-map.json').read_bytes()
+    boundary = (ROOT/'packages/lean/verification/boundary.py').read_text()
+    names = {'UnsupportedBoundary', 'real', 'darwin_profile', 'child_limits', 'current_limits'}
+    nodes = [node for node in ast.parse(boundary).body if getattr(node, 'name', None) in names]
+    if {node.name for node in nodes} != names:
+        raise ValueError('Receiver boundary definitions changed; review the generator')
+    header = '# Generated from the receiver-owned Lean boundary by generate_runtime.py.\n'
+    header += 'import json\nimport os\nfrom pathlib import Path\nimport resource\nimport subprocess\nimport sys\n\n'
+    outputs[HERE/'slean/_boundary.py'] = (header+'\n\n'.join(ast.get_source_segment(boundary, node) for node in nodes)+'\n').encode()
     return outputs
 
 

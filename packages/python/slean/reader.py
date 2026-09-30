@@ -13,7 +13,7 @@ from pathlib import Path
 import rfc8785
 
 from . import contract
-from .authoring import KNOWN_PROFILES, QUANTITY, RESEARCH, qualify_requirements
+from .authoring import KNOWN_PROFILES, QUANTITY, RESEARCH, qualify_requirements, _requirements
 from .quantities import QuantityError, check_scalar, convert_scalar, scalar
 
 INTERFACE_POLICY = 'quantity-interface/0.1-draft.1'
@@ -187,7 +187,7 @@ class Reader:
         if low > high: return {'status': 'violated', 'reason': 'reversed_range'}
         return {'status': 'satisfied' if low <= magnitude <= high else 'violated', 'reason': 'declared_magnitude_inclusive_range'}
 
-    def apply(self, component, *, bindings, context, policy):
+    def apply(self, component, *, bindings, context, policy, extra_requirements=None):
         base = {'policy': policy, 'obligations': [], 'selections': {}, 'prospective': True,
                 'formal_verification': 'not_performed', 'computational_reproduction': 'not_performed', 'empirical_validity': 'not_assessed'}
         if policy != INTERFACE_POLICY:
@@ -219,18 +219,31 @@ class Reader:
                 ports.append(diagnostic(identifier, {'port': name, **checked(lambda: self._port(bindings.get(name), port, self.module))}))
             for name in set(bindings)-set(interface['inputs']):
                 ports.append(diagnostic('extra-'+hashlib.sha256(name.encode()).hexdigest()[:16], {'status': 'violated', 'reason': 'undeclared_input', 'port': name}))
-            def evaluate(node):
+            def evaluate(node, origin):
                 if 'leaf' in node:
-                    return diagnostic(node['id'], checked(lambda: self._leaf(node['leaf'], bindings, context, owner, self.module)))
+                    return diagnostic(node['id'], checked(lambda: self._leaf(node['leaf'], bindings, context, origin, self.module)))
                 operator = 'all' if 'all' in node else 'any'
-                outcomes = [evaluate(child) for child in node[operator]]
+                outcomes = [evaluate(child, origin) for child in node[operator]]
                 if operator == 'any' and 'satisfied' in outcomes:
                     selections[node['id']] = node[operator][outcomes.index('satisfied')]['id']
                 return contract.aggregate(operator, outcomes)
-            status = contract.aggregate('all', [*ports, evaluate(producer['requires'])])
+            requirement_ids = _requirements(producer['requires'])
+            if extra_requirements is not None:
+                extra_ids = _requirements(extra_requirements)
+                if requirement_ids & extra_ids:
+                    raise ValueError('Extra conditions duplicate a producer requirement ID')
+                requirement_ids |= extra_ids
+            outcomes = [*ports, evaluate(producer['requires'], owner)]
+            if extra_requirements is not None:
+                outcomes.append(evaluate(extra_requirements, self.module))
+            status = contract.aggregate('all', outcomes)
             selected = {'module': owner, 'id': producer['id']}
             requirements = qualify_requirements(producer['requires'], owner)
-            identifier = 'application-'+hashlib.sha256(rfc8785.dumps({'component': selected, 'bindings': bindings, 'context': context, 'policy': policy})).hexdigest()[:32]
+            if extra_requirements is not None:
+                suffix = 0
+                while f'slean-runtime-extra-{suffix}' in requirement_ids: suffix += 1
+                requirements = {'id': f'slean-runtime-extra-{suffix}', 'all': [requirements, qualify_requirements(extra_requirements, self.module)]}
+            identifier = 'application-'+hashlib.sha256(rfc8785.dumps({'component': selected, 'bindings': bindings, 'context': context, 'policy': policy, 'requires': requirements})).hexdigest()[:32]
             record = {'id': identifier, 'component': selected, 'phase': 'planned', 'bindings': deepcopy(bindings),
                       'context': deepcopy(context), 'requires': requirements}
             return {**base, 'application': {'id': identifier}, 'record': record, 'compatibility': COMPATIBILITY[status],

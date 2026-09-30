@@ -1,0 +1,231 @@
+{
+  "consumer": {
+    "comparison_sha256": "57e1b5c10735cb8446ae0ba16a56f4f07ef547ea976d789de93e892c3a74cdb1",
+    "evidence_imported_as": "declared",
+    "fresh_evidence_check": "reproduced",
+    "invocation_sha256": "ba785394069fca24384125734d9d2ddac2a6f3f5b347e163fdd606452c250753",
+    "module": "sha256:0b2998d5afe5125128cade5294118320a41b6886d3d6120f687e1f8b42fbcd06",
+    "outcome": "reproduced",
+    "outputs": {
+      "displacement": {
+        "typed": {
+          "profile": "slean-quantity/0.1-draft.1",
+          "value": {
+            "dimension": "length",
+            "kind": "scalar",
+            "uncertainty": {
+              "kind": "unknown"
+            },
+            "unit": "millimeter",
+            "value": "4"
+          }
+        }
+      },
+      "error_bound": {
+        "typed": {
+          "profile": "slean-quantity/0.1-draft.1",
+          "value": {
+            "dimension": "length",
+            "kind": "scalar",
+            "uncertainty": {
+              "kind": "unknown"
+            },
+            "unit": "millimeter",
+            "value": "0.01"
+          }
+        }
+      }
+    },
+    "physical_validity": "not_assessed",
+    "plan": "sha256:62eb56a671225cb72c041ee8e32c36f5e4614b3b7839134ef88599913a95bda2",
+    "remaining_assumptions": [
+      {
+        "claim": {
+          "id": "affine-assumption",
+          "module": "sha256:e0c7f2e916c86a37818fc1931e38f48fba26e961b8e4cf54e14145383d081ad3"
+        },
+        "context": {
+          "sensor": {
+            "literal": "sensor-A"
+          },
+          "temperature": {
+            "typed": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "value": {
+                "dimension": "temperature",
+                "kind": "scalar",
+                "uncertainty": {
+                  "kind": "unknown"
+                },
+                "unit": "kelvin",
+                "value": "293.15"
+              }
+            }
+          }
+        },
+        "reason": "model_applicability_needs_contextual_evidence",
+        "requirement": "affine-assumption-required",
+        "status": "unresolved",
+        "witnesses": []
+      },
+      {
+        "claim": {
+          "id": "gain-assumption",
+          "module": "sha256:e0c7f2e916c86a37818fc1931e38f48fba26e961b8e4cf54e14145383d081ad3"
+        },
+        "context": {
+          "sensor": {
+            "literal": "sensor-A"
+          },
+          "temperature": {
+            "typed": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "value": {
+                "dimension": "temperature",
+                "kind": "scalar",
+                "uncertainty": {
+                  "kind": "unknown"
+                },
+                "unit": "kelvin",
+                "value": "293.15"
+              }
+            }
+          }
+        },
+        "reason": "model_applicability_needs_contextual_evidence",
+        "requirement": "gain-assumption-required",
+        "status": "unresolved",
+        "witnesses": []
+      },
+      {
+        "claim": {
+          "id": "residual-assumption",
+          "module": "sha256:e0c7f2e916c86a37818fc1931e38f48fba26e961b8e4cf54e14145383d081ad3"
+        },
+        "context": {
+          "sensor": {
+            "literal": "sensor-A"
+          },
+          "temperature": {
+            "typed": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "value": {
+                "dimension": "temperature",
+                "kind": "scalar",
+                "uncertainty": {
+                  "kind": "unknown"
+                },
+                "unit": "kelvin",
+                "value": "293.15"
+              }
+            }
+          }
+        },
+        "reason": "model_applicability_needs_contextual_evidence",
+        "requirement": "residual-assumption-required",
+        "status": "unresolved",
+        "witnesses": []
+      }
+    ],
+    "uses": [
+      {
+        "id": "measurement-result",
+        "module": "sha256:0b2998d5afe5125128cade5294118320a41b6886d3d6120f687e1f8b42fbcd06"
+      },
+      {
+        "id": "measurement",
+        "module": "sha256:62eb56a671225cb72c041ee8e32c36f5e4614b3b7839134ef88599913a95bda2"
+      }
+    ],
+    "verification": "sha256:740e47f950da6a19ba53706addf20c76074595068069ab7c6b9d234d5f0c0651"
+  },
+  "dimensional_conversion": "reproduced",
+  "frozen_files_unchanged": 34,
+  "negative_cases": [
+    {
+      "diagnostic": "wrong_dimension",
+      "id": "wrong-dimension",
+      "outcome": "rejected"
+    },
+    {
+      "diagnostic": "declared_magnitude_inclusive_range",
+      "id": "outside-range",
+      "outcome": "rejected"
+    },
+    {
+      "diagnostic": "declared_identity_comparison",
+      "id": "wrong-sensor",
+      "outcome": "rejected"
+    },
+    {
+      "diagnostic": "declared_identity_comparison",
+      "id": "wrong-temperature",
+      "outcome": "rejected"
+    },
+    {
+      "diagnostic": "missing_binding",
+      "id": "missing-temperature",
+      "outcome": "conditional"
+    },
+    {
+      "diagnostic": "Receiver-selected component revision differs",
+      "id": "wrong-version",
+      "outcome": "rejected"
+    },
+    {
+      "diagnostic": "Source differs from the explicitly reviewed bytes",
+      "id": "changed-source-approval",
+      "outcome": "rejected"
+    },
+    {
+      "id": "unacknowledged-physical-assumptions",
+      "outcome": "conditional"
+    },
+    {
+      "absolute_error_mm": "0.25",
+      "id": "omitted-offset-output",
+      "outcome": "different"
+    },
+    {
+      "id": "unsupported-parameter-uncertainty",
+      "outcome": "unsupported"
+    }
+  ],
+  "observed_date": "2026-09-30",
+  "producer": {
+    "calibration": "sha256:e0c7f2e916c86a37818fc1931e38f48fba26e961b8e4cf54e14145383d081ad3",
+    "fit_outcome": "reproduced",
+    "fit_plan": "sha256:23ccb3f1f65d09b5e3a033dc870b190070caa6780aed3ca12558a1855b8e605a",
+    "fit_producer": "sha256:b696649104ec5316dd969fc1a0bfde7b208ee6643d85dd0b71ebf689066c711c",
+    "fit_result": "sha256:8238d1414cf6ac31b58f59adfa9812fd113cbfcc0ff90442bd551340c0cb673e",
+    "fit_verification": "sha256:995f8e11020ffef0e9f5c641348c58f6a4e9e4155a106adb5b197494aa1ec4f8",
+    "fixture": "synthetic; no physical validation",
+    "reviewed_source_sha256": "548335487014d2f015d75dc1157e4db56c5bed6ac4dbf7872429b0dad2efca3a"
+  },
+  "scope": "Numerical calibration-to-measurement checkpoint; SR-T08 research cycle, formal bridge and Gate U remain open",
+  "seconds": 32.415,
+  "source_sha256": {
+    "examples/reuse/with-slean-python/check_path.py": "89d4e76691e3f678aea2083d9b39e9d4a20a67b3054bd6b2812a6d31edd28b3d",
+    "examples/reuse/with-slean-python/consumer.py": "eddf773a1f067a618ae427a2ea92f75d37ecfbffaff7707fe7c93f7c08016b67",
+    "examples/reuse/with-slean-python/methods.py": "548335487014d2f015d75dc1157e4db56c5bed6ac4dbf7872429b0dad2efca3a",
+    "examples/reuse/with-slean-python/producer.py": "99b22a21e0c3460f4d7ff7bcd53d546b32c465c8dc38576e5d64ead8dfb7e957",
+    "packages/python/generate_runtime.py": "b46ce02e89dba9571775ab1310d928408a406371897ab2d96fa5554498bc842e",
+    "packages/python/slean/__init__.py": "22fd66f9fcdafad92d54723a8ee65a29d74c022acc7c85eb468594bfacaf14a8",
+    "packages/python/slean/_boundary.py": "4bb382f49513da70e406a91bd7d3f59be9834542a16489c71a50ab7c1fa5cec2",
+    "packages/python/slean/_runner.py": "7c91ce88aae9392b7d3a7e31295050af151df61debfe962fdf027ba7fb2be4d6",
+    "packages/python/slean/authoring.py": "803ef2d771cd627cbb03d114aef11725d7831f1885fb2daa88323263001a4a92",
+    "packages/python/slean/contract.py": "5b039c6db5da8b6ad3f5e9adb72b84457c2b9efb7a48d128eaf8afbf41e233fa",
+    "packages/python/slean/data/lean.schema.json": "c0f82ebabfe826225048b98b91a94465ff96650f98163ed2bd3187331fb07fad",
+    "packages/python/slean/data/module.schema.json": "15b472d19ec871e0531dfae1d7b89a9ca65d6c33c4a90fb97aef6a359f4ac175",
+    "packages/python/slean/data/quantity-map.json": "24e16b967a27b871f56a0873039e710db10eb525fc10ed742ed106ac0b52b4b9",
+    "packages/python/slean/data/quantity.schema.json": "2c926dbb004a5fbed49c1f201275465abe0ed3ab9aeedaf556cc5f7e878f4698",
+    "packages/python/slean/data/research.schema.json": "3ed547568f6f42331f5949121abf61bdfad91e247a86add98df90b2451bcd67e",
+    "packages/python/slean/execution.py": "7b1f3bfebb6e390af7ba95ea5feda03a369e6d2b8b810d9ce5ffc3b6de202e71",
+    "packages/python/slean/interfaces.py": "4405b6ab9a38321544602813aec4f4b8079bb97d40c7179b8a7a01375129387f",
+    "packages/python/slean/quantities.py": "2a32668c2aa5d266678e992909e03974bedecda2b6e6aa6c4e81ddae8527af0d",
+    "packages/python/slean/reader.py": "2f0a8835764122f241302222f85ab2c703f4a41c34302a4e633df395618953af"
+  },
+  "status": "passed",
+  "temporary_artifact_bytes": 118234,
+  "temporary_artifact_files": 28
+}
