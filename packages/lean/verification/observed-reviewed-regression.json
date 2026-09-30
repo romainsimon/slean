@@ -1,0 +1,58 @@
+{
+  "application_capture_verification": "not_performed",
+  "bound_import_modules": 5611,
+  "checked_consumer_proofs": 2,
+  "checked_mixed_proofs": 3,
+  "checks": [
+    "namespace_overlay_layout_controls",
+    "receiver_rebuilds_real_physlib_consumers",
+    "offline_inspection_accepts_only_exact_local_receipts",
+    "component_proof_does_not_promote_application_capture",
+    "receipt_is_bound_to_exact_module_revision",
+    "wire_valid_changed_statement_is_rejected_after_rebuild",
+    "changed_dependency_environment_is_not_silently_accepted",
+    "native_quoted_and_polymorphic_theorems_are_verified",
+    "incomplete_inherited_and_unapproved_axioms_are_rejected",
+    "payload_integrity_is_rechecked_on_offline_inspection"
+  ],
+  "consumer": "sha256:ba832d668b8c5b93893dbc3c6c60fe9c8e5f75e9c0d772b40f9687da32406ba3",
+  "frozen_baseline_files_unchanged": 34,
+  "limitations": [
+    "Reviewed source/build inputs and exact installed imports are trusted",
+    "No hard memory or aggregate disk/job quota on this macOS backend",
+    "Component proofs only; application captures are not receiver-verified",
+    "No unreviewed-contribution policy or scientific-validity claim"
+  ],
+  "mixed": "sha256:b6fffe8b093f0a1574e6d4d7ec228b8b3ec90c91d92242eba6951caa799dc893",
+  "producer": "sha256:871fa71f38eecccf9be2be18f3ae3a72e1f75b12ba66430b57421a651cfbc67b",
+  "rebuilt_consumer_modules": [
+    "SleanExport.Native",
+    "SleanExport.Application",
+    "SleanExport.BuildInputs",
+    "SleanExport",
+    "DirectReuse",
+    "ApplicationExample"
+  ],
+  "receiver_environment_fingerprint": "545ceb57a36a501dbeb3723dcb9efbe4dc670d716fb295495dd742ae99874957",
+  "rejected_mixed_proofs": 4,
+  "scope": "SR-T06 reviewed-source component reconstruction and local receipts",
+  "seconds": 173.414,
+  "source_sha256": {
+    "packages/lean/SleanAudit.lean": "45c06f49195e84e78a64a6dbbe80677c999eb7b3680efb2fa33999d439b60211",
+    "packages/lean/SleanExport.lean": "64f67547955a94f69f813dd9bf6c3a9131f6170939fc1477705e15a07a429cf3",
+    "packages/lean/SleanExport/Application.lean": "87abfcc73d98d461571f4abecc6146753993f8185b5c076956fc897f57edef05",
+    "packages/lean/SleanExport/BuildInputs.lean": "e4b13eb55bc678b063a9395e6b98a9425ce7d125f781039f751720d73914f9e7",
+    "packages/lean/SleanExport/Native.lean": "59ce50f8e8ff3be8c2d2c0c9e37c2c594520290451494a8de072a9d4a21e8dd2",
+    "packages/lean/build_inputs.py": "1fbee88f90bf804b823f380d829ba382a7b21e5d1474df450ada9bc6e76ab5ca",
+    "packages/lean/export.py": "f9320bea89f91c0fdcef2874ff6576583348d533fab68f6ece7e484fafc2ee42",
+    "packages/lean/lakefile.toml": "7514117572eb071c3faddf6d3311af518b11f3a848f4af80e962179b28509a1b",
+    "packages/lean/tests/test_reviewed_layout.py": "5fe262f1e3f3e11e13846cadc8916a3371847cb1c3da10194f402171204f6a0d",
+    "packages/lean/verification/boundary.py": "1e73de40f1d54bb08e7b58fe43d069699d0aa7b7083877cf593eb45ba96d9a1e",
+    "packages/lean/verification/check_reviewed.py": "d8bf48585876c0882f72b9e0e693abcb20823eb0d48e8e58a979d843d844f52c",
+    "packages/lean/verification/receipts.py": "2fcfb7a5879aa21f16301c74db580a4da38fd0960dbd8011d9a7e3620cb52620",
+    "packages/lean/verification/reviewed.py": "b3633a9d2c5a7ce95c1899168b29086f6ffe7a2cd47a29eaa72c75cf789d4e21",
+    "packages/lean/verification/run_comparator.py": "a9d30d7454d44f7622d316a3d6c3817703784d94a953eeba52a15bacce836b02"
+  },
+  "status": "passed",
+  "unreviewed_policy": "unsupported"
+}

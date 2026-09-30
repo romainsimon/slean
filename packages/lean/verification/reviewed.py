@@ -92,7 +92,8 @@ def check_namespace_overlays(links):
             raise ValueError("Receiver namespace overlay changed: " + str(path))
 
 
-def verify(directory, components, *, dependency_project, policy, store=None, toolchain=DEFAULT_TOOLCHAIN):
+def verify(directory, components, *, dependency_project, policy, store=None, toolchain=DEFAULT_TOOLCHAIN,
+           _audit_request=None, _issue_receipts=True):
     base = {"format": "slean-verification/0.1-draft.1", "policy": policy,
             "status": "unsupported", "receipts": [], "results": []}
     if policy != POLICY:
@@ -100,7 +101,8 @@ def verify(directory, components, *, dependency_project, policy, store=None, too
     try:
         directory, dependency_project, toolchain = map(lambda p: Path(p).resolve(strict=True),
                                                       (directory, dependency_project, toolchain))
-        return _verify(directory, components, dependency_project, toolchain, store, base)
+        return _verify(directory, components, dependency_project, toolchain, store, base,
+                       _audit_request, _issue_receipts)
     except (UnsupportedBoundary, FileNotFoundError) as error:
         return {**base, "reason": str(error)}
     except (RuntimeError, ValueError) as error:
@@ -111,7 +113,7 @@ def verify(directory, components, *, dependency_project, policy, store=None, too
         return {**base, "reason": "Receiver tool or environment is unavailable: " + str(error)}
 
 
-def _verify(directory, identifiers, dependency_project, toolchain, store, base):
+def _verify(directory, identifiers, dependency_project, toolchain, store, base, audit_request, issue_receipts):
     if os.getuid() == 0:
         raise UnsupportedBoundary("Run receiver verification without root privileges")
     if store and store.directory.resolve().is_relative_to(directory):
@@ -193,6 +195,10 @@ def _verify(directory, identifiers, dependency_project, toolchain, store, base):
     implementations = [HERE / name for name in ("reviewed.py", "receipts.py", "boundary.py", "run_comparator.py")]
     implementations += [LEAN / "build_inputs.py", ROOT / "conformance/contract.py"]
     implementation_hashes = {str(path.relative_to(ROOT)): file_digest(path) for path in implementations}
+    for name in ("applications.py", "SleanExport/Application.lean", "SleanExport/Native.lean", "SleanAudit.lean"):
+        implementation_hashes[str((LEAN / name).relative_to(ROOT))] = file_digest(LEAN / name)
+    if audit_request is not None:
+        implementation_hashes[str((HERE / "reviewed_applications.py").relative_to(ROOT))] = file_digest(HERE / "reviewed_applications.py")
     limits = current_limits()
     with tempfile.TemporaryDirectory(prefix="slean-reviewed-") as temporary:
         workspace = Path(temporary).resolve()
@@ -236,8 +242,13 @@ def _verify(directory, identifiers, dependency_project, toolchain, store, base):
         for name in rebuilt:
             execute([tools["leanchecker"], name], "kernel replay " + name)
         request = source / "receiver-request.json"
-        request.write_bytes(canonical({"modules": sorted({c["interface"]["value"]["module"] for c in selected}),
-            "declarations": [c["interface"]["value"]["declaration"] for c in selected]}))
+        request_data = {"modules": sorted({c["interface"]["value"]["module"] for c in selected}),
+            "declarations": [c["interface"]["value"]["declaration"] for c in selected]}
+        if audit_request is not None:
+            if set(audit_request) != {"application_captures", "auxiliary_declarations"}:
+                raise ValueError("Invalid receiver-owned auxiliary audit request")
+            request_data.update(audit_request)
+        request.write_bytes(canonical(request_data))
         audit = json.loads(execute([AUDITOR, request], "native audit"))
         check_namespace_overlays(overlays)
         actual_modules = {item["module"]: item for item in audit["modules"]}
@@ -290,11 +301,12 @@ def _verify(directory, identifiers, dependency_project, toolchain, store, base):
         # Recheck exact input integrity before any successful receipt is issued.
         if load_module(directory)["id"] != manifest["id"]:
             raise ValueError("Module changed during verification")
-        if store:
+        if store and issue_receipts:
             receipts = [store._record_checked(result) for result in results if result["status"] == "passed"]
         return {**base, "status": "passed" if all(r["status"] == "passed" for r in results) else "failed",
             "subject_module": manifest["id"], "results": results, "receipts": receipts,
             "environment": environment_record, "rebuilt_modules": rebuilt, "limits": limits,
+            **({"native_audit": audit} if audit_request is not None else {}),
             "limitations": ["Reviewed source/build inputs and exact installed imports are trusted",
                 "No hard memory or aggregate disk/job quota on this macOS backend",
                 "Component proofs only; application captures are not receiver-verified",

@@ -77,11 +77,17 @@ build uses the receiver's fixed compiler invocation, not the supplied Lake
 configuration. The build-input payload records these reconstruction inputs;
 older exports without it remain declared.
 
-The current local receipt authenticates a component proof to one receiver. It
-is outside module identity, binds exact artifacts and environment, and cannot
-be promoted by another receiver or under a different policy. It does not
-authenticate native application captures or establish empirical applicability.
-See the [receiver implementation and limits](../packages/lean/verification/REVIEWED.md).
+Local receipts authenticate a component proof or a native application to one
+receiver. They are outside module identity, bind exact artifacts and environment,
+and cannot be promoted by another receiver or under a different policy. A
+component receipt does not authenticate an application capture. The separate
+[application adapter](../packages/lean/verification/REVIEWED_APPLICATIONS.md)
+rebuilds the consumer with known instrumentation, reads captures with imported
+initializers disabled, audits the producer in that environment and regenerates
+the portable invocation. Capture fidelity still relies on reviewed caller source.
+Extra producer requirements stay unresolved; caller hypotheses remain conditional.
+Neither receipt establishes empirical applicability. See the
+[receiver implementation and limits](../packages/lean/verification/REVIEWED.md).
 
 The adapter reuses LeanArchitect for annotations and blueprint artifacts.
 Overrides of displayed edges and local presentation readiness cannot replace

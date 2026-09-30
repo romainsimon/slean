@@ -6,8 +6,9 @@ with a restricted macOS execution adapter. It compares a candidate proof with
 a separately supplied, trusted statement and replays the exported proof in
 Lean's kernel. This primitive does **not** issue Slean verification receipts.
 The separate [reviewed-source receiver](REVIEWED.md) now reconstructs components
-and issues local receipts. Native application verification and the complete
-module-bound unreviewed policy remain unfinished.
+and issues local receipts. The separate [native application adapter](REVIEWED_APPLICATIONS.md)
+checks captures and exact producer bindings under that reviewed policy.
+The complete module-bound unreviewed policy remains unfinished.
 
 The [Lean validation guide](https://lean-lang.org/doc/reference/latest/ValidatingProofs/)
 explains why successful compilation alone is insufficient for an unreviewed
@@ -102,6 +103,7 @@ The result therefore always has `module_receipt: not_issued` and
 `slean_policy: unsupported`, even when the local comparison passes. Inspection,
 offline application and imported evidence keep their previous trust status.
 The separate reviewed-source receiver covers reconstruction and receipt
-authentication for components. SR-T06 still needs native application checking,
-the module-bound unreviewed path and its resource containment. No release or
+authentication for components; its application adapter checks fresh native
+invocations. SR-T06 still needs the module-bound unreviewed path and its resource
+containment. No release or
 public deployment is included here.

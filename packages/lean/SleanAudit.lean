@@ -1,4 +1,5 @@
 import SleanExport.BuildInputs
+import SleanExport.Application
 
 open Lean SleanExport
 
@@ -38,11 +39,28 @@ def main (args : List String) : IO Unit := do
   let names ← IO.ofExcept <| encodedNames.mapM decodeName
   let roots := moduleStrings.map String.toName
   initSearchPath (← findSysroot)
-  let env ← importModules (roots.map fun module => { module, importAll := true }) {} (loadExts := false)
+  let env ← importModules (roots.map fun module => { module, importAll := true }) {}
+    (loadExts := false) (leakEnv := true)
   let declarations ← (names.mapM auditDeclaration).toIO'
     { fileName := "Slean receiver audit", fileMap := default } { env }
   let modules ← moduleInputs env roots (← getSrcSearchPath)
+  let auxiliaryNames ← IO.ofExcept <| ((request.getObjValAs? (Array Json) "auxiliary_declarations").toOption.getD #[]).mapM decodeName
+  let auxiliary ← (auxiliaryNames.mapM auditDeclaration).toIO'
+    { fileName := "Slean receiver auxiliary audit", fileMap := default } { env }
+  let mut captures : Array Json := #[]
+  if (request.getObjValAs? Bool "application_captures").toOption.getD false then
+    for name in names do
+      let some index := env.getModuleIdxFor? name
+        | throw <| IO.userError "Missing capture's defining module"
+      let some info := env.find? name | throw <| IO.userError "Missing capture's consumer"
+      let statement ← IO.ofExcept <| nativeStatement info
+      -- Serialized per-module entries remain readable without extension initializers.
+      let entries := applicationExt.getModuleEntries env index
+      captures := captures ++ (entries.filter fun entry =>
+        (entry.getObjVal? "consumer").toOption == some (nativeName name)).map
+        (fun entry => entry.setObjVal! "consumer_statement" statement)
   IO.println <| (Json.mkObj [
     ("format", toJson "slean-receiver-audit/0.1-draft.1"),
     ("lean_version", toJson Lean.versionString),
-    ("declarations", toJson declarations), ("modules", modules)]).compress
+    ("declarations", toJson declarations), ("modules", modules),
+    ("auxiliary_declarations", toJson auxiliary), ("application_captures", toJson captures)]).compress

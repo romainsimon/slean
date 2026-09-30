@@ -3,9 +3,10 @@
 `reviewed.py` implements the component portion of
 `reviewed-source/0.1-draft.1`. It rebuilds the selected declaration's source
 closure in a temporary workspace, checks the resulting proof and binds a
-local receipt to the exact Slean module. SR-T06 remains in progress: native
-application capture verification and the module-bound unreviewed policy are
-not implemented here.
+local receipt to the exact Slean module. The separate
+[native application verifier](REVIEWED_APPLICATIONS.md) binds fresh captures to
+those consumer proofs and their exact producers. SR-T06 remains in progress:
+the module-bound unreviewed policy is not implemented.
 
 ## Inputs and trust
 
@@ -85,7 +86,8 @@ requested policy cannot inherit the passing status.
 Inspection does not run code or open the network. A JSON receipt placed in a
 module's `receipts/` directory is still imported evidence. Ordinary application
 inspection also remains conditional: a checked consumer theorem does not
-authenticate the recorded application arguments or capture.
+authenticate the recorded application arguments or capture. Use the separate
+explicit application operation and its authenticated local receipt for that check.
 
 ## Run the checks
 
@@ -105,7 +107,8 @@ repository root, run:
 conformance/.venv/bin/python packages/lean/verification/check_reviewed.py
 ```
 
-The [recorded check](observed-reviewed.json) covers the real Physlib consumers,
+The [28 September recorded check](observed-reviewed.json), bound to the
+implementation hashes in that report, covers the real Physlib consumers,
 quoted and polymorphic theorem names, incomplete and inherited proofs,
 unapproved axioms, changed statements and imports, receipt tampering, wrong
 receivers and revisions, offline inspection and application trust limits.
@@ -127,3 +130,10 @@ sequence. Its consumer environment binds 5,611 modules with 4,448,894,240
 bytes of compiled artifacts, including available IR. These local measurements
 include hashing and reconstruction and must count in Gate U. They establish
 no speed advantage over the direct-tool baseline.
+
+The [30 September component regression](observed-reviewed-regression.json)
+repeats all ten groups against the updated shared auditor and implementation.
+It again accepts five selected valid proofs and rejects four incomplete or
+unapproved-axiom proofs, with all 34 frozen baseline files unchanged. Its complete
+sequence took 173.414 seconds locally; this is regression evidence, not a
+controlled timing comparison.

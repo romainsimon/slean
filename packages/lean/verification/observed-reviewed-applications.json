@@ -1,0 +1,38 @@
+{
+  "bound_import_modules": 5611,
+  "checked_applications": 2,
+  "checks": [
+    "adversarial_modules_are_wire_valid_before_native_checks",
+    "wrong_policy_plan_producer_revision_and_instrumentation_rejected_before_execution",
+    "two_physlib_applications_rebuilt_and_authenticated_with_actual_native_captures",
+    "offline_application_inspection_requires_exact_local_authority_and_never_executes",
+    "application_receipt_cannot_be_reused_for_another_module_or_context",
+    "wire_valid_imported_capture_forgery_rejected_after_real_rebuild"
+  ],
+  "consumer": "sha256:ba832d668b8c5b93893dbc3c6c60fe9c8e5f75e9c0d772b40f9687da32406ba3",
+  "frozen_baseline_files_unchanged": 34,
+  "limitations": [
+    "Reviewed caller source and receiver-trusted installed imports; not a hostile-input policy",
+    "Capture fidelity relies on reviewed caller source using receiver-known instrumentation",
+    "Caller hypotheses remain conditional; empirical validity and extra producer requirements are not assessed",
+    "No hard memory or aggregate disk/job quota on this macOS backend"
+  ],
+  "producer": "sha256:871fa71f38eecccf9be2be18f3ae3a72e1f75b12ba66430b57421a651cfbc67b",
+  "scope": "SR-T06 reviewed-source native application verification",
+  "seconds": 109.368,
+  "source_sha256": {
+    "packages/lean/SleanAudit.lean": "45c06f49195e84e78a64a6dbbe80677c999eb7b3680efb2fa33999d439b60211",
+    "packages/lean/SleanExport/Application.lean": "87abfcc73d98d461571f4abecc6146753993f8185b5c076956fc897f57edef05",
+    "packages/lean/SleanExport/Native.lean": "59ce50f8e8ff3be8c2d2c0c9e37c2c594520290451494a8de072a9d4a21e8dd2",
+    "packages/lean/applications.py": "ac34c757a2114cec22a15ab8e85ec34a7b4b17101d2b3e19374a347a895c8561",
+    "packages/lean/build_inputs.py": "1fbee88f90bf804b823f380d829ba382a7b21e5d1474df450ada9bc6e76ab5ca",
+    "packages/lean/export.py": "f9320bea89f91c0fdcef2874ff6576583348d533fab68f6ece7e484fafc2ee42",
+    "packages/lean/verification/boundary.py": "1e73de40f1d54bb08e7b58fe43d069699d0aa7b7083877cf593eb45ba96d9a1e",
+    "packages/lean/verification/check_reviewed_applications.py": "86f9967c70c7dcbf54a20e6d62738ee77ed9666cb1918a714dc2d4cad7c69917",
+    "packages/lean/verification/receipts.py": "2fcfb7a5879aa21f16301c74db580a4da38fd0960dbd8011d9a7e3620cb52620",
+    "packages/lean/verification/reviewed.py": "b3633a9d2c5a7ce95c1899168b29086f6ffe7a2cd47a29eaa72c75cf789d4e21",
+    "packages/lean/verification/reviewed_applications.py": "bab9a473eb2da68ff7699b574fc209c999de97642b7b280c46bbbc2244a2b7d3",
+    "packages/lean/verification/run_comparator.py": "a9d30d7454d44f7622d316a3d6c3817703784d94a953eeba52a15bacce836b02"
+  },
+  "status": "passed"
+}

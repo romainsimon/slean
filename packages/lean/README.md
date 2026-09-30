@@ -92,8 +92,9 @@ SR-T06 now has a [local Comparator primitive](verification/README.md) for
 separately supplied statements and self-contained proof candidates. It issues
 no module receipt. The [reviewed-source receiver](verification/REVIEWED.md)
 separately verifies exact components and can issue receiver-local receipts.
-Native application capture verification and the module-bound unreviewed policy
-remain unfinished.
+The separate [native application verifier](verification/REVIEWED_APPLICATIONS.md)
+checks rebuilt captures and exact producer bindings. The module-bound unreviewed
+policy remains unfinished.
 
 ## Apply a declaration in ordinary Lean
 
@@ -153,7 +154,10 @@ remain `conditional` with `formal_verification: not_performed`. Imported
 `passed` results and detached receipts cannot promote them.
 
 This is a repository adapter over the draft reference validator. It is not
-yet the public SDK, general offline `apply` operation or verification policy.
+yet the public SDK or general offline `apply` operation. Explicit reviewed
+verification uses the separate [native application adapter](verification/REVIEWED_APPLICATIONS.md);
+its offline inspector needs an authenticated local application receipt. Caller
+hypotheses remain conditions and extra producer requirements remain unresolved.
 
 ## Validation
 
