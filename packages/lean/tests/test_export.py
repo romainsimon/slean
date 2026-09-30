@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[3]
 PROJECT = ROOT / "examples/reuse/with-slean-lean"
 NATIVE = PROJECT / "_out/native.json"
 sys.path.insert(0, str(ROOT / "conformance"))
+sys.path.insert(0, str(ROOT / "packages/lean"))
 import contract
 
 spec = importlib.util.spec_from_file_location("slean_lean_export", ROOT / "packages/lean/export.py")

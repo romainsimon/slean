@@ -12,6 +12,7 @@ import shutil
 import tempfile
 
 import rfc8785
+from build_inputs import snapshot as snapshot_build_inputs, roots as environment_roots
 
 FORMAT = "slean-module/0.1-draft.1"
 PROFILE = "slean-lean/0.1-draft.1"
@@ -56,14 +57,7 @@ def pack(extraction, project, destination, license_name="unknown", *, applicatio
     prefix = Path(raw["toolchain_prefix"]).resolve()
     if not (prefix / "bin/lean").is_file():
         raise ValueError("missing installed Lean toolchain")
-    source_roots = [project, prefix / "src/lean"]
-    for dependency in lock["packages"]:
-        if dependency["type"] == "git":
-            source_roots.append((project / lock["packagesDir"] / dependency["name"]).resolve())
-        elif dependency["type"] == "path":
-            source_roots.append((project / dependency["dir"]).resolve())
-        else:
-            raise ValueError("unsupported Lake dependency")
+    source_roots = [entry["directory"] for entry in environment_roots(project, lock, prefix)]
     compiled_roots = [prefix / "lib/lean"] + [p / ".lake/build/lib/lean" for p in source_roots]
     files = {}
 
@@ -89,6 +83,7 @@ def pack(extraction, project, destination, license_name="unknown", *, applicatio
             add("environment/" + name, (project / name).read_bytes())
     implementation = add("exporter/export.py", Path(__file__).read_bytes())
     for name in ("SleanExport.lean", "SleanExport/Native.lean", "SleanExport/Application.lean",
+                 "SleanExport/BuildInputs.lean", "build_inputs.py",
                  "applications.py", "lake-manifest.json", "lean-toolchain", "lakefile.toml"):
         add("exporter/" + name, (HERE / name).read_bytes())
     components, evidence, origins = [], [], []
@@ -133,6 +128,7 @@ def pack(extraction, project, destination, license_name="unknown", *, applicatio
                 "statement_fingerprint": fingerprint, "statement_dependencies": declaration["statement_dependencies"],
                 "proof_dependencies": declaration["proof_dependencies"], "axioms": declaration["axioms"]}}})
     add("environment/origins.json", canonical({"toolchain": TOOLCHAIN, "declarations": origins}) + b"\n")
+    snapshot_build_inputs(raw, project, lock, prefix, add, canonical)
     application_records, dependencies = [], []
     if applications is not None:
         from applications import build_applications

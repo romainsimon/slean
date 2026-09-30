@@ -68,6 +68,21 @@ Missing source/dependencies, `sorryAx`, new axioms or changed statements prevent
 a passing result. The unreviewed-contribution policy stays unsupported until
 the isolated execution and separately trusted statement path are implemented.
 
+The reference receiver rebuilds local source payloads and replays those modules
+with Lean's bundled checker. Exact installed dependency binaries remain
+reviewed, trusted inputs; this does not recheck every imported declaration from
+source. Its native audit disables imported extension initializers and compares
+the actual import closure and native statement to the module. The temporary
+build uses the receiver's fixed compiler invocation, not the supplied Lake
+configuration. The build-input payload records these reconstruction inputs;
+older exports without it remain declared.
+
+The current local receipt authenticates a component proof to one receiver. It
+is outside module identity, binds exact artifacts and environment, and cannot
+be promoted by another receiver or under a different policy. It does not
+authenticate native application captures or establish empirical applicability.
+See the [receiver implementation and limits](../packages/lean/verification/REVIEWED.md).
+
 The adapter reuses LeanArchitect for annotations and blueprint artifacts.
 Overrides of displayed edges and local presentation readiness cannot replace
 the native audit. Native formal applications remain ordinary Lean code.

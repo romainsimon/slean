@@ -4,8 +4,10 @@ This is an SR-T06 implementation checkpoint. It integrates the upstream
 [Comparator](https://github.com/leanprover/comparator/tree/d03acab154d269c06e60e4de7e4cc85deebff94b)
 with a restricted macOS execution adapter. It compares a candidate proof with
 a separately supplied, trusted statement and replays the exported proof in
-Lean's kernel. It does **not** issue Slean verification receipts. Both complete
-Slean verification policies remain unsupported.
+Lean's kernel. This primitive does **not** issue Slean verification receipts.
+The separate [reviewed-source receiver](REVIEWED.md) now reconstructs components
+and issues local receipts. Native application verification and the complete
+module-bound unreviewed policy remain unfinished.
 
 The [Lean validation guide](https://lean-lang.org/doc/reference/latest/ValidatingProofs/)
 explains why successful compilation alone is insufficient for an unreviewed
@@ -99,6 +101,7 @@ it does not establish that a theorem is false.
 The result therefore always has `module_receipt: not_issued` and
 `slean_policy: unsupported`, even when the local comparison passes. Inspection,
 offline application and imported evidence keep their previous trust status.
-SR-T06 still needs receiver reconstruction, separate policy reports, receipt
-authority, forgery/downgrade controls and stronger resource containment for
-unreviewed code. No release or public deployment is included here.
+The separate reviewed-source receiver covers reconstruction and receipt
+authentication for components. SR-T06 still needs native application checking,
+the module-bound unreviewed path and its resource containment. No release or
+public deployment is included here.

@@ -14,3 +14,7 @@ rev = "f2effa3d803fda822b1f97b806c47cf2adfbcbc2"
 
 [[lean_lib]]
 name = "SleanExport"
+
+[[lean_exe]]
+name = "slean_audit"
+root = "SleanAudit"

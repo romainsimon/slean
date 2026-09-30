@@ -1,4 +1,5 @@
 import SleanExport.Native
+import SleanExport.BuildInputs
 import SleanExport.Application
 import Architect
 
@@ -49,11 +50,18 @@ syntax (name := exportDeclarations) "#slean_export" "[" ident,* "]" "to" str : c
       let resolved ← liftCoreM <| realizeGlobalConstNoOverloadWithInfo name
       liftCoreM <| declarationData resolved
     if declarations.isEmpty then throwError "Select at least one declaration"
+    let env ← getEnv
+    let roots ← names.getElems.mapM fun name => liftCoreM do
+      let resolved ← realizeGlobalConstNoOverloadWithInfo name
+      let some index := env.getModuleIdxFor? resolved | throwError "Missing defining module"
+      return env.allImportedModuleNames[index]!
+    let inputs ← moduleInputs env roots (← getSrcSearchPath)
     let output := Json.mkObj [
       ("format", toJson "slean-lean-extraction/0.1-draft.1"),
       ("lean_version", toJson Lean.versionString),
       ("toolchain_prefix", toJson ((← IO.appDir) / "..").toString),
       ("declarations", toJson declarations),
+      ("modules", inputs),
       ("verification", toJson "not_performed")]
     IO.FS.writeFile path.getString (output.pretty ++ "\n")
   | _ => throwUnsupportedSyntax

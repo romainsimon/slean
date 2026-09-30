@@ -82,12 +82,18 @@ a compiled-module digest does not establish that the compiled proof was built
 from those source bytes. Receiver rebuilding, trusted statement comparison,
 complete dependency verification and isolated execution belong to SR-T06.
 The exporter issues no proof receipt and imports no claim of scientific validity.
-Local Lake path dependencies still require the original projects; this is not
-the standalone package reconstruction promised by later milestones.
+Fresh exports include a build-input description with the selected modules'
+actual import closure, local source payloads and installed import fingerprints.
+The receiver can rebuild those local sources using explicitly supplied,
+matching installed dependency caches. This is not dependency installation or
+reconstruction of every third-party package from its source.
 
 SR-T06 now has a [local Comparator primitive](verification/README.md) for
 separately supplied statements and self-contained proof candidates. It issues
-no module receipt and does not yet change either Slean verification policy.
+no module receipt. The [reviewed-source receiver](verification/REVIEWED.md)
+separately verifies exact components and can issue receiver-local receipts.
+Native application capture verification and the module-bound unreviewed policy
+remain unfinished.
 
 ## Apply a declaration in ordinary Lean
 
