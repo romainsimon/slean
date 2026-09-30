@@ -1,0 +1,104 @@
+{
+  "dimensions": {
+    "gain": [
+      "1",
+      "1",
+      "-3",
+      "-1",
+      "0",
+      "0",
+      "0"
+    ],
+    "length": [
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "temperature": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0"
+    ],
+    "voltage": [
+      "2",
+      "1",
+      "-3",
+      "-1",
+      "0",
+      "0",
+      "0"
+    ]
+  },
+  "isq_basis": [
+    "length",
+    "mass",
+    "time",
+    "current",
+    "temperature",
+    "amount",
+    "luminousIntensity"
+  ],
+  "physlib_basis": "Dimension ISQDimensionBase",
+  "physlib_revision": "44c66d54be78db4693be9f8f92bd3b5ad124ed6f",
+  "pint": {
+    "pint": "0.26.1",
+    "sha256": {
+      "constants_en.txt": "a713dd2974ee78de1fb89c9ac633afdc262938b07ea77a5275ae3091147b2e7b",
+      "default_en.txt": "d6d6e8fd4f930a4cf79e3669aa9608a0336547074ae56861287e38dca8689036",
+      "xtranslated.txt": "ec4242bf905d33ebecb8292a3f4856edee6ea82cef3d670ede849203fbada426"
+    }
+  },
+  "profile": "slean-quantity/0.1-draft.1",
+  "units": {
+    "degree_Celsius": {
+      "base_unit": "kelvin",
+      "dimension": "temperature",
+      "offset": "273.15",
+      "scale": "1"
+    },
+    "kelvin": {
+      "base_unit": "kelvin",
+      "dimension": "temperature",
+      "offset": "0",
+      "scale": "1"
+    },
+    "meter": {
+      "base_unit": "meter",
+      "dimension": "length",
+      "offset": "0",
+      "scale": "1"
+    },
+    "millimeter": {
+      "base_unit": "meter",
+      "dimension": "length",
+      "offset": "0",
+      "scale": "0.001"
+    },
+    "millivolt": {
+      "base_unit": "volt",
+      "dimension": "voltage",
+      "offset": "0",
+      "scale": "0.001"
+    },
+    "volt": {
+      "base_unit": "volt",
+      "dimension": "voltage",
+      "offset": "0",
+      "scale": "1"
+    },
+    "volt/millimeter": {
+      "base_unit": "volt/meter",
+      "dimension": "gain",
+      "offset": "0",
+      "scale": "1000"
+    }
+  }
+}

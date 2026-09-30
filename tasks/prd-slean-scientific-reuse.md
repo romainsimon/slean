@@ -1,6 +1,6 @@
 # Slean: an open foundation for cumulative science in the age of AI
 
-Version: direction 2.10, updated 30 September 2026. Status: M0, the general Lean exporter (SR-T04) and native formal application (SR-T05) are complete. Receiver verification (SR-T06) now includes reviewed-source component reconstruction, native application verification and receiver-local receipts. The module-bound unreviewed policy remains unfinished. The Python runtime library and usefulness comparison remain to be implemented; no standard is released. Owner: Slean maintainer. The user delegated the product and architecture decision, then clarified that Slean must aim to become a new foundation for advancing science in the age of AI. Reuse is the first engineering test of that mission, not its full scope.
+Version: direction 2.11, updated 30 September 2026. Status: M0, the general Lean exporter (SR-T04) and native formal application (SR-T05) are complete. Receiver verification (SR-T06) now includes reviewed-source component reconstruction, native application verification and receiver-local receipts. The module-bound unreviewed policy remains unfinished. The Python quantity API is implemented; method authoring, the full runtime library and the usefulness comparison remain to be implemented; no standard is released. Owner: Slean maintainer. The user delegated the product and architecture decision, then clarified that Slean must aim to become a new foundation for advancing science in the age of AI. Reuse is the first engineering test of that mission, not its full scope.
 
 This PRD supersedes the **forward implementation direction** of the dossier-first PRD. It preserves V0's code, evidence and limitations. It does not declare the earlier full-program goal complete. Release, repository publication, deployment, outside-project changes, external outreach and new spending retain their existing boundaries.
 
@@ -235,7 +235,7 @@ For SR-12, export only an explicit selection of publishable components and suppo
 
 ## 7. Delivery order and tasks
 
-SR-T01–05 are **complete** with the local evidence linked below. SR-T06 is **in progress** and remains unchecked. SR-T07–16 are **not started**. A task is complete only when its full acceptance evidence is recorded. Existing V0 work is not used to tick them. The repository's roadmap links here so milestone status has one owner.
+SR-T01–05 are **complete** with the local evidence linked below. SR-T06–07 are **in progress** and remain unchecked. SR-T08–16 are **not started**. A task is complete only when its full acceptance evidence is recorded. Existing V0 work is not used to tick them. The repository's roadmap links here so milestone status has one owner.
 
 ### M0: reuse the ecosystem and freeze the comparison
 
@@ -266,6 +266,8 @@ SR-T01–05 are **complete** with the local evidence linked below. SR-T06 is **i
 ### M2: empirical methods compose with explicit conditions
 
 - [ ] **SR-T07: implement the Python method/profile API.** Declare quantities, ports, range and identity constraints; emit method/application/evidence records. Keep exact decimals and explicit uncertainty interpretation. Test dimensional conversion rather than string equality alone. Covers SR-02, SR-04, SR-05.
+
+  In progress: the [Python quantity API](../packages/python/README.md) declares supported scalar ports and values, preserves decimal spelling, converts through pinned Pint definitions and returns explicit dimensional/missing/unsupported diagnostics. Its [dated checkpoint](../packages/python/observed-quantities.json) records four test groups, including long decimals, unit-definition drift and the distinction between absolute temperature and offset-free error bounds. Method/application/evidence authoring, tables, range/identity predicates and the calibration research cycle remain. This does not close SR-T07, M2 or Gate U.
 - [ ] **SR-T08: deliver the calibration and research-cycle path.** Run and package the synthetic calibration, reuse it in an independently authored consumer, reproduce its result, and check the conditional Lean error theorem. Complete section 3C–D with a failed prediction, affected-use query, explicit revision and later recheck of a blocked application. Run every negative case from section 3, including an attempt to change the old evaluation rule and irrelevant or incompatible contributions. Covers SR-04–07 and the state needed by SR-11.
 - [ ] **SR-T09: implement portable package identity and RO-Crate export.** Pin dependencies and payload bytes, generate the envelope, validate with an existing RO-Crate reader/validator and report any unimplemented profile checks. Covers SR-09, SR-12, SR-13.
 - [ ] **SR-T10: prove the narrow composition property.** Show that successful core application exposes witnesses for its required leaves under the declared policy. Test that this property does not turn empirical assumptions into formal proofs. The theorem is infrastructure evidence, not the main product demonstration. Covers SR-05–08.
