@@ -7,7 +7,9 @@ execution record records a supplied result: it does not run or reproduce the
 method. The separate, explicit `Executor` operation now runs reviewed numerical
 methods and checks per-output reproduction. See [the execution policy](EXECUTION.md)
 and [the calibration path](../../examples/reuse/with-slean-python/README.md).
-SR-T08's full research cycle and formal bridge remain open.
+The separate [finite research checks](RESEARCH.md) carry predictions through a
+failed test, explicit revision, scoped reassessment and blocked-use retry.
+SR-T08's conditional formal bridge and complete negative-case acceptance remain open.
 This is a local candidate wheel, not a published standard or PyPI release.
 
 From the repository root, prepare the pinned environment and validate it:

@@ -56,7 +56,22 @@ call_revision=author.pack("call",publishable=[method,call])
 result=Executor(Reader("call")).run(call,policy=POLICY,expected_component={"module":call_revision,**method},reviewed_source_sha256=hashlib.sha256(source).hexdigest())
 assert result["outcome"] == "executed", result
 assert result["outputs"]["distance"]["typed"]["value"]["value"] == "4.000"
-print(json.dumps({"status": "passed", "producer": revision, "consumer": consumer_revision, "outside_checkout": True, "inspection_executed_candidate": False, "explicit_reviewed_execution": "passed"}))
+from slean.authoring import RESEARCH
+from slean.research import Research, POLICY as RESEARCH_POLICY
+def voltage(text):
+ return scalar(text,dimension="voltage",unit="volt",uncertainty={"kind":"unknown"})
+observation_bytes=json.dumps({"id":"observation","context":{},"voltage":voltage("1.1")}).encode()
+research_author=Author(payloads={"observation.json":observation_bytes})
+model=research_author.component(id="model",kind="model",name="Installed finite-check model",interface={"profile":profile,"value":{"inputs":{},"outputs":{"voltage":scalar_port(dimension="voltage",unit="volt")}}},requires={"id":"conditions","all":[]},sources=[],license="unknown")
+question=research_author.question(id="question",wording="Does this prediction match?",source="Owned installed-package check")
+test=research_author.plan_test(model,id="test",question=question,bindings={},context={},prediction={"profile":profile,"value":voltage("1")},bound={"profile":profile,"value":voltage("0.02")},observation_id="observation")
+run=research_author.record_execution(test,id="run",outputs={"voltage":{"typed":{"profile":profile,"value":voltage("1")}}})
+observation=research_author.component(id="observation",kind="data",name="Installed observation",interface={"profile":profile,"value":{"inputs":{},"outputs":{}}},requires={"id":"conditions","all":[]},sources=[{"path":"observation.json"}],license="unknown",annotations={RESEARCH:{"role":"observation"}})
+research_revision=research_author.pack("research",publishable=[model,question,test,run,observation])
+finite=Research(Reader("research")).assess(run,observation,expected_plan={"module":research_revision,**test},policy=RESEARCH_POLICY)
+assert finite["outcome"] == "failed_prediction",finite
+assert finite["prediction_reproduction"] == "not_performed"
+print(json.dumps({"status": "passed", "producer": revision, "consumer": consumer_revision, "outside_checkout": True, "inspection_executed_candidate": False, "explicit_reviewed_execution": "passed", "explicit_finite_comparison":"passed"}))
 '''
 
 
@@ -72,8 +87,8 @@ def check():
     run([sys.executable, str(HERE/'generate_runtime.py')], cwd=ROOT)
     suite = unittest.defaultTestLoader.discover(str(HERE/'tests'))
     result = unittest.TextTestRunner(stream=sys.stderr, verbosity=2).run(suite)
-    if not result.wasSuccessful() or result.testsRun != 32 or result.skipped:
-        raise RuntimeError('Expected all 32 SDK test groups to pass without skipped execution checks')
+    if not result.wasSuccessful() or result.testsRun != 44 or result.skipped:
+        raise RuntimeError('Expected all 44 SDK test groups to pass without skipped execution checks')
     with tempfile.TemporaryDirectory(prefix='slean-installed-sdk-') as temporary:
         directory = Path(temporary)
         wheels = directory/'wheels'; wheels.mkdir()
@@ -88,10 +103,10 @@ def check():
     hashes = frozen['sha256']
     changed = [path for path, expected in hashes.items() if hashlib.sha256((ROOT/'examples/reuse'/path).read_bytes()).hexdigest() != expected]
     if changed: raise RuntimeError('Frozen direct-tool files changed: '+repr(changed))
-    paths = [HERE/name for name in ('README.md', 'EXECUTION.md', 'check_sdk.py', 'generate_runtime.py', 'pyproject.toml', 'requirements.lock', 'build-requirements.lock')]
+    paths = [HERE/name for name in ('README.md', 'EXECUTION.md', 'RESEARCH.md', 'check_sdk.py', 'generate_runtime.py', 'pyproject.toml', 'requirements.lock', 'build-requirements.lock')]
     paths += sorted((HERE/'slean').glob('*.py')) + sorted((HERE/'slean/data').glob('*.json')) + sorted((HERE/'tests').glob('test_*.py'))
     paths += [ROOT/'conformance/contract.py', ROOT/'spec/module.schema.json', ROOT/'spec/authoring.pyi', ROOT/'packages/lean/verification/boundary.py', *sorted((ROOT/'profiles').glob('*.schema.json')), ROOT/'profiles/quantity-map.json']
-    return {'status': 'passed', 'observed_date': datetime.date.today().isoformat(), 'scope': 'SR-T07 authoring/interface and SR-T08 reviewed numerical execution checkpoint; research cycle and Gate U remain open',
+    return {'status': 'passed', 'observed_date': datetime.date.today().isoformat(), 'scope': 'SR-T07 authoring/interface and SR-T08 numerical execution plus finite research-cycle checkpoint; conditional formal bridge, full negative-case acceptance and Gate U remain open',
         'python': platform.python_version(), 'test_groups': result.testsRun, 'negative_vectors': 41, 'requirement_vectors': 34, 'positive_modules': 3,
         'installed_wheel': wheel_report, 'frozen_files_unchanged': len(hashes), 'seconds': round(time.monotonic()-started, 3),
         'source_sha256': {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}}

@@ -60,7 +60,34 @@ The [SDK execution policy](../../../packages/python/EXECUTION.md) records the
 ABI, receiver authority, numerical tolerance and local process limits. Its
 installed-wheel check establishes operation outside the source checkout.
 
-The failed prediction, explicit revision, later blocked-use retry and Lean
-conditional error-theorem bridge are still required to close SR-T08. RO-Crate,
-the complete usefulness comparison, independent reading and external adoption
-remain separate tasks. This checkpoint does not close M2 or Gate U.
+The numerical report is the earlier execution checkpoint. The later
+[cycle report](observed-cycle.json) adds a failed prediction, calculated offset
+revision, separate second test and blocked-use retry. Run its check separately:
+
+```sh
+PYTHONPATH=packages/python packages/python/.venv/bin/python examples/reuse/with-slean-python/check_cycle.py
+```
+
+The original hypothesis predicts 8.5 V and misses the first observation by
+0.1 V under the frozen 0.02 V bound. A separate method takes the gain through
+an exact output reference to the calibration execution and calculates the new
+offset, 0.6 V. The revised model predicts 6.6 V for a separate 3 mm observation.
+The original failed assessment stays failed. The same blocked 8.6 V measurement
+then yields 4 mm through the unchanged inverse source at the revised context.
+The temperature check passes; three physical assumptions remain open.
+
+The controller exports the first prediction plan before exposing the new reading
+in its dependency corpus. Each observation artifact is added after the respective
+plan. This is controlled script order, not real-world preregistration. A second
+reader reconstructs the exported links without private chat state, using the same
+SDK; it is not the separately implemented reader required by SR-T14.
+
+`slean.research.Research` performs the comparisons, scoped query and retry checks.
+The [research policy](../../../packages/python/RESEARCH.md) states their precise
+authority. A new citation cannot repair an incompatible method. A changed plan
+cannot replace an old failed test. The motivated follow-up and temporal-drift
+alternative remain unresolved.
+
+The conditional Lean error-theorem bridge and complete remaining negative-case
+acceptance are still required to close SR-T08. RO-Crate, Gate U, independent
+reading and external adoption remain separate tasks. This does not close M2.

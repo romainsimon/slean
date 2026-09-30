@@ -1,0 +1,406 @@
+{
+  "consumer_reconstruction": "passed; same SDK, no private chat state",
+  "cycle": {
+    "blocked_attempt": {
+      "id": "before",
+      "module": "sha256:8f7d605cf0d7a7ab50527263c95b25e64dcda290a4000086e75c81f20a43eb89"
+    },
+    "changed_rule": "rejected",
+    "directories": [
+      "producer/calibration",
+      "producer/fit-producer",
+      "producer/fit-plan",
+      "producer/fit-result",
+      "producer/fit-verification",
+      "question",
+      "hypothesis",
+      "first-preview",
+      "first-plan",
+      "blocked",
+      "first-run",
+      "first-observation",
+      "first-assessment",
+      "offset-plan",
+      "offset-run",
+      "revision",
+      "second-preview",
+      "second-plan",
+      "second-run",
+      "second-observation",
+      "second-assessment",
+      "revised-calibration",
+      "retry",
+      "retry-run",
+      "unrelated-retry"
+    ],
+    "first_assessment": {
+      "id": "assessment",
+      "module": "sha256:61bea0348129a9a0346dd04b628af03b407b0e8778cbfe96b572302ea91d6a7e"
+    },
+    "first_error": {
+      "dimension": "voltage",
+      "kind": "scalar",
+      "uncertainty": {
+        "kind": "unknown"
+      },
+      "unit": "volt",
+      "value": "0.1"
+    },
+    "first_outcome": "failed_prediction",
+    "first_plan": {
+      "id": "plan",
+      "module": "sha256:58f4d590e9e34802db719acf70147244167e21a2ae999c711ffe509b76274f43"
+    },
+    "fixture": "synthetic; scripted handoff; no autonomous discovery or real-world preregistration",
+    "follow_up": {
+      "id": "follow-up",
+      "module": "sha256:d8f951cc55bae5fe825e15ee74e9a3fd62bef92a5d2014e9f20c93c17350dca4"
+    },
+    "formal_bridge": "not_performed",
+    "gate_u": "not_evaluated",
+    "modules": {
+      "blocked": "sha256:8f7d605cf0d7a7ab50527263c95b25e64dcda290a4000086e75c81f20a43eb89",
+      "first-assessment": "sha256:61bea0348129a9a0346dd04b628af03b407b0e8778cbfe96b572302ea91d6a7e",
+      "first-observation": "sha256:0ec78fd5703f749d6545e11904ad0b1bd6698d6d0b94d64eb4964aaf5ce1d661",
+      "first-plan": "sha256:58f4d590e9e34802db719acf70147244167e21a2ae999c711ffe509b76274f43",
+      "first-preview": "sha256:05f360b0212b016b8e14f1446865406fc9cc56fde597de6506e26ed3967fd9ce",
+      "first-run": "sha256:315cd183f944b76097fb42be55e59e4f51a34cd0549d2feee56159c09323faba",
+      "hypothesis": "sha256:3dd245ad309cc6c91a73b377e49d9dc38116145285daab7f8803adcfb736230f",
+      "offset-plan": "sha256:1449091b74c3dd381c2e75391ad8ccd0daf547c347d733db38830d8a3df6ec28",
+      "offset-run": "sha256:88c67e0875c44b3a691b8af547559d3bc75ddb1942ee09a3a903c1fcd42f3585",
+      "question": "sha256:267a4c9a3542212274e71ead865c42e01ee054bcb7d640909df2c94aacab1515",
+      "retry": "sha256:3a8c71ba78ebbc0806e916d3f40471bbabe3445c8cc0ff9bad7cc723ac41defd",
+      "retry-run": "sha256:62722b29685b152323a5f247b21a1ad454851d2d46f6244348bc4d6a581e5520",
+      "revised-calibration": "sha256:0b871886d3eeda2d6d3761d918d00d8684a8ec3f7b9b5b66cd593e05dcd22255",
+      "revision": "sha256:d8f951cc55bae5fe825e15ee74e9a3fd62bef92a5d2014e9f20c93c17350dca4",
+      "second-assessment": "sha256:950fc48b3165d2abfaac3b90a7dcc80ae362d4a860074bdee06b57b77977ab01",
+      "second-observation": "sha256:40ebfdbeae0130ba2311490ce245cea1fb8d662fe3b5fbef309f507eb6854fc5",
+      "second-plan": "sha256:e25a9066f2b3df8371771d447e4025c9429202ff640174595b060f3bd0612e51",
+      "second-preview": "sha256:acf510bbdeffdb85d545058fa3e63da043eb4a6047d6bdeb2136de45555d6196",
+      "second-run": "sha256:7766337f8a2b9e44ab7b9bce45256f9caf7febfb2d3491623aeec4c9af1794e1",
+      "unrelated-retry": "sha256:55bb2a1b7006c450bd50a87102b66244935bb153774fff90d44956dabe04e99b"
+    },
+    "needs_reassessment": [
+      {
+        "action": "reassess; no automatic retraction",
+        "active_assumption_requirements": [],
+        "application": {
+          "id": "preview",
+          "module": "sha256:05f360b0212b016b8e14f1446865406fc9cc56fde597de6506e26ed3967fd9ce"
+        },
+        "compatibility": "conditional",
+        "context": {
+          "sensor": {
+            "literal": "sensor-A"
+          },
+          "temperature": {
+            "typed": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "value": {
+                "dimension": "temperature",
+                "kind": "scalar",
+                "uncertainty": {
+                  "kind": "unknown"
+                },
+                "unit": "kelvin",
+                "value": "313.15"
+              }
+            }
+          }
+        },
+        "direct_model_use": true,
+        "scope": [
+          {
+            "field": "sensor",
+            "reason": "declared_identity_comparison",
+            "status": "satisfied"
+          },
+          {
+            "field": "temperature",
+            "reason": "declared_identity_comparison",
+            "status": "satisfied"
+          }
+        ]
+      },
+      {
+        "action": "reassess; no automatic retraction",
+        "active_assumption_requirements": [],
+        "application": {
+          "id": "run",
+          "module": "sha256:315cd183f944b76097fb42be55e59e4f51a34cd0549d2feee56159c09323faba"
+        },
+        "compatibility": "conditional",
+        "context": {
+          "sensor": {
+            "literal": "sensor-A"
+          },
+          "temperature": {
+            "typed": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "value": {
+                "dimension": "temperature",
+                "kind": "scalar",
+                "uncertainty": {
+                  "kind": "unknown"
+                },
+                "unit": "kelvin",
+                "value": "313.15"
+              }
+            }
+          }
+        },
+        "direct_model_use": true,
+        "scope": [
+          {
+            "field": "sensor",
+            "reason": "declared_identity_comparison",
+            "status": "satisfied"
+          },
+          {
+            "field": "temperature",
+            "reason": "declared_identity_comparison",
+            "status": "satisfied"
+          }
+        ]
+      },
+      {
+        "action": "reassess; no automatic retraction",
+        "active_assumption_requirements": [],
+        "application": {
+          "id": "plan",
+          "module": "sha256:58f4d590e9e34802db719acf70147244167e21a2ae999c711ffe509b76274f43"
+        },
+        "compatibility": "conditional",
+        "context": {
+          "sensor": {
+            "literal": "sensor-A"
+          },
+          "temperature": {
+            "typed": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "value": {
+                "dimension": "temperature",
+                "kind": "scalar",
+                "uncertainty": {
+                  "kind": "unknown"
+                },
+                "unit": "kelvin",
+                "value": "313.15"
+              }
+            }
+          }
+        },
+        "direct_model_use": true,
+        "scope": [
+          {
+            "field": "sensor",
+            "reason": "declared_identity_comparison",
+            "status": "satisfied"
+          },
+          {
+            "field": "temperature",
+            "reason": "declared_identity_comparison",
+            "status": "satisfied"
+          }
+        ]
+      }
+    ],
+    "physical_validity": "unresolved; finite comparisons do not prove the model",
+    "remaining_obligations": [
+      {
+        "claim": {
+          "id": "physical",
+          "module": "sha256:0b871886d3eeda2d6d3761d918d00d8684a8ec3f7b9b5b66cd593e05dcd22255"
+        },
+        "context": {
+          "sensor": {
+            "literal": "sensor-A"
+          },
+          "temperature": {
+            "typed": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "value": {
+                "dimension": "temperature",
+                "kind": "scalar",
+                "uncertainty": {
+                  "kind": "unknown"
+                },
+                "unit": "kelvin",
+                "value": "313.15"
+              }
+            }
+          }
+        },
+        "reason": "model_applicability_needs_contextual_evidence",
+        "requirement": "physical-condition",
+        "status": "unresolved",
+        "witnesses": []
+      },
+      {
+        "claim": {
+          "id": "gain",
+          "module": "sha256:0b871886d3eeda2d6d3761d918d00d8684a8ec3f7b9b5b66cd593e05dcd22255"
+        },
+        "context": {
+          "sensor": {
+            "literal": "sensor-A"
+          },
+          "temperature": {
+            "typed": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "value": {
+                "dimension": "temperature",
+                "kind": "scalar",
+                "uncertainty": {
+                  "kind": "unknown"
+                },
+                "unit": "kelvin",
+                "value": "313.15"
+              }
+            }
+          }
+        },
+        "reason": "model_applicability_needs_contextual_evidence",
+        "requirement": "gain-condition",
+        "status": "unresolved",
+        "witnesses": []
+      },
+      {
+        "claim": {
+          "id": "residual",
+          "module": "sha256:0b871886d3eeda2d6d3761d918d00d8684a8ec3f7b9b5b66cd593e05dcd22255"
+        },
+        "context": {
+          "sensor": {
+            "literal": "sensor-A"
+          },
+          "temperature": {
+            "typed": {
+              "profile": "slean-quantity/0.1-draft.1",
+              "value": {
+                "dimension": "temperature",
+                "kind": "scalar",
+                "uncertainty": {
+                  "kind": "unknown"
+                },
+                "unit": "kelvin",
+                "value": "313.15"
+              }
+            }
+          }
+        },
+        "reason": "model_applicability_needs_contextual_evidence",
+        "requirement": "residual-condition",
+        "status": "unresolved",
+        "witnesses": []
+      }
+    ],
+    "resolved_obstacles": [
+      "temperature"
+    ],
+    "retry": {
+      "id": "after",
+      "module": "sha256:3a8c71ba78ebbc0806e916d3f40471bbabe3445c8cc0ff9bad7cc723ac41defd"
+    },
+    "retry_output": {
+      "displacement": {
+        "typed": {
+          "profile": "slean-quantity/0.1-draft.1",
+          "value": {
+            "dimension": "length",
+            "kind": "scalar",
+            "uncertainty": {
+              "kind": "unknown"
+            },
+            "unit": "millimeter",
+            "value": "4"
+          }
+        }
+      },
+      "error_bound": {
+        "typed": {
+          "profile": "slean-quantity/0.1-draft.1",
+          "value": {
+            "dimension": "length",
+            "kind": "scalar",
+            "uncertainty": {
+              "kind": "unknown"
+            },
+            "unit": "millimeter",
+            "value": "0.01"
+          }
+        }
+      }
+    },
+    "retry_run": {
+      "id": "run",
+      "module": "sha256:62722b29685b152323a5f247b21a1ad454851d2d46f6244348bc4d6a581e5520"
+    },
+    "reused_method_source_sha256": "548335487014d2f015d75dc1157e4db56c5bed6ac4dbf7872429b0dad2efca3a",
+    "reused_result": {
+      "output": "gain",
+      "ref": {
+        "id": "fit-run",
+        "module": "sha256:8bb7e6caadb1ea790f1abbe8fdddb7383c2482e3797e747afa7cb3f9acaa41d0"
+      }
+    },
+    "revised_offset": {
+      "dimension": "voltage",
+      "kind": "scalar",
+      "uncertainty": {
+        "kind": "unknown"
+      },
+      "unit": "volt",
+      "value": "0.6"
+    },
+    "revision": {
+      "id": "model",
+      "module": "sha256:d8f951cc55bae5fe825e15ee74e9a3fd62bef92a5d2014e9f20c93c17350dca4"
+    },
+    "second_assessment": {
+      "id": "assessment",
+      "module": "sha256:950fc48b3165d2abfaac3b90a7dcc80ae362d4a860074bdee06b57b77977ab01"
+    },
+    "second_outcome": "within_bound",
+    "second_plan": {
+      "id": "plan",
+      "module": "sha256:e25a9066f2b3df8371771d447e4025c9429202ff640174595b060f3bd0612e51"
+    },
+    "unrelated_contribution": "incompatible"
+  },
+  "formal_bridge": "not_performed",
+  "frozen_files_unchanged": 34,
+  "gate_u": "not_evaluated",
+  "observed_date": "2026-09-30",
+  "scope": "SR-T08 prediction/failure/revision/scoped-reassessment/result-and-method-reuse/retry checkpoint; conditional Lean bridge and complete negative-case acceptance remain open",
+  "seconds": 30.548,
+  "source_sha256": {
+    "examples/reuse/with-slean-python/check_cycle.py": "66c008c22acd2119a53c5508d0693989b32b71fcf009d887141f93cf01ff894d",
+    "examples/reuse/with-slean-python/check_path.py": "89d4e76691e3f678aea2083d9b39e9d4a20a67b3054bd6b2812a6d31edd28b3d",
+    "examples/reuse/with-slean-python/consumer.py": "eddf773a1f067a618ae427a2ea92f75d37ecfbffaff7707fe7c93f7c08016b67",
+    "examples/reuse/with-slean-python/cycle.py": "79eb8b32a6db37daff3d31bcfc6d0cf401a2ed1512862adbf9da064152ffc4b5",
+    "examples/reuse/with-slean-python/methods.py": "548335487014d2f015d75dc1157e4db56c5bed6ac4dbf7872429b0dad2efca3a",
+    "examples/reuse/with-slean-python/producer.py": "99b22a21e0c3460f4d7ff7bcd53d546b32c465c8dc38576e5d64ead8dfb7e957",
+    "examples/reuse/with-slean-python/revision_method.py": "ba188f2b4b1d73409f4b6c7a73499333dd4f58954e24bb65828332eb6eb51acf",
+    "packages/python/requirements.lock": "168f49bd104dd57292dc2bce9eb55a94b9891ad5ba9182c62e28f6592917e9fb",
+    "packages/python/slean/__init__.py": "22fd66f9fcdafad92d54723a8ee65a29d74c022acc7c85eb468594bfacaf14a8",
+    "packages/python/slean/_boundary.py": "4bb382f49513da70e406a91bd7d3f59be9834542a16489c71a50ab7c1fa5cec2",
+    "packages/python/slean/_runner.py": "7c91ce88aae9392b7d3a7e31295050af151df61debfe962fdf027ba7fb2be4d6",
+    "packages/python/slean/authoring.py": "803ef2d771cd627cbb03d114aef11725d7831f1885fb2daa88323263001a4a92",
+    "packages/python/slean/contract.py": "5b039c6db5da8b6ad3f5e9adb72b84457c2b9efb7a48d128eaf8afbf41e233fa",
+    "packages/python/slean/data/lean.schema.json": "c0f82ebabfe826225048b98b91a94465ff96650f98163ed2bd3187331fb07fad",
+    "packages/python/slean/data/module.schema.json": "15b472d19ec871e0531dfae1d7b89a9ca65d6c33c4a90fb97aef6a359f4ac175",
+    "packages/python/slean/data/quantity-map.json": "24e16b967a27b871f56a0873039e710db10eb525fc10ed742ed106ac0b52b4b9",
+    "packages/python/slean/data/quantity.schema.json": "2c926dbb004a5fbed49c1f201275465abe0ed3ab9aeedaf556cc5f7e878f4698",
+    "packages/python/slean/data/research.schema.json": "3ed547568f6f42331f5949121abf61bdfad91e247a86add98df90b2451bcd67e",
+    "packages/python/slean/execution.py": "7b1f3bfebb6e390af7ba95ea5feda03a369e6d2b8b810d9ce5ffc3b6de202e71",
+    "packages/python/slean/interfaces.py": "4405b6ab9a38321544602813aec4f4b8079bb97d40c7179b8a7a01375129387f",
+    "packages/python/slean/quantities.py": "2a32668c2aa5d266678e992909e03974bedecda2b6e6aa6c4e81ddae8527af0d",
+    "packages/python/slean/reader.py": "2f0a8835764122f241302222f85ab2c703f4a41c34302a4e633df395618953af",
+    "packages/python/slean/research.py": "1ff1c6b37dbb1849325506bba39fcaf8fe21e500f583127451906bc94b026de7",
+    "packages/python/tests/test_research.py": "5b641dd5617a4240f6cc34d45e379d8d8d729e640548a3f48b50971bfbef227a"
+  },
+  "status": "passed",
+  "temporary_artifact_bytes": 165350,
+  "temporary_artifact_files": 40
+}
