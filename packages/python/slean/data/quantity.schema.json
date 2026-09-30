@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:slean:quantity:0.1-draft.1",
+  "$defs": {
+    "decimal": {"type": "string", "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"},
+    "text": {"type": "string", "minLength": 1},
+    "uncertainty": {"oneOf": [
+      {"type": "object", "additionalProperties": false, "required": ["kind"], "properties": {"kind": {"const": "unknown"}}},
+      {"type": "object", "additionalProperties": false, "required": ["kind", "value", "unit"], "properties": {
+        "kind": {"const": "absolute_bound"}, "value": {"$ref": "#/$defs/decimal"}, "unit": {"$ref": "#/$defs/text"}}},
+      {"type": "object", "required": ["kind"], "properties": {
+        "kind": {"type": "string", "minLength": 1, "not": {"enum": ["unknown", "absolute_bound"]}}}}
+    ]},
+    "scalar": {"type": "object", "additionalProperties": false,
+      "required": ["kind", "dimension", "unit", "value", "uncertainty"], "properties": {
+        "kind": {"const": "scalar"}, "dimension": {"$ref": "#/$defs/text"}, "unit": {"$ref": "#/$defs/text"},
+        "value": {"anyOf": [{"$ref": "#/$defs/decimal"}, {"type": "null"}]},
+        "uncertainty": {"$ref": "#/$defs/uncertainty"}}},
+    "scalarPort": {"type": "object", "additionalProperties": false,
+      "required": ["kind", "dimension", "unit", "allow_missing"], "properties": {
+        "kind": {"const": "scalar"}, "dimension": {"$ref": "#/$defs/text"}, "unit": {"$ref": "#/$defs/text"}, "allow_missing": {"type": "boolean"}}},
+    "tablePort": {"type": "object", "additionalProperties": false,
+      "required": ["kind", "format", "columns"], "properties": {
+        "kind": {"const": "table"}, "format": {"const": "csv"},
+        "columns": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/scalarPort"}}}},
+    "port": {"oneOf": [
+      {"$ref": "#/$defs/scalarPort"}, {"$ref": "#/$defs/tablePort"},
+      {"type": "object", "additionalProperties": false, "required": ["kind"], "properties": {"kind": {"const": "text"}}}
+    ]},
+    "artifact": {"type": "object", "additionalProperties": false, "required": ["path"], "properties": {
+      "path": {"type": "string"}, "module": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}}},
+    "table": {"type": "object", "additionalProperties": false, "required": ["kind", "format", "columns", "artifact"], "properties": {
+      "kind": {"const": "table"}, "format": {"const": "csv"}, "artifact": {"$ref": "#/$defs/artifact"},
+      "columns": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/scalarPort"}}}},
+    "interface": {"type": "object", "additionalProperties": false, "required": ["inputs", "outputs"], "properties": {
+      "inputs": {"type": "object", "additionalProperties": {"$ref": "#/$defs/port"}},
+      "outputs": {"type": "object", "additionalProperties": {"$ref": "#/$defs/port"}},
+      "parameters": {"type": "object", "additionalProperties": {"$ref": "#/$defs/scalar"}},
+      "entrypoint": {"type": "object", "additionalProperties": false, "required": ["artifact", "symbol"], "properties": {
+        "artifact": {"$ref": "#/$defs/artifact"}, "symbol": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"}}}}},
+    "result": {"type": "object", "additionalProperties": false,
+      "required": ["status", "numeric_representation", "tolerance"], "properties": {
+        "status": {"enum": ["reproduced", "different", "unsupported"]},
+        "numeric_representation": {"$ref": "#/$defs/text"}, "tolerance": {"$ref": "#/$defs/scalar"}}}
+  }
+}

@@ -5,6 +5,11 @@
 /examples/reuse/direct-python/_out/
 /conformance/.venv/
 /conformance/_out/
+/packages/python/.venv/
+/packages/python/_out/
+/packages/python/dist/
+/packages/python/build/
+*.egg-info/
 /packages/lean/.lake/
 /packages/lean/_out/
 /packages/lean/verification/.lake/

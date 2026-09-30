@@ -8,7 +8,10 @@ identifier and fixtures; never reinterpret an old identifier.
 
 The public operations are `inspect`, `apply`, `verify`, `pack` and `uses`.
 The [typed authoring signatures](authoring.pyi) specify their library boundary.
-They are a specification, not an installed Python implementation.
+The signatures describe the portable API. The bounded experimental Python
+implementation and its installed-wheel evidence are documented in
+[`packages/python`](../packages/python/README.md); support for every profile
+or scientific verification policy is not implied.
 
 ## Files and identity
 

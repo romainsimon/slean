@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools==80.9.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slean"
+version = "0.1.0a1"
+description = "Experimental portable scientific records and receiver-owned quantity checks"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["pint==0.26.1", "jsonschema==4.26.0", "rfc8785==0.1.4"]
+
+[tool.setuptools]
+packages = ["slean"]
+
+[tool.setuptools.package-data]
+slean = ["data/*.json"]
