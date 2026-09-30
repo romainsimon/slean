@@ -1,0 +1,57 @@
+{
+  "checks": [
+    "all_comparison_fixtures_are_wire_valid_before_execution",
+    "wrong_policy_has_no_reviewed_fallback",
+    "dependency_bearing_physlib_consumer_is_compared_and_replayed",
+    "receipt_metadata_comes_from_kernel_checked_textual_constants",
+    "quoted_native_name_matches_a_separately_selected_unproved_statement",
+    "offline_receipts_bind_reference_exports_environment_and_exact_policy",
+    "changed_candidate_rejected_after_build_and_export",
+    "sorry_candidate_rejected_after_build_and_export",
+    "axiom_candidate_rejected_after_build_and_export"
+  ],
+  "frozen_baseline_files_unchanged": 34,
+  "limitations": [
+    "Receiver independently selects trusted reference source and installed imports",
+    "Native exports are compared with pinned Comparator and replayed in Lean; no external kernel",
+    "No hard memory or aggregate disk/job quota on this macOS backend; not a hostile-upload service",
+    "Component proof only; unreviewed application capture fidelity and empirical validity are not assessed"
+  ],
+  "observed_on": "2026-09-30",
+  "physlib_component": "lean-2ad3d5b06e2fa05402c953a6f8f5e327b0d2d18acfec9af96112a739cc2b0471",
+  "physlib_proof_exports": {
+    "challenge": {
+      "sha256": "67a1aa7077fc6f60cf84b2414d68dc624f1e47af8c96c0fab1f85f061246a05b",
+      "size": "327233941"
+    },
+    "solution": {
+      "sha256": "67a1aa7077fc6f60cf84b2414d68dc624f1e47af8c96c0fab1f85f061246a05b",
+      "size": "327233941"
+    }
+  },
+  "policy": "unreviewed-contribution/0.1-draft.1",
+  "quoted_component": "lean-7126ae0af22e5f80ff7bc7d8f19dd481345f8426e382223b754e1e758fc33fc9",
+  "rejected": {
+    "axiom": "uncaught exception: Illegal axiom detected: 'FormalExample.invented'",
+    "changed": "uncaught exception: Challenge and solution theorem statement do not match: 'FormalExample.\u00abname.with.dots\u00bb'",
+    "sorry": "uncaught exception: Illegal axiom detected: 'sorryAx'"
+  },
+  "seconds": 1585.268,
+  "source_sha256": {
+    "packages/lean/SleanAudit.lean": "45c06f49195e84e78a64a6dbbe80677c999eb7b3680efb2fa33999d439b60211",
+    "packages/lean/build_inputs.py": "1fbee88f90bf804b823f380d829ba382a7b21e5d1474df450ada9bc6e76ab5ca",
+    "packages/lean/export.py": "f9320bea89f91c0fdcef2874ff6576583348d533fab68f6ece7e484fafc2ee42",
+    "packages/lean/tests/test_streamed_export.py": "b0035f1e59a601df71fc0e53dab8ecf136a5fa9c84012e5f5c9eba0f6f3da946",
+    "packages/lean/verification/SleanCompare.lean": "b8848a569cfc79478c549adbf8cb04dabae948750bc1bc1adfbed7d2b1d07e85",
+    "packages/lean/verification/boundary.py": "1e73de40f1d54bb08e7b58fe43d069699d0aa7b7083877cf593eb45ba96d9a1e",
+    "packages/lean/verification/check_unreviewed.py": "a13d167288098661863db15673c5e2d1f5a658e963fd99e55baa059af5de45eb",
+    "packages/lean/verification/lake-manifest.json": "adf6e20c10290b2f5c2cdbf6e91d2eecefff5dc1146f3970c576f0a376733813",
+    "packages/lean/verification/lakefile.toml": "949f5660e1b550e799bfd0c0e44f047281883c9524ce60942780a3f9233c8b9d",
+    "packages/lean/verification/receipts.py": "5a532c23bed635e4b5be5d39dd9da53b36f1978af0771b22a1f072f029fbd58b",
+    "packages/lean/verification/reviewed.py": "baad467e640c38ab5b06aa91e126d9cd8366662ded708121b34eb2aa904bf202",
+    "packages/lean/verification/run_comparator.py": "ed043ede83e31ddd1f07c9b0a581367b9a3484c98b5b63cbc4de5d99f7316aaf",
+    "packages/lean/verification/unreviewed.py": "6393da4323f997ede48678839b0b127cda2b21aec1939af0cde399698ee36d97"
+  },
+  "status": "passed",
+  "trusted_reference": "sha256:1d582ecc1f950d31b4c4bbb96e76db4bac7af1e22a1985257200f15de092e37e"
+}

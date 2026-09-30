@@ -45,7 +45,9 @@ not establish that those conditions describe the physical world.
 Capture fidelity relies on reviewed caller source using receiver-known
 instrumentation. The policy does not accept hostile source that manually forges
 extension entries. Pinning the instrumentation does not replace review of that
-caller source. The module-bound unreviewed-contribution policy remains unfinished. Four
+caller source. The separate [unreviewed component operation](UNREVIEWED.md) compares proofs
+against receiver-selected statements. It does not authenticate unreviewed
+application captures. Four
 [producer-binding controls](../tests/test_reviewed_producer.py) additionally
 check installed source/binary matching, selected upstream pins, interface
 source/toolchain mismatches and duplicate producer modules. These small
@@ -126,5 +128,5 @@ passing control groups, two checked invocations, 5,611 bound import modules and
 all 34 frozen direct-tool baseline files unchanged. The complete sequence took
 109.368 seconds locally. Its implementation/test hashes bind the report to the
 checked code. This is a different sequence from the earlier component check;
-the time is not a comparative speed or usefulness result. SR-T06 stays open until the module-bound unreviewed policy is
-implemented and validated.
+the time is not a comparative speed or usefulness result. The unreviewed component path has its own explicit operation and validation.
+This application report covers the reviewed-caller policy only.

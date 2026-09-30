@@ -15,6 +15,8 @@ import rfc8785
 
 FORMAT = "slean-local-receipt/0.1-draft.1"
 POLICY = "reviewed-source/0.1-draft.1"
+UNREVIEWED_POLICY = "unreviewed-contribution/0.1-draft.1"
+SUPPORTED_POLICIES = {POLICY, UNREVIEWED_POLICY}
 
 
 class ReceiptStore:
@@ -43,8 +45,8 @@ class ReceiptStore:
 
     def _record_checked(self, verification):
         """Internal: only the receiver verifier calls this after its checks pass."""
-        if verification["status"] != "passed" or verification["policy"] != POLICY:
-            raise ValueError("Only completed reviewed-source checks can issue local receipts")
+        if verification["status"] != "passed" or verification["policy"] not in SUPPORTED_POLICIES:
+            raise ValueError("Only completed supported receiver checks can issue local receipts")
         body = {"format": FORMAT, "issuer": self.issuer, "verification": verification}
         receipt = {**body, "authentication": self._signature(body)}
         data = rfc8785.dumps(receipt) + b"\n"
@@ -63,7 +65,7 @@ class ReceiptStore:
         """Read-only authentication plus exact subject, statement and policy match."""
         if not isinstance(receipt, dict) or set(receipt) != {"format", "issuer", "verification", "authentication"}:
             return None
-        if receipt["format"] != FORMAT or receipt["issuer"] != self.issuer or policy != POLICY:
+        if receipt["format"] != FORMAT or receipt["issuer"] != self.issuer or policy not in SUPPORTED_POLICIES:
             return None
         body = {k: receipt[k] for k in ("format", "issuer", "verification")}
         try:

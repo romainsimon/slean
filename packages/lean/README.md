@@ -93,8 +93,10 @@ separately supplied statements and self-contained proof candidates. It issues
 no module receipt. The [reviewed-source receiver](verification/REVIEWED.md)
 separately verifies exact components and can issue receiver-local receipts.
 The separate [native application verifier](verification/REVIEWED_APPLICATIONS.md)
-checks rebuilt captures and exact producer bindings. The module-bound unreviewed
-policy remains unfinished.
+checks rebuilt captures and exact producer bindings. The separate
+[unreviewed component verifier](verification/UNREVIEWED.md) compares the candidate
+against a receiver-selected statement and replays its exported proof. The two
+policies keep distinct local receipts and execution limits.
 
 ## Apply a declaration in ordinary Lean
 

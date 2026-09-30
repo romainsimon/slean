@@ -5,8 +5,9 @@
 closure in a temporary workspace, checks the resulting proof and binds a
 local receipt to the exact Slean module. The separate
 [native application verifier](REVIEWED_APPLICATIONS.md) binds fresh captures to
-those consumer proofs and their exact producers. SR-T06 remains in progress:
-the module-bound unreviewed policy is not implemented.
+those consumer proofs and their exact producers. The separate
+[unreviewed operation](UNREVIEWED.md) adds a receiver-selected statement comparison
+and full exported-proof replay under its own named policy.
 
 ## Inputs and trust
 
@@ -121,7 +122,8 @@ artifacts, substituted or redirected links, and missing installed sources.
 The explicit verification CLI accepts `--module DIRECTORY`, one or more
 `--component ID`, `--dependency-project DIRECTORY`, `--policy reviewed-source/0.1-draft.1`
 and optional `--store DIRECTORY`. Requesting the unreviewed policy returns
-`unsupported` without falling back to reviewed-source execution.
+`unsupported` in this component entrypoint without falling back to reviewed
+execution. Use `unreviewed.py` explicitly for that separate operation.
 
 ## Observed cost
 

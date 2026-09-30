@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import signal
 import sys
 import tempfile
 
@@ -52,12 +53,23 @@ def closure(modules, selected):
     return ordered
 
 
-def run_step(arguments, *, directory, readable, writable, environment, limits, label):
+def run_step(arguments, *, directory, readable, writable, environment, limits, label,
+             output_bytes=4 * 1024 * 1024, output_file=None):
     print(label, file=sys.stderr, flush=True)
     process = subprocess.Popen(command({"readable": readable}, list(map(str, arguments)), writable, can_fork=False),
         cwd=directory, env=environment, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         start_new_session=True, preexec_fn=lambda: child_limits(limits))
-    output, stop = bounded_output(process, 600)
+    try:
+        if output_file is None:
+            output, stop = bounded_output(process, 600, max_bytes=output_bytes)
+        else:
+            with Path(output_file).open("xb") as sink:
+                output, stop = bounded_output(process, 600, max_bytes=output_bytes, sink=sink)
+    except BaseException:
+        if process.poll() is None:
+            os.killpg(process.pid, signal.SIGKILL)
+            process.wait(timeout=10)
+        raise
     if stop or process.returncode or "PANIC" in output:
         raise RuntimeError(label + ": " + (stop or "execution failed") + "\n" + output[-12000:])
     return output
@@ -93,7 +105,7 @@ def check_namespace_overlays(links):
 
 
 def verify(directory, components, *, dependency_project, policy, store=None, toolchain=DEFAULT_TOOLCHAIN,
-           _audit_request=None, _issue_receipts=True):
+           _audit_request=None, _issue_receipts=True, _export_to=None):
     base = {"format": "slean-verification/0.1-draft.1", "policy": policy,
             "status": "unsupported", "receipts": [], "results": []}
     if policy != POLICY:
@@ -102,7 +114,7 @@ def verify(directory, components, *, dependency_project, policy, store=None, too
         directory, dependency_project, toolchain = map(lambda p: Path(p).resolve(strict=True),
                                                       (directory, dependency_project, toolchain))
         return _verify(directory, components, dependency_project, toolchain, store, base,
-                       _audit_request, _issue_receipts)
+                       _audit_request, _issue_receipts, _export_to)
     except (UnsupportedBoundary, FileNotFoundError) as error:
         return {**base, "reason": str(error)}
     except (RuntimeError, ValueError) as error:
@@ -113,7 +125,7 @@ def verify(directory, components, *, dependency_project, policy, store=None, too
         return {**base, "reason": "Receiver tool or environment is unavailable: " + str(error)}
 
 
-def _verify(directory, identifiers, dependency_project, toolchain, store, base, audit_request, issue_receipts):
+def _verify(directory, identifiers, dependency_project, toolchain, store, base, audit_request, issue_receipts, export_to):
     if os.getuid() == 0:
         raise UnsupportedBoundary("Run receiver verification without root privileges")
     if store and store.directory.resolve().is_relative_to(directory):
@@ -188,6 +200,8 @@ def _verify(directory, identifiers, dependency_project, toolchain, store, base, 
             raise UnsupportedBoundary("Installed import artifacts differ: " + name)
         artifacts[name] = compiled
     tools = {"lean": toolchain / "bin/lean", "leanchecker": toolchain / "bin/leanchecker", "auditor": AUDITOR}
+    if export_to is not None:
+        tools["native_comparison"] = HERE / ".lake/build/bin/slean_compare"
     for binary in tools.values():
         if not binary.is_file():
             raise UnsupportedBoundary("Missing receiver verification tool: " + str(binary))
@@ -199,6 +213,9 @@ def _verify(directory, identifiers, dependency_project, toolchain, store, base, 
         implementation_hashes[str((LEAN / name).relative_to(ROOT))] = file_digest(LEAN / name)
     if audit_request is not None:
         implementation_hashes[str((HERE / "reviewed_applications.py").relative_to(ROOT))] = file_digest(HERE / "reviewed_applications.py")
+    if export_to is not None:
+        for name in ("SleanCompare.lean", "unreviewed.py"):
+            implementation_hashes[str((HERE / name).relative_to(ROOT))] = file_digest(HERE / name)
     limits = current_limits()
     with tempfile.TemporaryDirectory(prefix="slean-reviewed-") as temporary:
         workspace = Path(temporary).resolve()
@@ -214,7 +231,7 @@ def _verify(directory, identifiers, dependency_project, toolchain, store, base, 
                 (build / module_path(name)).parent.mkdir(parents=True, exist_ok=True)
         overlays = stage_namespace_overlays(modules, ordered, artifacts, dependency_sources, source, build)
         # Receiver key and original module directory are never readable by builds.
-        readable = [source, build, toolchain, AUDITOR.parent, *caches]
+        readable = [source, build, toolchain, *(binary.parent for binary in tools.values()), *caches]
         system_roots = [Path(path) for path in ("/usr", "/System/Library", "/System/Cryptexes",
             "/Library/Developer", "/private/preboot", "/private/var/db/dyld")]
         if store and any(store.directory.resolve().is_relative_to(path.resolve()) for path in [*readable, *system_roots]):
@@ -223,9 +240,10 @@ def _verify(directory, identifiers, dependency_project, toolchain, store, base, 
             "LEAN_PATH": os.pathsep.join(map(str, [build, *sorted(caches)])),
             "LEAN_SRC_PATH": os.pathsep.join(map(str, [source, *sorted(source_paths)])),
             "LEAN_ABORT_ON_PANIC": "1", "LEAN_NUM_THREADS": "2"}
-        def execute(arguments, label, writable=()):
+        def execute(arguments, label, writable=(), output_bytes=4 * 1024 * 1024, output_file=None):
             return run_step(arguments, directory=source, readable=readable, writable=writable,
-                            environment=environment, limits=limits, label=label)
+                            environment=environment, limits=limits, label=label,
+                            output_bytes=output_bytes, output_file=output_file)
         version = execute([tools["lean"], "--version"], "toolchain").strip()
         if not version.startswith("Lean (version 4.34.1,"):
             raise UnsupportedBoundary("Receiver toolchain is not Lean 4.34.1")
@@ -249,6 +267,13 @@ def _verify(directory, identifiers, dependency_project, toolchain, store, base, 
                 raise ValueError("Invalid receiver-owned auxiliary audit request")
             request_data.update(audit_request)
         request.write_bytes(canonical(request_data))
+        proof_export = None
+        if export_to is not None:
+            # The child can only emit bytes. The receiver saves them outside all
+            # candidate execution roots for a separate trusted-statement check.
+            execute([tools["native_comparison"], "export", request], "native proof export",
+                    output_bytes=512 * 1024 * 1024, output_file=export_to)
+            proof_export = {"sha256": file_digest(export_to), "size": str(Path(export_to).stat().st_size)}
         audit = json.loads(execute([AUDITOR, request], "native audit"))
         check_namespace_overlays(overlays)
         actual_modules = {item["module"]: item for item in audit["modules"]}
@@ -307,6 +332,7 @@ def _verify(directory, identifiers, dependency_project, toolchain, store, base, 
             "subject_module": manifest["id"], "results": results, "receipts": receipts,
             "environment": environment_record, "rebuilt_modules": rebuilt, "limits": limits,
             **({"native_audit": audit} if audit_request is not None else {}),
+            **({"proof_export": proof_export} if export_to is not None else {}),
             "limitations": ["Reviewed source/build inputs and exact installed imports are trusted",
                 "No hard memory or aggregate disk/job quota on this macOS backend",
                 "Component proofs only; application captures are not receiver-verified",

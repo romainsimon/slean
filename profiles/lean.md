@@ -65,8 +65,13 @@ recorded proof dependencies, not claims about all possible derivations.
 and reviewed source/build inputs. A receipt must bind the exact module,
 component/application, statement, dependency environment and artifacts.
 Missing source/dependencies, `sorryAx`, new axioms or changed statements prevent
-a passing result. The unreviewed-contribution policy stays unsupported until
-the isolated execution and separately trusted statement path are implemented.
+a passing result. The unreviewed-contribution policy requires isolated execution and an
+independently selected reference statement. Its
+[local component operation](../packages/lean/verification/UNREVIEWED.md) reconstructs
+that reference before the candidate, compares their complete native exports
+with pinned Comparator and replays the solution in Lean. Missing tools or an
+unsupported path cannot downgrade to a compilation badge. Definition holes
+and unreviewed application-capture fidelity remain unsupported.
 
 The reference receiver rebuilds local source payloads and replays those modules
 with Lean's bundled checker. Exact installed dependency binaries remain

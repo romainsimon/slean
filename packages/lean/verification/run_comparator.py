@@ -28,9 +28,10 @@ MAX_LOG_BYTES = 4 * 1024 * 1024
 TOOLCHAIN = "leanprover/lean4:v4.34.1"
 
 
-def bounded_output(process, timeout, *, max_bytes=MAX_LOG_BYTES):
+def bounded_output(process, timeout, *, max_bytes=MAX_LOG_BYTES, sink=None):
     """Bound captured diagnostics and wall time, including inherited pipes."""
     output = bytearray()
+    seen_bytes = 0
     deadline = time.monotonic() + timeout
     reason = None
     with selectors.DefaultSelector() as selector:
@@ -45,8 +46,12 @@ def bounded_output(process, timeout, *, max_bytes=MAX_LOG_BYTES):
                 if not block:
                     selector.unregister(key.fileobj)
                     continue
-                available = max_bytes - len(output)
-                output.extend(block[:available])
+                available = max_bytes - seen_bytes
+                if sink is None:
+                    output.extend(block[:available])
+                else:
+                    sink.write(block[:available])
+                seen_bytes += min(len(block), available)
                 if len(block) > available:
                     reason = "output_limit"
                     break
