@@ -1,0 +1,14 @@
+name = "slean_calibration_example"
+version = "0.1.0"
+defaultTargets = ["CalibrationApplication"]
+
+[[require]]
+name = "slean_export"
+path = "../../../packages/lean"
+
+[[require]]
+name = "direct_reuse"
+path = "../direct-lean"
+
+[[lean_lib]]
+name = "CalibrationApplication"

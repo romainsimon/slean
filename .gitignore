@@ -16,6 +16,8 @@
 /packages/lean/verification/.lake/
 /examples/reuse/with-slean-lean/.lake/
 /examples/reuse/with-slean-lean/_out/
+/examples/reuse/with-slean-calibration/.lake/
+/examples/reuse/with-slean-calibration/_out/
 /site/.lake/
 /site/_out/
 /site/node_modules/
