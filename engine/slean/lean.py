@@ -23,7 +23,18 @@ def _ints(values) -> str:
     return "[" + ", ".join(str(v) for v in values) + "]"
 
 
-def theorem(name: str, ca: CA, claim: Claim, verdict: Verdict) -> str:
+def travel_theorem(name: str, ca: CA, claim, verdict: Verdict) -> str:
+    from .worlds.structures import padded
+
+    world = f"({ca.lean()})"
+    cells = _ints(padded(claim.block, claim.q, ca.s, claim.t))
+    neg = "" if verdict.status == "certified" else "¬ "
+    return f"theorem {name} : {neg}Travels {world} {cells} {claim.t} {claim.d} := by decide +kernel\n"
+
+
+def theorem(name: str, ca: CA, claim, verdict: Verdict) -> str:
+    if getattr(claim, "kind", "") == "structure":
+        return travel_theorem(name, ca, claim, verdict)
     world = f"({ca.lean()})"
     density = f"(tableFn {ca.k} {_ints(claim.f)})"
     if verdict.status == "certified":
@@ -43,7 +54,7 @@ def theorem(name: str, ca: CA, claim: Claim, verdict: Verdict) -> str:
 
 def module(name: str, theorems: list[str], doc: str) -> str:
     header = (
-        "import Slean.World.CellularAutomaton\n\n"
+        "import Slean.World.Structures\n\n"
         f"/-! {doc} -/\n\n"
         "set_option maxRecDepth 100000\n\n"
         f"namespace Slean.{name}\n\n"

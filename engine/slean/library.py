@@ -42,6 +42,7 @@ class Library:
         self.bricks: list[Brick] = []
         self._spans: dict[str, list[list[Fraction]]] = {}
         self._seen: set[tuple] = set()
+        self._classes: dict[str, set[tuple]] = {}
 
     # ---- recording ---------------------------------------------------------
 
@@ -54,33 +55,61 @@ class Library:
             self._spans[world] = list(trivial_densities(ca.k, self.max_width))
         return self._spans[world]
 
+    @staticmethod
+    def _key(claim) -> tuple:
+        if getattr(claim, "kind", "") == "structure":
+            return ("structure", claim.world, claim.q, claim.block, claim.t, claim.d)
+        return (claim.world, claim.w, claim.f)
+
+    @staticmethod
+    def structure_class(verdict: Verdict, claim) -> tuple:
+        return (claim.q, verdict.extra["period"], verdict.extra["velocity"])
+
+    def structure_classes(self, world: str) -> set[tuple]:
+        return self._classes.setdefault(world, set())
+
     def is_novel(self, claim: Claim) -> bool:
+        if getattr(claim, "kind", "") == "structure":
+            return True  # decided after verification, from the species class
         ca = self.worlds[claim.world]
         span = self._span(claim.world)
         v = embed(list(claim.f), ca.k, claim.w, self.max_width)
         n = ca.k**self.max_width
         return linalg.rank(span + [v], n) > linalg.rank(span, n)
 
-    def record(self, claim: Claim, verdict: Verdict, provenance: dict) -> Brick:
+    def record(self, claim, verdict: Verdict, provenance: dict) -> Brick:
+        if getattr(claim, "kind", "") == "structure":
+            novel = False
+            if verdict.status == "certified":
+                cls = self.structure_class(verdict, claim)
+                known = self.structure_classes(claim.world)
+                novel = cls not in known
+                known.add(cls)
+            brick = Brick(f"b{len(self.bricks):05d}", claim, verdict, novel, provenance)
+            self.bricks.append(brick)
+            self._seen.add(self._key(claim))
+            return brick
         novel = verdict.status == "certified" and self.is_novel(claim)
         if novel:
             ca = self.worlds[claim.world]
             self._span(claim.world).append(embed(list(claim.f), ca.k, claim.w, self.max_width))
         brick = Brick(f"b{len(self.bricks):05d}", claim, verdict, novel, provenance)
         self.bricks.append(brick)
-        self._seen.add((claim.world, claim.w, claim.f))
+        self._seen.add(self._key(claim))
         return brick
 
-    def seen(self, claim: Claim) -> bool:
-        return (claim.world, claim.w, claim.f) in self._seen
+    def seen(self, claim) -> bool:
+        return self._key(claim) in self._seen
 
     # ---- queries -------------------------------------------------------------
 
-    def certified(self, world: str | None = None) -> list[Brick]:
+    def certified(self, world: str | None = None, kind: str = "conservation") -> list[Brick]:
         return [
             b
             for b in self.bricks
-            if b.verdict.status == "certified" and (world is None or b.claim.world == world)
+            if b.verdict.status == "certified"
+            and b.claim.kind == kind
+            and (world is None or b.claim.world == world)
         ]
 
     def discovered_dim(self, world: str) -> int:
@@ -103,9 +132,10 @@ class Library:
     def lean_module(self, name: str, doc: str, include_refuted: bool = True) -> str:
         theorems = []
         for b in self.bricks:
-            if b.verdict.status == "certified" and b.novel or (
-                include_refuted and b.verdict.status == "refuted"
-            ):
+            refuted_with_proof = b.verdict.status == "refuted" and (
+                b.verdict.witness is not None or getattr(b.claim, "kind", "") == "structure"
+            )
+            if b.verdict.status == "certified" and b.novel or (include_refuted and refuted_with_proof):
                 ca = self.worlds[b.claim.world]
                 ident = lean.lean_ident(f"{b.claim.world}_{b.id}")
                 theorems.append(lean.theorem(ident, ca, b.claim, b.verdict))

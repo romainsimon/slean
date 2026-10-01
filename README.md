@@ -62,7 +62,14 @@ python3 -m unittest discover -s tests               # engine + Lean agreement te
 python3 -m slean check 184 1 0,1                    # is the number of cars conserved by rule 184?
 python3 -m slean explore --explorer datafit --lean  # explore hidden worlds, kernel-check results
 python3 -m slean transfer --explorer library        # cold vs library-warm discovery
+
+# A lab for autonomous agents: metered experiments, verified proposals, hidden scoring
+python3 -m slean lab init --dir /tmp/lab --mode blackbox --proposals 60 --cells 200000
+python3 -m slean lab baseline --dir /tmp/lab-ref     # scripted reference scientist, same budget
+python3 -m slean lab run --dir /tmp/lab --agent claude --model sonnet --max-usd 3
 ```
+
+A lab is the interface Mutome (or Claude Code, Codex, or a person) uses to do research. The task description and a `./lab` command are the only things inside the lab directory. The hidden answers stay outside it. Every experiment and proposal is metered and logged, and the run is scored and its results kernel-checked afterwards.
 
 ## Read next
 

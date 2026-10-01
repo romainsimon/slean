@@ -30,6 +30,28 @@ class Claim:
         return {"kind": self.kind, "world": self.world, "w": self.w, "f": list(self.f)}
 
 
+@dataclass(frozen=True)
+class Travel:
+    """"``block`` on background ``q`` reappears after ``t`` steps, shifted by ``d``"."""
+
+    world: str
+    q: int
+    block: tuple[int, ...]
+    t: int
+    d: int
+    kind: str = "structure"
+
+    def to_json(self) -> dict:
+        return {
+            "kind": self.kind,
+            "world": self.world,
+            "background": self.q,
+            "block": list(self.block),
+            "t": self.t,
+            "d": self.d,
+        }
+
+
 @dataclass
 class Verdict:
     # certified: conserved, with a current (flux) certificate
@@ -89,8 +111,33 @@ def is_trivial(k: int, w: int, f) -> bool:
     return linalg.rank(t + [embed(list(f), k, w, w)], n) == linalg.rank(t, n)
 
 
-def verify(ca: CA, claim: Claim, rng: random.Random | None = None) -> Verdict:
+MAX_BLOCK, MAX_PERIOD = 24, 24
+
+
+def verify_travel(ca: CA, claim: Travel) -> Verdict:
+    from .worlds import structures
+
+    if not (1 <= claim.t <= MAX_PERIOD and 1 <= len(claim.block) <= MAX_BLOCK):
+        return Verdict("invalid", reason=f"need 1 <= t <= {MAX_PERIOD} and 1..{MAX_BLOCK} cells")
+    if not 0 <= claim.q < ca.k or any(not 0 <= a < ca.k for a in claim.block):
+        return Verdict("invalid", reason="states out of range")
+    if claim.q not in structures.quiescent_states(ca):
+        return Verdict("invalid", reason="background state is not quiescent")
+    if all(a == claim.q for a in claim.block):
+        return Verdict("trivial", reason="empty pattern")
+    if not structures.check(ca, claim.block, claim.q, claim.t, claim.d):
+        return Verdict("refuted", reason="pattern does not reappear with that shift")
+    sp = structures.species(ca, claim.block, claim.q, claim.t)
+    return Verdict(
+        "certified",
+        extra={"period": sp.period, "velocity": str(sp.velocity), "shape": list(sp.shape)},
+    )
+
+
+def verify(ca: CA, claim, rng: random.Random | None = None) -> Verdict:
     rng = rng or random.Random(0)
+    if isinstance(claim, Travel):
+        return verify_travel(ca, claim)
     if claim.kind != "conservation":
         return Verdict("invalid", reason=f"unsupported claim kind {claim.kind!r}")
     if not 1 <= claim.w <= MAX_WIDTH:
