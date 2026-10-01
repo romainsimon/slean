@@ -129,7 +129,7 @@ def main(argv=None) -> int:
     p = sub.add_parser("lab", help="create, run or score an agent lab")
     p.add_argument("action", choices=["init", "run", "baseline", "score"])
     p.add_argument("--dir", required=True)
-    p.add_argument("--suite", default="hidden", choices=["hidden", "eca"])
+    p.add_argument("--suite", default="hidden", choices=["hidden", "eca", "compressible"])
     p.add_argument("--suite-seed", type=int, default=7)
     p.add_argument("--mode", default="whitebox", choices=["whitebox", "blackbox"])
     p.add_argument("--proposals", type=int, default=60)

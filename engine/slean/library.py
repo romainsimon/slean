@@ -57,6 +57,8 @@ class Library:
 
     @staticmethod
     def _key(claim) -> tuple:
+        if getattr(claim, "kind", "") == "mechanism":
+            return ("mechanism", claim.world, claim.table)
         if getattr(claim, "kind", "") == "structure":
             return ("structure", claim.world, claim.q, claim.block, claim.t, claim.d)
         return (claim.world, claim.w, claim.f)
@@ -68,7 +70,12 @@ class Library:
     def structure_classes(self, world: str) -> set[tuple]:
         return self._classes.setdefault(world, set())
 
+    def mechanisms(self) -> set[str]:
+        return {b.claim.world for b in self.bricks if b.claim.kind == "mechanism" and b.novel}
+
     def is_novel(self, claim: Claim) -> bool:
+        if getattr(claim, "kind", "") == "mechanism":
+            return claim.world not in self.mechanisms()
         if getattr(claim, "kind", "") == "structure":
             return True  # decided after verification, from the species class
         ca = self.worlds[claim.world]
@@ -78,6 +85,12 @@ class Library:
         return linalg.rank(span + [v], n) > linalg.rank(span, n)
 
     def record(self, claim, verdict: Verdict, provenance: dict) -> Brick:
+        if getattr(claim, "kind", "") == "mechanism":
+            novel = verdict.status == "certified" and claim.world not in self.mechanisms()
+            brick = Brick(f"b{len(self.bricks):05d}", claim, verdict, novel, provenance)
+            self.bricks.append(brick)
+            self._seen.add(self._key(claim))
+            return brick
         if getattr(claim, "kind", "") == "structure":
             novel = False
             if verdict.status == "certified":
@@ -135,6 +148,8 @@ class Library:
             refuted_with_proof = b.verdict.status == "refuted" and (
                 b.verdict.witness is not None or getattr(b.claim, "kind", "") == "structure"
             )
+            if b.claim.kind == "mechanism":
+                continue  # exact table comparison; no Lean statement
             if b.verdict.status == "certified" and b.novel or (include_refuted and refuted_with_proof):
                 ca = self.worlds[b.claim.world]
                 ident = lean.lean_ident(f"{b.claim.world}_{b.id}")
