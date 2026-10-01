@@ -60,14 +60,16 @@ Every milestone ends with a measurement. When an explorer fails to beat the gene
 - A Python engine with verifier, library, explorers and the cold/warm benchmark.
 - **Finding:** additive conservation laws in 1D are solved by data fitting (20/20 hidden laws in 24 proposals). The class calibrates the machinery but cannot demonstrate discovery.
 
-### M2: Discovery types without a recipe
+### M2: Discovery types without a recipe (in progress)
 
-- **Metered world access.** Cell updates and tokens are counted alongside proposals.
-- **Gliders and periodic structures.** Localised patterns that repeat with a shift. Exact witnesses are kernel-checked, the search space is combinatorial, and the answer is known within bounds and open beyond them.
+- **Done:** metered labs. Any agent works through `./lab` (experiments, checks, proposals). Cell updates, proposals, tokens and cost are counted; hidden answers stay outside the lab; transcripts are audited; results are exported to Lean.
+- **Done:** localised structures (particles, gliders, oscillators) as a second discovery type, with kernel-checked witnesses and refutations.
+- **Done:** a scripted reference scientist that uses exactly the agent's interface and budget.
 - **Reversibility.** An inverse-rule certificate when the rule is reversible, a collision when it is not.
 - **Isomorphisms as bricks.** "World B is world A relabelled" plus a Lean transport theorem, so one discovered relation proves every law of A again for B. This is the first real dependency between bricks.
 - **Open-ended allocation.** The explorer chooses the world, the claim type and the effort. Delayed usefulness is scored by how many later results depend on a brick.
 - **LLM and evolutionary explorers** measured over several suite seeds against `datafit` and brute force at equal metered cost.
+- **Open claim types.** The agent defines its own decidable properties in Lean and submits them. Their interest is judged by later use (Germinal), because in an open-ended setting the explorer chooses the question and not only the answer. This is where systematic search stops being enough.
 
 ### M3: Mutome runs on Slean
 
