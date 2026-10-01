@@ -1,0 +1,35 @@
+# Intended location: .github/workflows/check.yml (the agent token lacks the workflow scope).
+# Replaces .github/workflows/site-runtime.yml, which builds the removed Docker site.
+
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lean-and-engine:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Lean
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Kernel-check the core and the library
+        run: lake build
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Library is reproducible from the engine
+        run: |
+          cd engine && python -m slean.publish
+          git diff --exit-code -- ../Slean/Library ../library
+      - name: Engine and Lean agreement tests
+        run: cd engine && python -m unittest discover -s tests -v
