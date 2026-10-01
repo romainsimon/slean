@@ -1,0 +1,28 @@
+{
+ "lab_id": "20261001-031501-02abbc",
+ "mode": "blackbox",
+ "used": {
+  "proposals": 88,
+  "cell_updates": 199748
+ },
+ "budget": {
+  "proposals": 200,
+  "cell_updates": 200000
+ },
+ "verdicts": {
+  "certified": 88
+ },
+ "conservation": {
+  "found": 20,
+  "hidden": 20
+ },
+ "structures": {
+  "found": 68,
+  "hidden_within_bounds": 70,
+  "beyond_bounds": 0,
+  "bounds": {
+   "width": 7,
+   "period": 8
+  }
+ }
+}
