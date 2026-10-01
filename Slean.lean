@@ -1,3 +1,4 @@
-import Slean.Core
-import Slean.Export
-import Slean.Proof
+import Slean.Basic
+import Slean.World.CellularAutomaton
+import Slean.Library.ElementaryConservation
+import Slean.World.Structures

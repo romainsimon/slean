@@ -1,73 +1,93 @@
 <h1 align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="site/assets/brand/slean-white.svg">
-    <source media="(prefers-color-scheme: light)" srcset="site/assets/brand/slean-dark.svg">
-    <img src="site/assets/brand/slean-dark.svg" alt="Slean" width="148">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/slean-white.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/brand/slean-dark.svg">
+    <img src="assets/brand/slean-dark.svg" alt="Slean" width="148">
   </picture>
 </h1>
 
 <p align="center">
-  Make every research decision traceable.
+  Verifiable worlds, a kernel-checked library, and a way to measure whether an AI actually discovers anything.
 </p>
 
-<p align="center">
-  <img src="assets/slean-readme-banner.png" alt="A research record flowing from branching evidence through proof-like marks to a checked result." width="100%">
-</p>
+> **Status:** research engine, version 0.2. Private repository. One world class (cellular automata) and two discovery types (conservation laws and localised structures). This is the foundation that [Mutome](https://mutome.com) will run on. It is not yet a claim of open-ended discovery.
 
-> **Status:** Early, local V0 research prototype. The repository is private; no public license or contribution guide is available.
+## Why
 
-A structured decision record brings together observations, assumptions, rules, and conclusions. Slean checks that the record is consistent—including references, event order, units, and exact thresholds—and replays it so readers can see which recorded inputs led to each conclusion. It checks traceability and consistency; it does not establish whether measurements or external scientific claims are true.
+AI is moving mathematics forward largely because of [Lean](https://lean-lang.org): a model can attempt thousands of proofs, and the kernel accepts only correct ones. Every accepted result becomes a brick that later work can build on, and the list of open statements shows where the frontier is.
 
-## What it checks
+Science has no such kernel. A plausible paragraph and a true law look the same until someone checks. Slean builds the equivalent piece by piece:
 
-- IDs, references, event order, causal timing, units, exact-decimal threshold rules, and recorded cost caps.
-- Journal prefixes and audience-filtered JSON exports, so a reader can inspect only the records visible to that audience.
-- Source-trace links between manifests, protocols, events, and recorded outcomes. Imported external assessments remain `external_unverified` unless Slean itself can compute the narrow local rule.
+1. **Worlds** whose laws are defined exactly in Lean. Agents explore them by simulation. A finding cannot come from a simulator bug, because the Lean definition *is* the world.
+2. **Claims with certificates.** A discovery is accepted only when it comes with a finite certificate that the Lean kernel checks. Refutations come with a concrete counterexample, also kernel-checked.
+3. **A library** of everything accepted or refuted, kept as Lean theorems. It is the memory that later research reuses.
+4. **Measurement.** Discovery is scored on procedurally generated worlds with a hidden answer that no model has seen. It is compared with simple baselines at equal cost, and with and without the library.
 
-## A small example
+Mutome decides what to explore. Slean says what is true, keeps it, and measures whether the exploring helped.
 
-The synthetic case in [`examples/valid.json`](examples/valid.json) freezes a `>= 0.001` rule, records a measurement of `0.002` and a cost of `2.50 cpu_s` under a `10.00 cpu_s` cap, then records `pass` and `promote`.
+## What works today
+
+**A theorem that turns a local certificate into a global law.** [`Slean/World/CellularAutomaton.lean`](Slean/World/CellularAutomaton.lean) proves `conserved_of_fluxCheck`. If a density `ρ` and a current `J` satisfy the discrete continuity equation `ρ(step x)ᵢ − ρ(x)ᵢ = Jᵢ − Jᵢ₊₁` on every local pattern, then the total of `ρ` is conserved for **every** lattice size and configuration. That local check is finite, so `decide` settles it in the kernel. Only the standard axioms are used.
+
+**A kernel-checked library.** [`Slean/Library/ElementaryConservation.lean`](Slean/Library/ElementaryConservation.lean) contains all 84 conservation laws of width ≤ 3 of the 256 elementary cellular automata, up to trivial ones, across 66 rules. Each law is proved for all lattice sizes. `lake build` re-checks all of them in about 20 seconds.
+
+**A discovery loop and a benchmark.** [`engine/`](engine/) is plain Python with no dependencies:
+
+```
+propose (explorer) → verify (counterexample search or flux certificate) → record (library) → Lean kernel
+```
+
+It has five explorers: `random`, `datafit` (exact regression on simulated data), `library` (data fitting plus reuse of laws across structurally related worlds), `oracle` (knows the theory), and `llm` (a language model reading the rules and the feedback).
+
+## First measurements and what they mean
+
+All measurements are on generated worlds no model has seen, scored against a hidden answer. They are kernel-checked, and negative results are included.
+
+**1. Conservation laws alone are a solved class.** [Details](docs/results/2026-10-01-conservation.md). On 16 hidden worlds with 20 hidden laws:
+
+- random proposals find 3/20 in 40 proposals;
+- exact data fitting finds 20/20 in 24 proposals;
+- a language model reasoning without tools finds 14/20.
+
+This class calibrates the machinery. It cannot demonstrate discovery.
+
+**2. An autonomous agent in a metered lab beats a scripted reference scientist.** [Details](docs/results/2026-10-01-labs.md). The rules are hidden, and experiments are the only access, with a budget of 200 proposals and 200k simulated cell updates.
+
+| Seed | | Laws | Structures | Beyond search bounds | False claims | Experiments (cell updates) |
+|---|---|---|---|---|---|---|
+| 7 | scripted reference | 20/20 | 68/70 | 0 | 0 | 199,748 |
+| 7 | Claude Sonnet agent | 20/20 | 70/70 | 0 | 0 | 888 |
+| 11 | scripted reference | 18/18 | 75/87 | 0 | 0 | 199,802 |
+| 11 | Claude Sonnet agent | 18/18 | 78/87 | 2 | 0 | 1,277 |
+
+The agent designed de Bruijn experiments that reveal each world's rule in one run, then derived the rest by computation. Each run cost about $0.43.
+
+The honest reading: the loop and the measurement work, and a general agent behaves like a competent scientist here. But these worlds can be identified completely with one experiment, so this is not yet open-ended discovery. The next worlds must make inferring the law itself hard: partial observation, noise, large state spaces. Questions must also come without a prescribed form.
+
+## Quick start
+
+Requires [Lean via elan](https://lean-lang.org/install/) and Python ≥ 3.11.
 
 ```sh
-lake exe slean validate examples/valid.json
+lake build                                          # kernel-checks the core and the library
+cd engine
+python3 -m unittest discover -s tests               # engine + Lean agreement tests
+python3 -m slean check 184 1 0,1                    # is the number of cars conserved by rule 184?
+python3 -m slean explore --explorer datafit --lean  # explore hidden worlds, kernel-check results
+python3 -m slean transfer --explorer library        # cold vs library-warm discovery
+
+# A lab for autonomous agents: metered experiments, verified proposals, hidden scoring
+python3 -m slean lab init --dir /tmp/lab --mode blackbox --proposals 60 --cells 200000
+python3 -m slean lab baseline --dir /tmp/lab-ref     # scripted reference (after its own lab init)
+python3 -m slean lab run --dir /tmp/lab --agent claude --model sonnet --max-usd 3
 ```
 
-```json
-{"case_id":"synthetic-decision-1","events":10,"ok":true}
-```
+A lab is the interface Mutome (or Claude Code, Codex, or a person) uses to do research. The task description and a `./lab` command are the only things inside the lab directory. The hidden answers stay outside it. Every experiment and proposal is metered and logged, and the run is scored and its results kernel-checked afterwards.
 
-These values are synthetic. A local `pass` means the encoded rule passed for its cited record; it is not evidence that a real-world claim is true.
+## Read next
 
-The equivalent [typed Lean example](examples/Synthetic.lean) is synthetic too. The [UCI Bike Sharing example](examples/uci-bike-sharing/) is a separate retrospective teaching comparison on CC BY 4.0 public data. Its protocol was authored for Slean and frozen before the recorded evaluation. Slean validates the recorded case but does not independently hash the source or recompute the reported MAE. The [Verso manual](site/README.md) walks through the example and its limits.
+- [Vision and roadmap](docs/VISION.md): from calibration worlds to physics, engineering and biology, and how Mutome uses Slean
+- [How we measure discovery](docs/MEASUREMENT.md): the rules that keep the benchmark honest
+- [Results](docs/results/): dated measurements, including negative ones
 
-## Quickstart
-
-Install Lean using the [official setup guide](https://lean-lang.org/install/). The [`lean-toolchain`](lean-toolchain) file pins Lean 4.28.0, which `elan` selects for this project.
-
-With access to this private repository, clone it and run the validator from the repository root:
-
-```sh
-git clone https://github.com/romainsimon/slean.git
-cd slean
-lake build
-lake exe slean validate examples/valid.json
-```
-
-Run the local build and test checks with:
-
-```sh
-bash tests/check.sh
-```
-
-## Maturity and limits
-
-This is a local research prototype, not a general scientific evaluator or released software package. The [Gate V retest](docs/gate-v-retest.md) supports continuing a bounded structural prototype; representative reviewer value remains unmeasured. Slean does not execute experiments, recompute an external multi-observation assessment, or certify measurements, evaluators, human decisions, or scientific claims.
-
-## Further reading
-
-- [Product scope](PRODUCT.md)
-- [Architecture and trust boundary](ARCHITECTURE.md)
-- [Versioned schemas](schema/README.md)
-- [Verso manual and local build](site/README.md)
-- [Local Explorer prototype](explorer/README.md)
-- [Gate V retest and evidence limits](docs/gate-v-retest.md)
+The previous dossier validator and open-standard work are archived under the git tags `archive/dossier-v0` and `archive/open-standard-pr35`.
