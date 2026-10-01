@@ -80,3 +80,32 @@ def integral(v: Vector) -> list[int]:
     if lead < 0:
         ints = [-x for x in ints]
     return ints
+
+
+# ---- modular arithmetic (fast dimensions for large systems) ------------------
+
+PRIME = 2_147_483_647  # 2^31 - 1
+
+
+def rank_mod(rows: list[list[int]], ncols: int, p: int = PRIME) -> int:
+    """Rank over GF(p). Equals the rational rank unless p divides a minor
+    (vanishingly unlikely for small integer matrices; cross-checked in tests)."""
+    m = [[x % p for x in r] for r in rows]
+    rank = 0
+    for c in range(ncols):
+        pivot = next((i for i in range(rank, len(m)) if m[i][c]), None)
+        if pivot is None:
+            continue
+        m[rank], m[pivot] = m[pivot], m[rank]
+        inv = pow(m[rank][c], p - 2, p)
+        prow = [(v * inv) % p for v in m[rank]]
+        m[rank] = prow
+        for i in range(len(m)):
+            if i != rank and m[i][c]:
+                f = m[i][c]
+                row = m[i]
+                m[i] = [(a - f * b) % p for a, b in zip(row, prow)]
+        rank += 1
+        if rank == len(m):
+            break
+    return rank

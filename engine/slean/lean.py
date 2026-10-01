@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 
 from .verify import Claim, Verdict
-from .worlds.ca import CA
+from .worlds.ca import CA, lean_fn
 
 REPO = Path(__file__).resolve().parents[2]
 
@@ -36,9 +36,9 @@ def theorem(name: str, ca: CA, claim, verdict: Verdict) -> str:
     if getattr(claim, "kind", "") == "structure":
         return travel_theorem(name, ca, claim, verdict)
     world = f"({ca.lean()})"
-    density = f"(tableFn {ca.k} {_ints(claim.f)})"
+    density = lean_fn(ca.k, claim.f)
     if verdict.status == "certified":
-        current = f"(tableFn {ca.k} {_ints(ca.lift_flux(verdict.flux, claim.w))})"
+        current = lean_fn(ca.k, ca.lift_flux(verdict.flux, claim.w))
         return (
             f"theorem {name} : Conserved {world} {density} {claim.w} :=\n"
             f"  conserved_of_fluxCheck _ _ {current} {claim.w} (by decide +kernel)\n"
@@ -54,7 +54,7 @@ def theorem(name: str, ca: CA, claim, verdict: Verdict) -> str:
 
 def module(name: str, theorems: list[str], doc: str) -> str:
     header = (
-        "import Slean.World.Structures\n\n"
+        "import Slean.Packed\n\n"
         f"/-! {doc} -/\n\n"
         "set_option maxRecDepth 100000\n\n"
         f"namespace Slean.{name}\n\n"

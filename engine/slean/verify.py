@@ -52,6 +52,18 @@ class Travel:
         }
 
 
+@dataclass(frozen=True)
+class Mechanism:
+    """"``table`` is exactly the rule of ``world``" (the whole law, identified)."""
+
+    world: str
+    table: tuple[int, ...]
+    kind: str = "mechanism"
+
+    def to_json(self) -> dict:
+        return {"kind": self.kind, "world": self.world, "table": list(self.table)}
+
+
 @dataclass
 class Verdict:
     # certified: conserved, with a current (flux) certificate
@@ -134,8 +146,23 @@ def verify_travel(ca: CA, claim: Travel) -> Verdict:
     )
 
 
+def verify_mechanism(ca: CA, claim: Mechanism) -> Verdict:
+    from .worlds.ca import patterns
+
+    if len(claim.table) != len(ca.table) or any(not 0 <= v < ca.k for v in claim.table):
+        return Verdict("invalid", reason=f"a rule needs {len(ca.table)} entries in 0..{ca.k - 1}")
+    for p, (mine, true) in zip(patterns(ca.k, ca.s + 1), zip(claim.table, ca.table)):
+        if mine != true:
+            # The counterexample is one neighbourhood and what the world really does there.
+            return Verdict("refuted", reason="differs on at least one neighbourhood",
+                           extra={"neighbourhood": list(p), "claimed": mine, "observed": true})
+    return Verdict("certified", reason="identical rule on every neighbourhood")
+
+
 def verify(ca: CA, claim, rng: random.Random | None = None) -> Verdict:
     rng = rng or random.Random(0)
+    if isinstance(claim, Mechanism):
+        return verify_mechanism(ca, claim)
     if isinstance(claim, Travel):
         return verify_travel(ca, claim)
     if claim.kind != "conservation":
