@@ -1,10 +1,6 @@
 name = "Slean"
-version = "0.1.0"
-defaultTargets = ["Slean", "slean"]
+version = "0.2.0"
+defaultTargets = ["Slean"]
 
 [[lean_lib]]
 name = "Slean"
-
-[[lean_exe]]
-name = "slean"
-root = "Main"
