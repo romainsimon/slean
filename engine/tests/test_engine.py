@@ -115,6 +115,10 @@ class Discovery(unittest.TestCase):
 class LeanAgreement(unittest.TestCase):
     """Python certificates must be accepted by the Lean kernel, and forged ones rejected."""
 
+    @classmethod
+    def setUpClass(cls):
+        lean.ensure_built()
+
     def _check(self, theorems):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "Agreement.lean"

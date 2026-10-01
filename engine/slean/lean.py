@@ -70,6 +70,11 @@ def lake() -> str:
     return str(fallback)
 
 
+def ensure_built(timeout: int = 1800) -> None:
+    """Build the Slean library once, so a fresh checkout can check theorems."""
+    subprocess.run([lake(), "build"], cwd=REPO, capture_output=True, text=True, timeout=timeout, check=True)
+
+
 def kernel_check(path: Path, timeout: int = 1800) -> dict:
     """Elaborate a Lean file against the built Slean library."""
     started = time.monotonic()

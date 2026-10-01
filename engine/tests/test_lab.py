@@ -43,6 +43,10 @@ class Structures(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which("lake") or (Path.home() / ".elan/bin/lake").exists(), "Lean not installed")
 class StructuresInLean(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        lean.ensure_built()
+
     def test_kernel_agrees(self):
         ca = eca(184)
         good, bad = Travel("eca-184", 0, (1, 0, 1), 1, 0), Travel("eca-184", 0, (1,), 2, 1)
