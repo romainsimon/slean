@@ -32,7 +32,16 @@ def travel_theorem(name: str, ca: CA, claim, verdict: Verdict) -> str:
     return f"theorem {name} : {neg}Travels {world} {cells} {claim.t} {claim.d} := by decide +kernel\n"
 
 
+def law_theorem(name: str, ca: CA, claim, verdict: Verdict) -> str:
+    from .laws import lean_term
+
+    value = "true" if verdict.status == "certified" else "false"
+    return f"theorem {name} : lawHolds ({ca.lean()}) {lean_term(claim.law)} = {value} := by decide +kernel\n"
+
+
 def theorem(name: str, ca: CA, claim, verdict: Verdict) -> str:
+    if getattr(claim, "kind", "") == "law":
+        return law_theorem(name, ca, claim, verdict)
     if getattr(claim, "kind", "") == "structure":
         return travel_theorem(name, ca, claim, verdict)
     world = f"({ca.lean()})"
@@ -54,7 +63,7 @@ def theorem(name: str, ca: CA, claim, verdict: Verdict) -> str:
 
 def module(name: str, theorems: list[str], doc: str) -> str:
     header = (
-        "import Slean.Packed\n\n"
+        "import Slean.Law\n\n"
         f"/-! {doc} -/\n\n"
         "set_option maxRecDepth 100000\n\n"
         f"namespace Slean.{name}\n\n"

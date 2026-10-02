@@ -64,6 +64,21 @@ class Mechanism:
         return {"kind": self.kind, "world": self.world, "table": list(self.table)}
 
 
+@dataclass(frozen=True)
+class CompactLaw:
+    """"The rule of ``world`` is computed by this short ``law`` on every neighbourhood"."""
+
+    world: str
+    law: object  # slean.laws.Node
+    kind: str = "law"
+
+    def to_json(self) -> dict:
+        from .laws import description_length, to_json
+
+        return {"kind": self.kind, "world": self.world, "law": to_json(self.law),
+                "description_length": description_length(self.law)}
+
+
 @dataclass
 class Verdict:
     # certified: conserved, with a current (flux) certificate
@@ -159,8 +174,27 @@ def verify_mechanism(ca: CA, claim: Mechanism) -> Verdict:
     return Verdict("certified", reason="identical rule on every neighbourhood")
 
 
+def verify_law(ca: CA, claim: CompactLaw) -> Verdict:
+    from .laws import compactness_limit, description_length, evaluate
+    from .worlds.ca import patterns
+
+    size = description_length(claim.law)
+    limit = compactness_limit(len(ca.table))
+    if size > limit:
+        return Verdict("invalid", reason=f"description length {size} exceeds {limit} (a quarter of the rule table)")
+    for p in patterns(ca.k, ca.s + 1):
+        if evaluate(claim.law, p) != ca.loc(p):
+            return Verdict("refuted", reason="the law differs from the world on a neighbourhood",
+                           extra={"neighbourhood": list(p), "law_gives": evaluate(claim.law, p),
+                                  "observed": ca.loc(p), "description_length": size})
+    return Verdict("certified", reason="the law gives the rule on every neighbourhood",
+                   extra={"description_length": size})
+
+
 def verify(ca: CA, claim, rng: random.Random | None = None) -> Verdict:
     rng = rng or random.Random(0)
+    if isinstance(claim, CompactLaw):
+        return verify_law(ca, claim)
     if isinstance(claim, Mechanism):
         return verify_mechanism(ca, claim)
     if isinstance(claim, Travel):
