@@ -50,7 +50,13 @@ class StructuresInLean(unittest.TestCase):
     def test_kernel_agrees(self):
         ca = eca(184)
         good, bad = Travel("eca-184", 0, (1, 0, 1), 1, 0), Travel("eca-184", 0, (1,), 2, 1)
-        theorems = [lean.theorem("good", ca, good, verify(ca, good)), lean.theorem("bad", ca, bad, verify(ca, bad))]
+        # Negative shifts are taken modulo the lattice size, in Python and in the Lean export.
+        n = len(structures.padded((1,), 0, ca.s, 1))
+        good_neg, bad_neg = Travel("eca-184", 0, (1,), 1, -n), Travel("eca-184", 0, (1,), 2, -3)
+        self.assertEqual(verify(ca, good_neg).status, "certified")
+        self.assertEqual(verify(ca, bad_neg).status, "refuted")
+        theorems = [lean.theorem(name, ca, c, verify(ca, c)) for name, c in
+                    (("good", good), ("bad", bad), ("goodneg", good_neg), ("badneg", bad_neg))]
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "T.lean"
             path.write_text(lean.module("T", theorems, "test"))

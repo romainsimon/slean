@@ -27,9 +27,13 @@ def travel_theorem(name: str, ca: CA, claim, verdict: Verdict) -> str:
     from .worlds.structures import padded
 
     world = f"({ca.lean()})"
-    cells = _ints(padded(claim.block, claim.q, ca.s, claim.t))
+    lattice = padded(claim.block, claim.q, ca.s, claim.t)
+    cells = _ints(lattice)
+    # A shift is taken modulo the lattice size (as in the Python check); Lean's
+    # Travels takes a natural number, so write the equivalent shift in [0, n).
+    shift = claim.d % len(lattice)
     neg = "" if verdict.status == "certified" else "¬ "
-    return f"theorem {name} : {neg}Travels {world} {cells} {claim.t} {claim.d} := by decide +kernel\n"
+    return f"theorem {name} : {neg}Travels {world} {cells} {claim.t} {shift} := by decide +kernel\n"
 
 
 def law_theorem(name: str, ca: CA, claim, verdict: Verdict) -> str:
