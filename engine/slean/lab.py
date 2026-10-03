@@ -123,7 +123,15 @@ def _worlds(lab_id: str) -> dict[str, CA]:
     return {w["alias"]: CA(w["k"], w["s"], tuple(w["table"]), name=w["alias"]) for w in data}
 
 
-def init(lab: Path, suite: str, suite_seed: int, mode: str, proposals: int, cells: int) -> dict:
+def init(lab: Path, suite: str, suite_seed: int | None, mode: str, proposals: int, cells: int) -> dict:
+    """Create a lab. ``suite_seed=None`` draws a secret seed: a published generator plus a
+    known seed would let anyone recompute the hidden answers, so held-out measurements use
+    secret seeds. The seed is kept only in the secret directory, for later audit."""
+    if suite_seed is None:
+        suite_seed = secrets.randbelow(2**62)
+        seed_kind = "secret"
+    else:
+        seed_kind = "given"
     if suite == "hidden":
         seen, held = bench.hidden_suite(suite_seed)
         worlds = held
@@ -131,6 +139,8 @@ def init(lab: Path, suite: str, suite_seed: int, mode: str, proposals: int, cell
         worlds = bench.eca_suite()[:32]
     elif suite == "compressible":
         worlds = bench.compressible_suite(suite_seed)
+    elif suite == "novel":
+        worlds = bench.novel_suite(suite_seed)
     else:
         raise SystemExit(f"unknown suite {suite}")
     rng = random.Random(secrets.randbits(64))
@@ -144,6 +154,7 @@ def init(lab: Path, suite: str, suite_seed: int, mode: str, proposals: int, cell
     secret = _secret_dir(lab_id)
     secret.mkdir(parents=True, exist_ok=True)
     (secret / "worlds.json").write_text(json.dumps(aliased, indent=1))
+    (secret / "suite.json").write_text(json.dumps({"suite": suite, "seed": suite_seed, "seed_kind": seed_kind}))
     (lab / ".lab").mkdir(parents=True, exist_ok=True)
     span = worlds[0].s
     max_width = 2 if span <= 2 else 1
@@ -384,8 +395,7 @@ def score(lab: Path, max_width: int = 7, max_period: int = 8) -> dict:
     mechanisms = len(library.mechanisms() | set(library.compact_laws()))
     laws_found = library.compact_laws()
     sources = json.loads((_secret_dir(state["lab_id"]) / "worlds.json").read_text())
-    short_law_worlds = sum(1 for w in sources if w["source"].rsplit("-", 1)[-1]
-                           in ("totalistic", "outer", "linear", "particles"))
+    short_law_worlds = sum(1 for w in sources if w["source"].rsplit("-", 1)[-1] in bench.SHORT_LAW_FAMILIES)
     report = {
         "lab_id": state["lab_id"],
         "mode": state["mode"],

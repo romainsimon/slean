@@ -367,3 +367,82 @@ def compressible_world(family: str, k: int, s: int, rng: random.Random, name: st
     else:
         raise ValueError(family)
     return CA(k, s, _relabelled(k, s, out, rng, disguise), name=name)
+
+
+# ---- novel worlds: short laws outside the textbook families ----
+
+NOVEL_FAMILIES = ("pair", "count", "gated", "product")
+
+
+def novel_world(family: str, k: int, s: int, rng: random.Random, name: str, disguise: bool) -> tuple[CA, dict | None]:
+    """A rule with a short law from a family the compressible suite does not use, and that law.
+
+    ``pair``: an arbitrary table of two non-adjacent cells. ``count``: an arbitrary function of
+    how many cells hold one state. ``gated``: whether one edge cell exceeds another chooses how
+    the centre cell is mapped. ``product``: a quadratic polynomial modulo k. ``random``: no short law. Seen
+    through a secret relabelling of states when ``disguise``; the returned law (JSON, as
+    ``slean.laws`` reads it) then includes the relabelling.
+    """
+    centre = s // 2
+    if family == "random":
+        return CA(k, s, tuple(rng.randrange(k) for _ in range(k ** (s + 1))), name=name), None
+    perm = list(range(k))
+    if disguise:
+        rng.shuffle(perm)
+    inv = [0] * k
+    for a, b in enumerate(perm):
+        inv[b] = a
+
+    def cell(j: int) -> dict:
+        node = {"op": "cell", "j": j}
+        return {"op": "lookup", "table": inv, "a": node} if disguise else node
+
+    def const(c: int) -> dict:
+        return {"op": "const", "c": c}
+
+    if family == "pair":
+        while True:
+            i, j = sorted(rng.sample(range(s + 1), 2))
+            if j - i >= 2:
+                break
+        while True:
+            g = [rng.randrange(k) for _ in range(k * k)]
+            if len({tuple(g[a * k:(a + 1) * k]) for a in range(k)}) > 1 and len({tuple(g[b::k]) for b in range(k)}) > 1:
+                break  # depends on both cells
+        out = lambda c: g[c[i] * k + c[j]]
+        law = {"op": "lookup", "table": g, "a": {"op": "add", "a": {"op": "mul", "a": const(k), "b": cell(i)}, "b": cell(j)}}
+    elif family == "count":
+        t = rng.randrange(k)
+        while True:
+            g = [rng.randrange(k) for _ in range(s + 2)]
+            if len(set(g)) > 1:
+                break
+        out = lambda c: g[sum(1 for x in c if x == t)]
+        hit = [1 if v == t else 0 for v in range(k)]
+        hits = [{"op": "lookup", "table": hit, "a": cell(j)} for j in range(s + 1)]
+        law = {"op": "lookup", "table": g, "a": {"op": "sum", "args": hits}}
+    elif family == "gated":
+        left, right = rng.choice((0, 1)), rng.choice((s, s - 1))
+        while True:
+            g = [rng.randrange(k) for _ in range(2 * k)]
+            if g[:k] != g[k:]:
+                break
+        out = lambda c: g[(c[left] > c[right]) * k + c[centre]]
+        greater = [1 if a > b else 0 for a in range(k) for b in range(k)]
+        gate = {"op": "lookup", "table": greater,
+                "a": {"op": "add", "a": {"op": "mul", "a": const(k), "b": cell(left)}, "b": cell(right)}}
+        law = {"op": "lookup", "table": g, "a": {"op": "add", "a": {"op": "mul", "a": const(k), "b": gate}, "b": cell(centre)}}
+    elif family == "product":
+        i, j = rng.sample(range(s + 1), 2)
+        l = rng.randrange(s + 1)
+        a, b, d = rng.randrange(1, k), rng.randrange(k), rng.randrange(k)
+        out = lambda c: (a * c[i] * c[j] + b * c[l] + d) % k
+        terms = [{"op": "mul", "a": const(a), "b": {"op": "mul", "a": cell(i), "b": cell(j)}},
+                 {"op": "mul", "a": const(b), "b": cell(l)}, const(d)]
+        law = {"op": "mod", "a": {"op": "sum", "args": terms}, "m": k}
+    else:
+        raise ValueError(family)
+    table = tuple(perm[out([inv[x] for x in p])] for p in patterns(k, s + 1))
+    if disguise:
+        law = {"op": "lookup", "table": perm, "a": law}
+    return CA(k, s, table, name=name), law
