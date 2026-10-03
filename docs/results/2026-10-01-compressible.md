@@ -28,7 +28,7 @@
   - It never hypothesised a totalistic, linear or particle law. It stopped after 92 seconds, judging a 1,024-entry table "out of reach".
   - It scored below a brute-force script.
 - **This is the capability Mutome needs, and the place where a harness can show lift:** forming and testing compact hypotheses from little data, and persisting.
-- **Next:** run `run-slean-lift` on this suite across several seeds, with raw against harness arms (lessons, explicit hypothesis-testing strategy, persistence). A harness change is promoted only if it lifts held-out seeds (autoresearch rule 8).
+- **Next:** run `run-slean-lift` on this suite across several seeds, with raw against harness arms (lessons, explicit hypothesis-testing strategy, persistence). A harness change is promoted only if it lifts held-out seeds. Follow-up: [repetitions and compact laws](2026-10-02-compressible-lift.md).
 
 ## Limits
 
