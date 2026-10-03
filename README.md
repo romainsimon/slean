@@ -62,7 +62,7 @@ Every measurement is on generated worlds no model has seen, scored against a hid
 2. **On easy worlds, a Claude Sonnet agent matches a scripted scientist with 150 to 225 times fewer experiments**, and makes no false claim. But one well-chosen experiment reveals each of those rules. [Report](docs/results/2026-10-01-labs.md)
 3. **On compressible worlds, lessons help.** These are 1,024-entry rules that hide a short law, under a tight budget. The agent's own lessons from earlier labs win 8 of 9 repeated pairs, by 6 discoveries per lab on average. They also help it find compact laws: 8, 12 and 8 of 12, against 2, 6 and 5 without. [Report](docs/results/2026-10-02-compressible-lift.md)
 4. **A family-aware script draws level.** A scripted reference that tries the textbook rule families (linear, totalistic) scores 47 to 54 with 9 laws per lab, as well as the agent with lessons. [Report](docs/results/2026-10-03-inductive-reference.md)
-5. **Novel worlds remove that shortcut.** Their laws come from other families, and the same script finds 0 of 12. These worlds can tell induction apart from recall. [Report](docs/results/2026-10-03-novel-suite.md)
+5. **On novel worlds, the agent induces what the script cannot.** Their laws come from other families, with secret seeds. The script finds 0 of 12 laws. The agent finds 30 of 36 alone, and 36 of 36 with its lessons from `compressible`, which carried a technique, not just a family. [Suite](docs/results/2026-10-03-novel-suite.md) · [Report](docs/results/2026-10-03-novel-lift.md)
 
 What this does not show: a discovery about the real world, or a lab that improves itself. These are measurements on synthetic worlds, built to be checked exactly.
 
@@ -110,7 +110,7 @@ python3 -m slean lab score --dir /tmp/lab
 
 Research engine, version 0.2. It has one world class (cellular automata) and four discovery types. Next on the [roadmap](docs/VISION.md):
 
-- agents on novel worlds with secret seeds;
+- harnesses that make agents collect the free follow-ups of what they identify;
 - relations between worlds as reusable bricks;
 - claim types the agent defines itself;
 - worlds closer to physics.
