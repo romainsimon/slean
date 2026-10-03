@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/slean-logo-dark.svg">
-    <img src="assets/brand/slean-logo.svg" alt="Slean" width="240">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/slean-logo-dark.png">
+    <img src="assets/brand/slean-logo.png" alt="Slean" width="240">
   </picture>
 </p>
 
