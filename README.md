@@ -1,93 +1,122 @@
-<h1 align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/slean-wordmark-white.svg">
-    <source media="(prefers-color-scheme: light)" srcset="assets/brand/slean-wordmark.svg">
-    <img src="assets/brand/slean-wordmark.svg" alt="Slean" width="148">
-  </picture>
-</h1>
-
 <p align="center">
-  Verifiable worlds, a kernel-checked library, and a way to measure whether an AI actually discovers anything.
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/slean-logo-dark.png">
+    <img src="assets/brand/slean-logo.png" alt="Slean" width="240">
+  </picture>
 </p>
 
-> **Status:** research engine, version 0.2. Private repository. One world class (cellular automata) and two discovery types (conservation laws and localised structures). This is the foundation that [Mutome](https://mutome.com) will run on. It is not yet a claim of open-ended discovery.
+<p align="center">
+  <strong>Exact worlds, kernel-checked discoveries, and an honest way to measure whether an AI discovers anything.</strong>
+</p>
 
-## Why
+<p align="center">
+  <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-1f6feb"></a>
+  <img alt="Lean 4" src="https://img.shields.io/badge/Lean-4-6e40c9">
+  <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-3776ab">
+  <a href="https://slean.org"><img alt="slean.org" src="https://img.shields.io/badge/site-slean.org-00895f"></a>
+</p>
 
-AI is moving mathematics forward largely because of [Lean](https://lean-lang.org): a model can attempt thousands of proofs, and the kernel accepts only correct ones. Every accepted result becomes a brick that later work can build on, and the list of open statements shows where the frontier is.
+<p align="center">
+  <a href="https://slean.org">Website</a> ·
+  <a href="https://slean.org/learn">Learn by playing</a> ·
+  <a href="docs/VISION.md">Vision</a> ·
+  <a href="docs/MEASUREMENT.md">Measurement rules</a> ·
+  <a href="docs/results/">Results</a>
+</p>
 
-Science has no such kernel. A plausible paragraph and a true law look the same until someone checks. Slean builds the equivalent piece by piece:
+---
 
-1. **Worlds** whose laws are defined exactly in Lean. Agents explore them by simulation. A finding cannot come from a simulator bug, because the Lean definition *is* the world.
-2. **Claims with certificates.** A discovery is accepted only when it comes with a finite certificate that the Lean kernel checks. Refutations come with a concrete counterexample, also kernel-checked.
-3. **A library** of everything accepted or refuted, kept as Lean theorems. It is the memory that later research reuses.
-4. **Measurement.** Discovery is scored on procedurally generated worlds with a hidden answer that no model has seen. It is compared with simple baselines at equal cost, and with and without the library.
+An AI can propose a thousand discoveries in an hour. In mathematics there is a referee for them: the [Lean](https://lean-lang.org) kernel accepts a proof only if it is correct. Science has no such referee, so a plausible paragraph and a true law look the same until someone checks.
 
-Mutome decides what to explore. Slean says what is true, keeps it, and measures whether the exploring helped.
+**Slean** (Science + Lean) builds that referee, starting with small worlds whose laws are defined exactly in Lean. An agent explores them by experiment. A discovery counts only when it comes with a certificate that is checked exactly, and every accepted result joins a library that later work builds on. Labs with hidden answers then measure whether an agent, or a change to how it works, actually finds more.
 
-## What works today
+Slean is the verification and measurement layer of [Mutome](https://mutome.com), an autonomous research lab in progress.
 
-**A theorem that turns a local certificate into a global law.** [`Slean/World/CellularAutomaton.lean`](Slean/World/CellularAutomaton.lean) proves `conserved_of_fluxCheck`. If a density `ρ` and a current `J` satisfy the discrete continuity equation `ρ(step x)ᵢ − ρ(x)ᵢ = Jᵢ − Jᵢ₊₁` on every local pattern, then the total of `ρ` is conserved for **every** lattice size and configuration. That local check is finite, so `decide` settles it in the kernel. Only the standard axioms are used.
-
-**A kernel-checked library.** [`Slean/Library/ElementaryConservation.lean`](Slean/Library/ElementaryConservation.lean) contains all 84 conservation laws of width ≤ 3 of the 256 elementary cellular automata, up to trivial ones, across 66 rules. Each law is proved for all lattice sizes. `lake build` re-checks all of them in about 20 seconds.
-
-**A discovery loop and a benchmark.** [`engine/`](engine/) is plain Python with no dependencies:
+## How it works
 
 ```
-propose (explorer) → verify (counterexample search or flux certificate) → record (library) → Lean kernel
+ agent ──experiment──▶ world (exact, defined in Lean)
+   │
+   └──claim──▶ verifier ──▶ certified (+ Lean theorem) or refuted (+ counterexample)
+                                │
+                                ▼
+                     library of verified results ──▶ scored against the hidden answer
 ```
 
-It has five explorers: `random`, `datafit` (exact regression on simulated data), `library` (data fitting plus reuse of laws across structurally related worlds), `oracle` (knows the theory), and `llm` (a language model reading the rules and the feedback).
+Today's worlds are one-dimensional cellular automata: cells on a ring that all update at once by a fixed local rule. They are small enough to check exactly, and rich enough to hide laws, particles and compressed rules.
 
-## First measurements and what they mean
+| Discovery | Example | How it is checked |
+|---|---|---|
+| **Conservation law** | "the number of cars is conserved" | Lean kernel: a finite flux certificate proves it for every lattice size |
+| **Localised structure** | a glider of period 4 moving right | Lean kernel: the block reappears, shifted, after exactly `t` steps |
+| **Compact law** | "the rule is the sum of the cells, mod 4, through this small table" | Lean kernel: the short formula equals the rule on every neighbourhood |
+| **Mechanism** | the world's whole rule table | Exact comparison with the hidden rule, entry by entry (no Lean statement) |
 
-All measurements are on generated worlds no model has seen, scored against a hidden answer. They are kernel-checked, and negative results are included.
+A wrong claim comes back with a counterexample, which is checked too. Nothing false is ever accepted.
 
-**1. Conservation laws alone are a solved class.** [Details](docs/results/2026-10-01-conservation.md). On 16 hidden worlds with 20 hidden laws:
+## What we have measured
 
-- random proposals find 3/20 in 40 proposals;
-- exact data fitting finds 20/20 in 24 proposals;
-- a language model reasoning without tools finds 14/20.
+Every measurement is on generated worlds no model has seen, scored against a hidden answer, and published with its negative results. All data and reports are in [`docs/results/`](docs/results/).
 
-This class calibrates the machinery. It cannot demonstrate discovery.
+1. **Conservation laws alone are a solved class.** Exact data fitting finds 20 of 20 hidden laws in 24 proposals. This calibrates the machinery but cannot show discovery. [Report](docs/results/2026-10-01-conservation.md)
+2. **On easy worlds, a Claude Sonnet agent matches a scripted scientist with 150 to 225 times fewer experiments**, and makes no false claim. But one well-chosen experiment reveals each of those rules. [Report](docs/results/2026-10-01-labs.md)
+3. **On compressible worlds, lessons help.** These are 1,024-entry rules that hide a short law, under a tight budget. The agent's own lessons from earlier labs win 8 of 9 repeated pairs, by 6 discoveries per lab on average. They also help it find compact laws: 8, 12 and 8 of 12, against 2, 6 and 5 without. [Report](docs/results/2026-10-02-compressible-lift.md)
+4. **A family-aware script draws level.** A scripted reference that tries the textbook rule families (linear, totalistic) scores 47 to 54 with 9 laws per lab, as well as the agent with lessons. [Report](docs/results/2026-10-03-inductive-reference.md)
+5. **On novel worlds, the agent induces what the script cannot.** Their laws come from other families, with secret seeds. The script finds 0 of 12 laws. The agent finds 30 of 36 alone, and 36 of 36 with its lessons from `compressible`, which carried a technique, not just a family. [Suite](docs/results/2026-10-03-novel-suite.md) · [Report](docs/results/2026-10-03-novel-lift.md)
 
-**2. An autonomous agent in a metered lab beats a scripted reference scientist.** [Details](docs/results/2026-10-01-labs.md). The rules are hidden, and experiments are the only access, with a budget of 200 proposals and 200k simulated cell updates.
-
-| Seed | | Laws | Structures | Beyond search bounds | False claims | Experiments (cell updates) |
-|---|---|---|---|---|---|---|
-| 7 | scripted reference | 20/20 | 68/70 | 0 | 0 | 199,748 |
-| 7 | Claude Sonnet agent | 20/20 | 70/70 | 0 | 0 | 888 |
-| 11 | scripted reference | 18/18 | 75/87 | 0 | 0 | 199,802 |
-| 11 | Claude Sonnet agent | 18/18 | 78/87 | 2 | 0 | 1,277 |
-
-The agent designed de Bruijn experiments that reveal each world's rule in one run, then derived the rest by computation. Each run cost about $0.43.
-
-The honest reading: the loop and the measurement work, and a general agent behaves like a competent scientist here. But these worlds can be identified completely with one experiment, so this is not yet open-ended discovery. The next worlds must make inferring the law itself hard: partial observation, noise, large state spaces. Questions must also come without a prescribed form.
+What this does not show: a discovery about the real world, or a lab that improves itself. These are measurements on synthetic worlds, built to be checked exactly.
 
 ## Quick start
 
-Requires [Lean via elan](https://lean-lang.org/install/) and Python ≥ 3.11.
+Requires [Lean 4 via elan](https://lean-lang.org/install/) and Python 3.11 or later. The Python engine has no dependencies.
 
 ```sh
-lake build                                          # kernel-checks the core and the library
-cd engine
-python3 -m unittest discover -s tests               # engine + Lean agreement tests
-python3 -m slean check 184 1 0,1                    # is the number of cars conserved by rule 184?
-python3 -m slean explore --explorer datafit --lean  # explore hidden worlds, kernel-check results
-python3 -m slean transfer --explorer library        # cold vs library-warm discovery
+git clone https://github.com/romainsimon/slean && cd slean
+lake build                                     # kernel-checks the core and the library of laws
 
-# A lab for autonomous agents: metered experiments, verified proposals, hidden scoring
-python3 -m slean lab init --dir /tmp/lab --mode blackbox --proposals 60 --cells 200000
-python3 -m slean lab baseline --dir /tmp/lab-ref     # scripted reference (after its own lab init)
-python3 -m slean lab run --dir /tmp/lab --agent claude --model sonnet --max-usd 3
+cd engine
+python3 -m unittest discover -s tests          # engine tests, including Lean agreement
+python3 -m slean check 184 1 0,1               # does rule 184 conserve the number of cars? (yes)
+python3 -m slean explore --explorer datafit --lean   # explore hidden worlds, kernel-check the results
 ```
 
-A lab is the interface Mutome (or Claude Code, Codex, or a person) uses to do research. The task description and a `./lab` command are the only things inside the lab directory. The hidden answers stay outside it. Every experiment and proposal is metered and logged, and the run is scored and its results kernel-checked afterwards.
+## Measure an agent
 
-## Read next
+A lab is a directory with a task description and a `./lab` command. An agent (Claude Code, Codex, a Mutome worker or a person) runs experiments and submits claims only through that command. Every experiment and proposal is metered, and the run is scored against the hidden answer afterwards.
 
-- [Vision and roadmap](docs/VISION.md): from calibration worlds to physics, engineering and biology, and how Mutome uses Slean
-- [How we measure discovery](docs/MEASUREMENT.md): the rules that keep the benchmark honest
-- [Results](docs/results/): dated measurements, including negative ones
+```sh
+cd engine
+python3 -m slean lab init --dir /tmp/lab --suite novel --suite-seed secret \
+  --mode blackbox --proposals 200 --cells 4000
+python3 -m slean lab run --dir /tmp/lab --agent claude --model sonnet --max-usd 4
+python3 -m slean lab score --dir /tmp/lab
+```
 
-The previous dossier validator and open-standard work are archived under the git tags `archive/dossier-v0` and `archive/open-standard-pr35`.
+- **Isolated.** While the agent runs, `./lab` talks to a broker in the parent process. The agent runs under the OS sandbox (`sandbox-exec` on macOS, `bwrap` on Linux), so it can read neither the hidden answers nor the engine, and cannot rewrite its own budget. The score records which isolation was used.
+- **Secret seeds.** The generators are public, so a known seed would reveal the answers. `--suite-seed secret` draws one that only the secret directory records.
+- **A reference to beat.** `lab baseline` runs the scripted reference scientist, with the same interface and budget, in a lab of its own.
+
+## Repository
+
+| Path | What it holds |
+|---|---|
+| [`Slean/`](Slean/) | Lean definitions and theorems: worlds, structures, compact laws, packed tables |
+| [`Slean/Library/`](Slean/Library/) | The kernel-checked library: all 84 conservation laws of width ≤ 3 of the 256 elementary automata |
+| [`engine/`](engine/) | The Python engine: worlds, verifier, explorers, labs, isolation, Lean export |
+| [`library/`](library/) | The library as data, reproducible from the engine |
+| [`docs/`](docs/) | [Vision and roadmap](docs/VISION.md), [measurement rules](docs/MEASUREMENT.md), [dated results](docs/results/) |
+
+## Status
+
+Research engine, version 0.2. It has one world class (cellular automata) and four discovery types. Next on the [roadmap](docs/VISION.md):
+
+- harnesses that make agents collect the free follow-ups of what they identify;
+- relations between worlds as reusable bricks;
+- claim types the agent defines itself;
+- worlds closer to physics.
+
+Issues and discussion are welcome.
+
+## License
+
+[Apache License 2.0](LICENSE). The Slean name and logo identify this project; please do not use them to suggest endorsement.
