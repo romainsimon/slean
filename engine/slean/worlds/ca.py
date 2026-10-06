@@ -446,3 +446,104 @@ def novel_world(family: str, k: int, s: int, rng: random.Random, name: str, disg
     if disguise:
         law = {"op": "lookup", "table": perm, "a": law}
     return CA(k, s, table, name=name), law
+
+
+# ---- frontier worlds: harder short laws, more worlds than the budget can read ----
+
+FRONTIER_FAMILIES = ("switch", "triple", "modsum", "cubic")
+
+
+def frontier_world(family: str, k: int, s: int, rng: random.Random, name: str, disguise: bool) -> tuple[CA, dict | None]:
+    """A rule with a short law that is harder to infer than the novel families, and that law.
+
+    ``switch``: whether one edge cell exceeds the other chooses between two whole laws, a
+    weighted sum modulo k and a function of how many cells hold one state. ``triple``: an
+    arbitrary table of three cells that span the neighbourhood. ``modsum``: a table of a
+    weighted sum modulo a number other than k. ``cubic``: a cubic polynomial modulo k.
+    ``random``: no short law. Relabelled like ``novel_world`` when ``disguise``.
+    """
+    if family == "random":
+        return CA(k, s, tuple(rng.randrange(k) for _ in range(k ** (s + 1))), name=name), None
+    perm = list(range(k))
+    if disguise:
+        rng.shuffle(perm)
+    inv = [0] * k
+    for a, b in enumerate(perm):
+        inv[b] = a
+
+    def cell(j: int) -> dict:
+        node = {"op": "cell", "j": j}
+        return {"op": "lookup", "table": inv, "a": node} if disguise else node
+
+    def const(c: int) -> dict:
+        return {"op": "const", "c": c}
+
+    def mul(a: dict, b: dict) -> dict:
+        return {"op": "mul", "a": a, "b": b}
+
+    def add(a: dict, b: dict) -> dict:
+        return {"op": "add", "a": a, "b": b}
+
+    def weighted(weights: list[int]) -> dict:
+        terms = [cell(j) if w == 1 else mul(const(w), cell(j)) for j, w in enumerate(weights) if w]
+        return terms[0] if len(terms) == 1 else {"op": "sum", "args": terms}
+
+    if family == "switch":
+        left, right = rng.choice((0, 1)), rng.choice((s, s - 1))
+        while True:
+            w = [rng.randrange(k) for _ in range(s + 1)]
+            if sum(1 for x in w if x) >= 2:
+                break
+        t = rng.randrange(k)
+        while True:
+            g = [rng.randrange(k) for _ in range(s + 2)]
+            if len(set(g)) > 1:
+                break
+        linear = lambda c: sum(x * y for x, y in zip(w, c)) % k
+        counted = lambda c: g[sum(1 for x in c if x == t)]
+        out = lambda c: linear(c) if c[left] > c[right] else counted(c)
+        greater = [1 if a > b else 0 for a in range(k) for b in range(k)]
+        gate = {"op": "lookup", "table": greater, "a": add(mul(const(k), cell(left)), cell(right))}
+        hit = [1 if v == t else 0 for v in range(k)]
+        f1 = {"op": "mod", "a": weighted(w), "m": k}
+        f2 = {"op": "lookup", "table": g, "a": {"op": "sum", "args": [
+            {"op": "lookup", "table": hit, "a": cell(j)} for j in range(s + 1)]}}
+        law = add(mul(gate, f1), mul({"op": "sub", "a": const(1), "b": gate}, f2))
+    elif family == "triple":
+        i, l = 0, s
+        j = rng.randrange(1, s)
+        while True:
+            table = [rng.randrange(k) for _ in range(k ** 3)]
+            sliced = [{tuple(table[a * k * k + b * k + c] for a in range(k)) for b in range(k) for c in range(k)},
+                      {tuple(table[a * k * k + b * k + c] for b in range(k)) for a in range(k) for c in range(k)},
+                      {tuple(table[a * k * k + b * k + c] for c in range(k)) for a in range(k) for b in range(k)}]
+            if all(any(len(set(v)) > 1 for v in part) for part in sliced):
+                break  # depends on all three cells
+        out = lambda c: table[c[i] * k * k + c[j] * k + c[l]]
+        law = {"op": "lookup", "table": table,
+               "a": add(mul(const(k * k), cell(i)), add(mul(const(k), cell(j)), cell(l)))}
+    elif family == "modsum":
+        m = rng.choice((3, 5, 7))
+        while True:
+            w = [rng.randrange(m) for _ in range(s + 1)]
+            if sum(1 for x in w if x) >= 3:
+                break
+        while True:
+            g = [rng.randrange(k) for _ in range(m)]
+            if len(set(g)) > 1:
+                break
+        out = lambda c: g[sum(x * y for x, y in zip(w, c)) % m]
+        law = {"op": "lookup", "table": g, "a": {"op": "mod", "a": weighted(w), "m": m}}
+    elif family == "cubic":
+        i, j, l = rng.sample(range(s + 1), 3)
+        p = rng.randrange(s + 1)
+        a, b, d = rng.randrange(1, k), rng.randrange(k), rng.randrange(k)
+        out = lambda c: (a * c[i] * c[j] * c[l] + b * c[p] + d) % k
+        terms = [mul(const(a), mul(cell(i), mul(cell(j), cell(l)))), mul(const(b), cell(p)), const(d)]
+        law = {"op": "mod", "a": {"op": "sum", "args": terms}, "m": k}
+    else:
+        raise ValueError(family)
+    table_out = tuple(perm[out([inv[x] for x in q])] for q in patterns(k, s + 1))
+    if disguise:
+        law = {"op": "lookup", "table": perm, "a": law}
+    return CA(k, s, table_out, name=name), law
