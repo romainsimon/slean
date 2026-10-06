@@ -78,7 +78,8 @@ def cmd_lab(args) -> int:
     directory = Path(args.dir)
     if args.action == "init":
         directory.mkdir(parents=True, exist_ok=True)
-        state = lab.init(directory, args.suite, args.suite_seed, args.mode, args.proposals, args.cells)
+        state = lab.init(directory, args.suite, args.suite_seed, args.mode, args.proposals, args.cells,
+                         worlds_file=Path(args.worlds_file) if args.worlds_file else None)
         _log(f"lab {state['lab_id']} ready in {directory} ({args.mode})")
         return 0
     if args.action == "score":
@@ -129,7 +130,7 @@ def main(argv=None) -> int:
     p = sub.add_parser("lab", help="create, run or score an agent lab")
     p.add_argument("action", choices=["init", "run", "baseline", "score"])
     p.add_argument("--dir", required=True)
-    p.add_argument("--suite", default="hidden", choices=["hidden", "eca", "compressible", "novel", "frontier"])
+    p.add_argument("--suite", default="hidden", choices=["hidden", "eca", "compressible", "novel", "frontier", "sealed"])
     p.add_argument("--suite-seed", type=lambda v: None if v == "secret" else int(v), default=7,
                    help="an integer, or 'secret' to draw one that only the secret directory records")
     p.add_argument("--mode", default="whitebox", choices=["whitebox", "blackbox"])
@@ -139,6 +140,7 @@ def main(argv=None) -> int:
     p.add_argument("--model", default="sonnet")
     p.add_argument("--max-usd", type=float, default=3.0)
     p.add_argument("--brief", help="harness notes added to the agent's instructions (e.g. lessons)")
+    p.add_argument("--worlds-file", help="suite 'sealed': worlds from a private generator (JSON with tables)")
     p.set_defaults(func=cmd_lab)
 
     p = sub.add_parser("lab-cmd", help=argparse.SUPPRESS)

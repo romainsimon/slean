@@ -118,16 +118,27 @@ def _real(path: Path) -> str:
     return os.path.realpath(path)
 
 
-def sandbox(cmd: list[str], *, deny: list[Path], read_only: list[Path]) -> tuple[list[str], dict]:
-    """Wrap ``cmd`` so that it can neither read nor write ``deny`` nor write ``read_only``."""
-    info = {"mode": "none", "denied": [str(p) for p in deny], "read_only": [str(p) for p in read_only]}
+def sandbox(cmd: list[str], *, deny: list[Path], read_only: list[Path],
+            confine: tuple[Path, Path] | None = None) -> tuple[list[str], dict]:
+    """Wrap ``cmd`` so that it can neither read nor write ``deny`` nor write ``read_only``.
+
+    ``confine=(root, lab)`` also hides everything under ``root`` except ``lab``: labs that run
+    side by side on the same worlds (a harness and its challenger) cannot read each other.
+    """
+    info = {"mode": "none", "denied": [str(p) for p in deny], "read_only": [str(p) for p in read_only],
+            "confined_to": str(confine[1]) if confine else None}
     if sys.platform == "darwin" and shutil.which("sandbox-exec"):
         rules = ["(version 1)", "(allow default)"]
+        if confine:  # later rules win: hide the root, then give the lab back
+            rules += [f'(deny file-read* file-write* (subpath "{_real(confine[0])}"))',
+                      f'(allow file-read* file-write* (subpath "{_real(confine[1])}"))']
         rules += [f'(deny file-read* file-write* (subpath "{_real(p)}"))' for p in deny]
         rules += [f'(deny file-write* (subpath "{_real(p)}"))' for p in read_only]
         return ["sandbox-exec", "-p", "\n".join(rules), *cmd], {**info, "mode": "sandbox-exec"}
     if sys.platform.startswith("linux") and shutil.which("bwrap"):
         args = ["bwrap", "--dev-bind", "/", "/"]
+        if confine:
+            args += ["--tmpfs", _real(confine[0]), "--bind", _real(confine[1]), _real(confine[1])]
         for p in deny:
             args += ["--tmpfs", _real(p)]
         for p in read_only:
@@ -138,4 +149,4 @@ def sandbox(cmd: list[str], *, deny: list[Path], read_only: list[Path]) -> tuple
 
 def agent_env(env: dict[str, str]) -> dict[str, str]:
     """The agent's environment, without the paths that lead to the engine or the answers."""
-    return {k: v for k, v in env.items() if k not in ("SLEAN_LABS", "PYTHONPATH", "SLEAN_HOME")}
+    return {k: v for k, v in env.items() if k not in ("SLEAN_LABS", "PYTHONPATH", "SLEAN_HOME", "SLEAN_CONFINE_ROOT")}
