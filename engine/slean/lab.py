@@ -141,6 +141,8 @@ def init(lab: Path, suite: str, suite_seed: int | None, mode: str, proposals: in
         worlds = bench.compressible_suite(suite_seed)
     elif suite == "novel":
         worlds = bench.novel_suite(suite_seed)
+    elif suite == "frontier":
+        worlds = bench.frontier_suite(suite_seed)
     else:
         raise SystemExit(f"unknown suite {suite}")
     rng = random.Random(secrets.randbits(64))
