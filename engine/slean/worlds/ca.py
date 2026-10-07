@@ -177,7 +177,13 @@ def lean_fn(k: int, values) -> str:
         return f"(tableFn {k} [{', '.join(map(str, values))}])"
     off = -min(0, min(values))
     m = max(1, (max(values) + off).bit_length())
-    return f"(packedFn {k} {m} {off} {pack([v + off for v in values], m)})"
+    return f"(packedFn {k} {m} {off} {nat_literal(pack([v + off for v in values], m))})"
+
+
+def nat_literal(n: int) -> str:
+    """A Lean natural-number literal. Python refuses decimal conversion of integers above
+    about 4300 digits (a large conservation current reached it); hexadecimal has no limit."""
+    return str(n) if n.bit_length() <= 13_000 else f"0x{n:x}"
 
 
 def eca(rule: int) -> CA:
