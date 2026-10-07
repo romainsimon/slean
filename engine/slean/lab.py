@@ -477,10 +477,10 @@ def run_agent(lab: Path, agent: str, model: str, max_usd: float, brief: str = ""
             "--output-format", "stream-json", "--verbose",
             "--no-session-persistence",
             "--max-budget-usd", str(max_usd),
-            *(AGENT_PROFILE["claude_flags"] if profile == AGENT_PROFILE["name"] else OPERATOR_FLAGS),
+            *profile_flags(profile),
         ]
         if base_instructions.strip():
-            if profile != AGENT_PROFILE["name"]:
+            if profile == "operator":
                 raise ValueError("base instructions apply to the isolated profile only")
             cmd += ["--append-system-prompt", base_instructions]
     elif agent == "codex":
@@ -563,6 +563,25 @@ def _environment(event: dict) -> dict:
             "plugins": sorted(p.get("name", "") for p in event.get("plugins") or [] if p.get("path") != "builtin")}
 
 
+# Ablations change one factor of isolated-1 (``isolated-1/<variant>``), never for measurements.
+PROFILE_VARIANTS = ("auto", "no-safe-mode")
+
+
+def profile_flags(profile: str) -> tuple[str, ...]:
+    """Claude Code flags for a profile name: isolated-1, isolated-1/<variant> or operator."""
+    if profile == "operator":
+        return OPERATOR_FLAGS
+    base, _, variant = profile.partition("/")
+    if base != AGENT_PROFILE["name"] or (variant and variant not in PROFILE_VARIANTS):
+        raise ValueError(f"unknown agent profile {profile}")
+    flags = list(AGENT_PROFILE["claude_flags"])
+    if variant == "auto":
+        flags[flags.index("dontAsk")] = "auto"
+    elif variant == "no-safe-mode":
+        flags.remove("--safe-mode")
+    return tuple(flags)
+
+
 # Only for measuring the operator's configuration against isolated-1, never for measurements:
 # the session loads the operator's settings, instructions, hooks, plugins and MCP servers.
 OPERATOR_FLAGS = ("--permission-mode", "auto", "--allowedTools", "Bash(./lab:*)", "Bash(python3:*)", "Read", "Write", "Edit")
@@ -591,13 +610,13 @@ def audit(path: Path, expect: str = "isolated-1") -> dict:
             continue
         if event.get("type") == "system" and event.get("subtype") == "init" and environment is None:
             environment = _environment(event)
-            if expect != AGENT_PROFILE["name"]:
+            if expect == "operator":
                 continue  # an operator session is recorded, not held to the profile
             if not set(environment["tools"]) <= set(AGENT_TOOLS):
                 suspicious.append("environment: tools beyond the profile")
             if environment["mcp_servers"] or environment["plugins"] or environment["skills"]:
                 suspicious.append("environment: MCP servers, plugins or skills loaded")
-            if environment["permission_mode"] != "dontAsk":
+            if environment["permission_mode"] != ("auto" if expect.endswith("/auto") else "dontAsk"):
                 suspicious.append("environment: permission mode is not dontAsk")
         if event.get("type") == "system" and event.get("subtype") == "task_updated":
             if (event.get("patch") or {}).get("status") == "killed":
