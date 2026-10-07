@@ -480,7 +480,7 @@ def run_agent(lab: Path, agent: str, model: str, max_usd: float, brief: str = ""
             *profile_flags(profile),
         ]
         if base_instructions.strip():
-            if profile == "operator":
+            if profile.startswith("operator"):
                 raise ValueError("base instructions apply to the isolated profile only")
             cmd += ["--append-system-prompt", base_instructions]
     elif agent == "codex":
@@ -563,15 +563,22 @@ def _environment(event: dict) -> dict:
             "plugins": sorted(p.get("name", "") for p in event.get("plugins") or [] if p.get("path") != "builtin")}
 
 
-# Ablations change one factor of isolated-1 (``isolated-1/<variant>``), never for measurements.
+# Ablations change one factor of isolated-1 (``isolated-1/<variant>``) or remove one group from
+# the operator profile (``operator/<variant>``), never for measurements.
 PROFILE_VARIANTS = ("auto", "no-safe-mode")
+OPERATOR_VARIANTS = {
+    "no-hooks": ("--settings", '{"disableAllHooks": true}'),
+    "no-capabilities": ("--tools", ",".join(AGENT_TOOLS), "--strict-mcp-config"),
+}
 
 
 def profile_flags(profile: str) -> tuple[str, ...]:
-    """Claude Code flags for a profile name: isolated-1, isolated-1/<variant> or operator."""
-    if profile == "operator":
-        return OPERATOR_FLAGS
+    """Claude Code flags for a profile: isolated-1[/variant] or operator[/variant]."""
     base, _, variant = profile.partition("/")
+    if base == "operator":
+        if variant and variant not in OPERATOR_VARIANTS:
+            raise ValueError(f"unknown agent profile {profile}")
+        return OPERATOR_FLAGS + (OPERATOR_VARIANTS[variant] if variant else ())
     if base != AGENT_PROFILE["name"] or (variant and variant not in PROFILE_VARIANTS):
         raise ValueError(f"unknown agent profile {profile}")
     flags = list(AGENT_PROFILE["claude_flags"])
@@ -610,7 +617,7 @@ def audit(path: Path, expect: str = "isolated-1") -> dict:
             continue
         if event.get("type") == "system" and event.get("subtype") == "init" and environment is None:
             environment = _environment(event)
-            if expect == "operator":
+            if expect.startswith("operator"):
                 continue  # an operator session is recorded, not held to the profile
             if not set(environment["tools"]) <= set(AGENT_TOOLS):
                 suspicious.append("environment: tools beyond the profile")
