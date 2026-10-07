@@ -143,7 +143,7 @@ def main(argv=None) -> int:
     p.add_argument("--max-usd", type=float, default=3.0)
     p.add_argument("--brief", help="harness notes added to the agent's instructions (e.g. lessons)")
     p.add_argument("--worlds-file", help="suite 'sealed': worlds from a private generator (JSON with tables)")
-    p.add_argument("--profile", default="isolated-1", choices=["isolated-1", "operator"],
+    p.add_argument("--profile", default="isolated-1", choices=["isolated-1", "isolated-1/auto", "isolated-1/no-safe-mode", "operator"],
                    help="agent environment; 'operator' loads your own Claude Code configuration (ablations only)")
     p.add_argument("--base-instructions", help="file appended to the agent's system prompt (isolated profile)")
     p.set_defaults(func=cmd_lab)
