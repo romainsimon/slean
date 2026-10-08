@@ -92,7 +92,8 @@ def cmd_lab(args) -> int:
         brief = Path(args.brief).read_text() if args.brief else ""
         base = Path(args.base_instructions).read_text() if args.base_instructions else ""
         print(json.dumps(lab.run_agent(directory, args.agent, args.model, args.max_usd, brief,
-                                       profile=args.profile, base_instructions=base), indent=2))
+                                       profile=args.profile, base_instructions=base,
+                                       continue_once=args.continue_once), indent=2))
         return 0
     return 2
 
@@ -146,6 +147,8 @@ def main(argv=None) -> int:
     p.add_argument("--profile", default="isolated-1", choices=["isolated-1", "isolated-1/auto", "isolated-1/no-safe-mode",
                             "operator-1", "operator", "operator/no-hooks", "operator/no-capabilities"],
                    help="agent environment; 'operator' loads your own Claude Code configuration (ablations only)")
+    p.add_argument("--continue-once", action="store_true",
+                   help="resume the agent's session once if it stops with a quarter or more of its proposals left")
     p.add_argument("--base-instructions", help="file appended to the agent's system prompt (isolated profile)")
     p.set_defaults(func=cmd_lab)
 

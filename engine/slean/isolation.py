@@ -122,7 +122,8 @@ SHARED_TMP = Path("/tmp")
 
 
 def sandbox(cmd: list[str], *, deny: list[Path], read_only: list[Path],
-            confine: tuple[Path, Path] | None = None, own: list[Path] | None = None) -> tuple[list[str], dict]:
+            confine: tuple[Path, Path] | None = None, own: list[Path] | None = None,
+            hide: list[Path] | None = None) -> tuple[list[str], dict]:
     """Wrap ``cmd`` so that it can neither read nor write ``deny`` nor write ``read_only``.
 
     ``confine=(root, lab)`` also hides everything under ``root`` except ``lab``: labs that run
@@ -130,13 +131,18 @@ def sandbox(cmd: list[str], *, deny: list[Path], read_only: list[Path],
 
     ``own`` (the lab, its broker socket's directory) hides the shared /tmp except these paths:
     files one lab leaves there would otherwise reach later labs and labs running alongside.
+
+    ``hide`` lists more directories to hide except the ``own`` paths under them: other
+    checkouts (a private world generator), and Claude Code's stored sessions of other runs.
     """
     info = {"mode": "none", "denied": [str(p) for p in deny], "read_only": [str(p) for p in read_only],
-            "confined_to": str(confine[1]) if confine else None, "private_tmp": own is not None}
+            "confined_to": str(confine[1]) if confine else None, "private_tmp": own is not None,
+            "hidden": [str(p) for p in hide or []]}
     if sys.platform == "darwin" and shutil.which("sandbox-exec"):
         rules = ["(version 1)", "(allow default)"]
         if own is not None:  # later rules win: hide /tmp, then give back what belongs to this lab
             rules.append(f'(deny file-read* file-write* (subpath "{_real(SHARED_TMP)}"))')
+        rules += [f'(deny file-read* file-write* (subpath "{_real(p)}"))' for p in hide or []]
         if confine:  # hide the root, then give the lab back
             rules.append(f'(deny file-read* file-write* (subpath "{_real(confine[0])}"))')
         for p in [*(own or []), *([confine[1]] if confine else [])]:
@@ -148,6 +154,8 @@ def sandbox(cmd: list[str], *, deny: list[Path], read_only: list[Path],
         args = ["bwrap", "--dev-bind", "/", "/"]
         if own is not None:
             args += ["--tmpfs", _real(SHARED_TMP)]
+        for p in hide or []:
+            args += ["--tmpfs", _real(p)]
         if confine:
             args += ["--tmpfs", _real(confine[0])]
         for p in [*(own or []), *([confine[1]] if confine else [])]:
