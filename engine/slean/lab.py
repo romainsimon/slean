@@ -474,8 +474,9 @@ def _session_dir(lab: Path) -> Path:
     return root / "projects" / re.sub(r"[^A-Za-z0-9]", "-", os.path.realpath(lab))
 
 
-def run_agent(lab: Path, agent: str, model: str, max_usd: float, brief: str = "", *,
-              profile: str = "isolated-1", base_instructions: str = "", continue_once: bool = False) -> dict:
+def run_agent(lab: Path, agent: str, model: str | None, max_usd: float, brief: str = "", *,
+              profile: str = "isolated-1", base_instructions: str = "", continue_once: bool = False,
+              reasoning_effort: str | None = None) -> dict:
     """Run a coding agent inside the lab, record its transcript, then score it.
 
     ``brief`` is the harness: text added to the agent's instructions, such as
@@ -494,6 +495,11 @@ def run_agent(lab: Path, agent: str, model: str, max_usd: float, brief: str = ""
     import hashlib
     import subprocess
 
+    if agent == "codex":
+        from . import codex_agent
+        return codex_agent.run(lab, model, brief, profile=profile, base_instructions=base_instructions,
+                               continue_once=continue_once, reasoning_effort=reasoning_effort)
+    model = model or "sonnet"
     state = _load(lab)
     transcript = _secret_dir(state["lab_id"]) / "transcript.jsonl"
     prompt = AGENT_PROMPT
@@ -510,8 +516,6 @@ def run_agent(lab: Path, agent: str, model: str, max_usd: float, brief: str = ""
             flags += ["--append-system-prompt", base_instructions]
         # The session is kept (not --no-session-persistence) so that the continuation can resume it.
         cmd = ["claude", "-p", prompt, *flags, "--session-id", session, "--max-budget-usd", str(max_usd)]
-    elif agent == "codex":
-        cmd = ["codex", "exec", "--json", "-m", model, "-s", "workspace-write", "-C", str(lab), prompt]
     else:
         raise SystemExit(f"unknown agent {agent}")
     from . import isolation

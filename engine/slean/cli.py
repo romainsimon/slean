@@ -93,7 +93,8 @@ def cmd_lab(args) -> int:
         base = Path(args.base_instructions).read_text() if args.base_instructions else ""
         print(json.dumps(lab.run_agent(directory, args.agent, args.model, args.max_usd, brief,
                                        profile=args.profile, base_instructions=base,
-                                       continue_once=args.continue_once), indent=2))
+                                       continue_once=args.continue_once,
+                                       reasoning_effort=args.reasoning_effort), indent=2))
         return 0
     return 2
 
@@ -140,12 +141,13 @@ def main(argv=None) -> int:
     p.add_argument("--proposals", type=int, default=60)
     p.add_argument("--cells", type=int, default=200_000)
     p.add_argument("--agent", default="claude", choices=["claude", "codex"])
-    p.add_argument("--model", default="sonnet")
+    p.add_argument("--model", help="Claude: sonnet by default; Codex: selected model from operator config")
+    p.add_argument("--reasoning-effort", help="Codex reasoning effort (defaults to selected operator effort)")
     p.add_argument("--max-usd", type=float, default=3.0)
     p.add_argument("--brief", help="harness notes added to the agent's instructions (e.g. lessons)")
     p.add_argument("--worlds-file", help="suite 'sealed': worlds from a private generator (JSON with tables)")
     p.add_argument("--profile", default="isolated-1", choices=["isolated-1", "isolated-1/auto", "isolated-1/no-safe-mode",
-                            "operator-1", "operator", "operator/no-hooks", "operator/no-capabilities"],
+                            "operator-1", "operator", "operator/no-hooks", "operator/no-capabilities", "codex-isolated-1"],
                    help="agent environment; 'operator' loads your own Claude Code configuration (ablations only)")
     p.add_argument("--continue-once", action="store_true",
                    help="resume the agent's session once if it stops with a quarter or more of its proposals left")

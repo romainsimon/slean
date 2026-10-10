@@ -116,23 +116,28 @@ class Isolation(unittest.TestCase):
         self.assertFalse(report["clean"])
         self.assertEqual(len(report["markers"]), 3)
 
-    @unittest.skipUnless(sys.platform == "darwin" and shutil.which("sandbox-exec"), "macOS sandbox")
+    @unittest.skipUnless(SANDBOX, "no OS sandbox")
     def test_shared_tmp_is_hidden_except_the_lab_own_paths(self):
         other = Path(tempfile.mkdtemp(prefix="slean-other-", dir="/tmp"))
         own = Path(tempfile.mkdtemp(prefix="slean-own-", dir="/tmp"))
         (other / "tables.json").write_text("{}")
         (own / "s").write_text("socket stand-in")
+        fresh = Path("/tmp") / ("slean-leak-" + own.name)
         try:
             script = (f'cat {other}/tables.json >/dev/null 2>&1; echo other=$?; '
                       f'cat {own}/s >/dev/null 2>&1; echo own=$?; '
-                      f'echo x > /tmp/slean-leak-$$ 2>/dev/null; echo write=$?; '
+                      f'echo x > {fresh} 2>/dev/null; echo write=$?; '
                       f'echo x > {self.lab}/tmp-file; echo lab=$?')
             cmd, info = isolation.sandbox(["sh", "-c", script], deny=[], read_only=[], own=[self.lab, own])
             self.assertTrue(info["private_tmp"])
             out = subprocess.run(cmd, capture_output=True, text=True, cwd=self.lab)
             codes = dict(line.split("=") for line in out.stdout.split())
             self.assertNotEqual(codes["other"], "0", out.stdout)
-            self.assertNotEqual(codes["write"], "0", out.stdout)
+            if sys.platform == "darwin":
+                self.assertNotEqual(codes["write"], "0", out.stdout)
+            else:  # bwrap provides a writable private tmpfs, not the host /tmp.
+                self.assertEqual(codes["write"], "0", out.stdout)
+            self.assertFalse(fresh.exists(), "sandbox write reached shared /tmp")
             self.assertEqual((codes["own"], codes["lab"]), ("0", "0"), out.stdout + out.stderr)
         finally:
             shutil.rmtree(other, ignore_errors=True)
@@ -155,7 +160,7 @@ class Isolation(unittest.TestCase):
         self.assertNotIn("/", d.name)
         self.assertTrue(d.name.endswith("-lab"))
 
-    @unittest.skipUnless(sys.platform == "darwin" and shutil.which("sandbox-exec"), "macOS sandbox")
+    @unittest.skipUnless(SANDBOX, "no OS sandbox")
     def test_hidden_directories_except_own_paths(self):
         hidden = self.tmp / "checkouts"
         (hidden / "private-generator").mkdir(parents=True)
@@ -169,6 +174,25 @@ class Isolation(unittest.TestCase):
         codes = dict(line.split("=") for line in out.stdout.split())
         self.assertNotEqual(codes["other"], "0")
         self.assertEqual(codes["own"], "0", out.stdout + out.stderr)
+
+    @unittest.skipUnless(SANDBOX, "no OS sandbox")
+    def test_owned_paths_can_canonicalize_without_reading_hidden_parent(self):
+        hidden = self.tmp / "hidden"
+        own = hidden / "mine"
+        own.mkdir(parents=True)
+        (hidden / "secret.txt").write_text("secret")
+        script = ("import os; "
+                  f"print(os.path.realpath({str(own)!r}, strict=True)); "
+                  f"print(open({str(own / 'ok.txt')!r}, 'w').write('ok'))")
+        cmd, _ = isolation.sandbox([sys.executable, "-c", script], deny=[], read_only=[],
+                                    own=[self.lab, own], hide=[hidden])
+        out = subprocess.run(cmd, capture_output=True, text=True, cwd=self.lab)
+        self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
+        self.assertEqual((own / "ok.txt").read_text(), "ok")
+        cmd, _ = isolation.sandbox(["cat", str(hidden / "secret.txt")], deny=[], read_only=[],
+                                    own=[self.lab, own], hide=[hidden])
+        out = subprocess.run(cmd, capture_output=True, text=True, cwd=self.lab)
+        self.assertNotEqual(out.returncode, 0, "metadata permission exposed hidden contents")
 
     def test_operator_sessions_are_recorded_not_flagged(self):
         transcript = self.tmp / "t.jsonl"

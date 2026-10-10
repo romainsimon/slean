@@ -145,7 +145,13 @@ def sandbox(cmd: list[str], *, deny: list[Path], read_only: list[Path],
         rules += [f'(deny file-read* file-write* (subpath "{_real(p)}"))' for p in hide or []]
         if confine:  # hide the root, then give the lab back
             rules.append(f'(deny file-read* file-write* (subpath "{_real(confine[0])}"))')
-        for p in [*(own or []), *([confine[1]] if confine else [])]:
+        owned = [*(own or []), *([confine[1]] if confine else [])]
+        # realpath(3), used by Codex to open its runtime, stats each ancestor.
+        # Permit metadata of these exact directories, never listing or contents.
+        # Otherwise a readable owned path below hidden /tmp cannot canonicalize.
+        parents = {str(parent) for p in owned for parent in Path(_real(p)).parents}
+        rules += [f'(allow file-read-metadata (literal "{p}"))' for p in sorted(parents)]
+        for p in owned:
             rules.append(f'(allow file-read* file-write* (subpath "{_real(p)}"))')
         rules += [f'(deny file-read* file-write* (subpath "{_real(p)}"))' for p in deny]
         rules += [f'(deny file-write* (subpath "{_real(p)}"))' for p in read_only]
