@@ -92,3 +92,7 @@ Isolation alone gives a reproducible environment, but not a neutral one.
 ### Hidden directories
 
 The agent cannot read Claude Code's stored sessions of other runs, nor the directories listed in `SLEAN_HIDE_PATHS` (for example, other checkouts that hold a private world generator). Its own lab and its own session stay reachable.
+
+### Codex subscription profile
+
+[`codex-isolated-1`](CODEX_AGENT.md) measures Codex with a private client home, native filesystem permissions, protected subscription credentials, JSON event auditing and same-session continuation. Model and reasoning effort are pinned explicitly; subscription token usage is reported without inventing a dollar cost.
