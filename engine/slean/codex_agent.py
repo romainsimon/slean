@@ -18,7 +18,10 @@ import time
 import tomllib
 from pathlib import Path
 
+from .codex_path_context import non_path_slashes
+
 PROFILE = "codex-isolated-1"
+AUDIT_VERSION = "path-context-1"
 DISABLED_FEATURES = (
     "apps", "browser_use", "computer_use", "hooks", "image_generation", "memories",
     "multi_agent", "multi_agent_v2", "plugins", "remote_plugin", "shell_snapshot",
@@ -61,7 +64,7 @@ def selection(model: str | None = None, reasoning_effort: str | None = None) -> 
 def environment_record(model: str | None = None, reasoning_effort: str | None = None) -> dict:
     selected = selection(model, reasoning_effort)
     version = subprocess.run(["codex", "--version"], capture_output=True, text=True, check=True).stdout.strip()
-    record = {"profile": PROFILE, **selected, "codex_version": version,
+    record = {"profile": PROFILE, **selected, "codex_version": version, "audit_version": AUDIT_VERSION,
               "disabled_features": list(DISABLED_FEATURES), "settings": SETTINGS,
               "user_config": False, "user_rules": False, "shared_daemon": False, "private_home": True,
               "inherited_environment": "PATH, HOME, TMPDIR, LANG, LC_ALL, LC_CTYPE, USER, LOGNAME, SHELL, TZ",
@@ -279,7 +282,10 @@ def audit(path: Path, lab: Path, record: dict) -> dict:
                        "runs/labs", "/engine/slean", "import slean", ".lab/state", "~/", "$HOME", "${HOME}", "../"):
             if marker in text:
                 markers.add(marker)
+        non_paths = non_path_slashes(text) if name == "command_execution" else set()
         for match in re.finditer(r"(?<![\w./])(/[\w.~-]+(?:/[^\s'\";|&<>)]*)*)", text):
+            if match.start(1) in non_paths:
+                continue
             value = match.group(1)
             if value in ("/dev/null", "/bin/sh", "/bin/bash", "/usr/bin/python3") or text[max(0, match.start()-2):match.start()] == "./":
                 continue
